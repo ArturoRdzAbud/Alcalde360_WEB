@@ -8,7 +8,7 @@ export const Home = () => {
             <SideBarHeader titulo=''></SideBarHeader>
             <br /><br /><br /><br />
 
-            <h1>Bienvenido a Enlaces Soccer!</h1>
+            <h1>Bienvenido !</h1>
 
             
         </>
