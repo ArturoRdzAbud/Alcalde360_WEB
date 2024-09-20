@@ -14,6 +14,8 @@ import Login from './Login';
 
 import FrmArbitro from './FrmArbitro';
 import FrmUsuario from './FrmUsuario';
+import FrmConsultaIncidencia from './FrmConsultaIncidencia';
+import FrmPrueba from './FrmPrueba';
 
 import ProtectedRoute from './ProtectedRoute';
 import AccessDeniedPage from './AccessDeniedPage';
@@ -25,6 +27,7 @@ import HomeSvg from '../svg/icon-home.svg?react'
 import Arbitrosvg from '../svg/arbitro.svg?react'
 import Arbitros2vg from '../svg/arbitro.svg?react'
 import UsuarioSvg from '../svg/usuario.svg?react'
+import IconFlagvg from '../svg/icon-flag.svg?react'
 
 
 
@@ -47,7 +50,7 @@ export const SideBar = () => {
     };
 
 
-    
+
     const [isAdminOpen, setIsAdminOpen] = useState(false);
     const toggleAdmin = () => {
         setIsAdminOpen(!isAdminOpen);
@@ -143,7 +146,9 @@ export const SideBar = () => {
                                     {isAdminOpen ? '▾' : '▸'} Configuración</div><div style={separatorStyles}></div></>)}
                                 {isAdminOpen && (
                                     <div style={fontsize}>
-                                        {perfil >= 4 && <NavLink onClick={closeMenu} to='/Arbitros' className='nav-link' > <Arbitros2vg />{' Catálogo de Árbitros'} </NavLink>}
+                                        {perfil >= 4 && <NavLink onClick={closeMenu} to='/Arbitros' className='nav-link' > <Arbitros2vg />{'Catálogo de Árbitros'} </NavLink>}
+                                        {perfil >= 4 && <NavLink onClick={closeMenu} to='/ConsultarIncidencia' className='nav-link' > <IconFlagvg />{'Consulta de Incidencias'} </NavLink>}
+                                        {perfil >= 4 && <NavLink onClick={closeMenu} to='/Prueba' className='nav-link' > <IconFlagvg />{'Prueba'} </NavLink>}
                                     </div>
                                 )}
                             </div>
@@ -185,10 +190,12 @@ export const SideBar = () => {
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path="/access-denied" element={<AccessDeniedPage />} /></Route>
 
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/Arbitros' element={<FrmArbitro />} /></Route>
-                       
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/ConsultarIncidencia' element={<FrmConsultaIncidencia />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/Prueba' element={<FrmPrueba />} /></Route>
 
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmUsuario' element={<FrmUsuario />} /></Route>
-                        
+
+
                         {/* <ProtectedRoute path="/Liga" element={<CatLiga />} profile={perfil} requiredProfile={2}/> */}
                         {/* <Route path="/Liga" element={<ProtectedRoute profile={perfil} requiredProfile={2} />}/> */}
 

@@ -166,7 +166,7 @@ function SimpleTable({ data
                                         <td key={cell.id}>
                                             {
                                                 // let hasMeta = flexRender(cell.column.columnDef.cell, cell.getContext())
-                                                ((cell.column.id == "Nombre" || cell.column.id == "Descripcion")) ?    //VALIDA SI ES COLUMNA TIPO LINK
+                                                ((cell.column.id == "Nombre" || cell.column.id == "Descripcion" || cell.column.id == "Link")) ?    //VALIDA SI ES COLUMNA TIPO LINK
                                                     <a href="#" onClick={(e) => { e.preventDefault(); handleEdit(row, cell.column.id) }}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</a>
                                                     // : (cell.column.id == "Activo") ?
                                                     : (cell.column.id.endsWith("Chk")) ?
@@ -184,7 +184,7 @@ function SimpleTable({ data
                                                             <button type="button" className="btn btn-secondary" onClick={vuelveArriba}><Pagetop /></button>
                                                             : (cell.column.id.endsWith("EditTxt")) ?
                                                                 <input
-                                                                    style={{width:50}}//ancho de col
+                                                                    style={{ width: 50 }}//ancho de col
                                                                     min="0"//Solo Positivos
                                                                     type="number"//solo nums
                                                                     value={cell.renderValue().toString()}//trae el valor de BD
