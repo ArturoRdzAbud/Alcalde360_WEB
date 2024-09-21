@@ -34,7 +34,8 @@ export const SideBarHeader = ({ titulo = 'Encabezado', esConLogin = true }) => {
       <h4 className="text">{titulo}</h4>
       {/* <ElementoHeader titulo={titulo}></ElementoHeader> */}
 
-      {esConLogin == true &&
+      {/* {esConLogin == true && ocultar login temporalmente*/}
+      {esConLogin && 
         <div className="buttons">
           {perfil == 1 ?
             < button type="button" className="Xbtn btn-primary" onClick={aceptar} title="Login">Login</button>
