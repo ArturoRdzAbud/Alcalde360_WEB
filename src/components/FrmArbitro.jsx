@@ -8,6 +8,9 @@ import config from '../config'; // archivo configs globales del proy
 import { ElementoImagen } from './ElementoImagen'
 import { ElementoToastNotification } from './ElementoToastNotification';
 import { ElementoBotones } from './ElementoBotones'
+import { FcAlarmClock } from 'react-icons/fc';
+import { FaBeer } from "react-icons/fa";
+import { FaGrinAlt } from "react-icons/fa";
 
 export const FrmArbitro = () => {
     const [datosArbitro, setDatosArbitro] = useState([]);
@@ -427,6 +430,10 @@ export const FrmArbitro = () => {
         {!esEditar ?
           <>
             {/*<button type="button" className="btn btn-primary" onClick={nuevo}>Nuevo</button>*/}
+            <FcAlarmClock size={40} />
+            <FaBeer size={40} color='black'/>
+            <FaGrinAlt size={40} color='orange'/>
+            
             <ElementoCampo type='checkbox' lblCampo="Ver Inactivos:" claCampo="activo" nomCampo={esVerBaja} onInputChange={setEsVerBaja} />
             <ElementoCampo type="select" lblCampo="Liga: " claCampo="campo" nomCampo={ligaF} options={datosLiga} onInputChange={setLigaF} />
             {/*<p>Parrafo temporal para ver parametros del SP a Base de datos|@IdLiga={ligaF}|</p>*/}
