@@ -50,7 +50,7 @@ export const FrmConsultaIncidencia = (Route) => {
   const inicializaCampos = () => {
     //TODO LIMPIAR CADA FILTRO A SU VALOR INICIAL
     //setEsVerBaja(true)
-    setActivo(true)
+    //setActivo(true)
     setTipoF(-1)
     setAreaF(-1)
     setEstatusF(-1)
@@ -75,7 +75,7 @@ export const FrmConsultaIncidencia = (Route) => {
     inicializaCampos()
     setEsEditar(true)
     setEsNuevo(true)
-    setAccion(1)
+    //setAccion(1)
   };
 
   useEffect(() => {
@@ -226,7 +226,7 @@ export const FrmConsultaIncidencia = (Route) => {
 
   const handleEdit = (rowData) => {
     setEsEditar(true)
-    setAccion(0)//0 para MODIF 1 para nuevo
+    //setAccion(0)//0 para MODIF 1 para nuevo
     setIdAlcaldia(rowData.original.IdAlcaldia)
     setIdIncidencia(rowData.original.IdIncidencia)
     //console.log(idIncidencia)
