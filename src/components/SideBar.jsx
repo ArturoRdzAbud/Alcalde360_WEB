@@ -16,6 +16,7 @@ import FrmArbitro from './FrmArbitro';
 import FrmUsuario from './FrmUsuario';
 import FrmConsultaIncidencia from './FrmConsultaIncidencia';
 import FrmPrueba from './FrmPrueba';
+import FrmEncuesta from './FrmEncuesta';
 
 import ProtectedRoute from './ProtectedRoute';
 import AccessDeniedPage from './AccessDeniedPage';
@@ -56,9 +57,16 @@ export const SideBar = () => {
         setIsAdminOpen(!isAdminOpen);
     };
     const [isAccesosOpen, setIsAccesosOpen] = useState(false);
+    const [isEncuestaOpen, setIsEncuestaOpen] = useState(false);
     const toggleAccesos = () => {
         setIsAccesosOpen(!isAccesosOpen);
     };
+    const toggleEncuesta = () => {
+        setIsEncuestaOpen(!isEncuestaOpen);
+    };
+    // const toggleMenu = (setState,stateValue) => {
+    //     setState(!stateValue);
+    // };
     const fontsize = {
         fontSize: '14px' // Puedes ajustar este valor al tamaño que desees
     };
@@ -169,7 +177,16 @@ export const SideBar = () => {
                                             {isAccesosOpen ? '▾' : '▸'} Control de Accesos</div><div style={separatorStyles}></div>
                                         {isAccesosOpen && (
                                             <div style={fontsize}>
-                                                <NavLink onClick={closeMenu} to='/FrmUsuario' className='nav-link' > <JugadoresSvg />{' Registro de Usuarios'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/FrmUsuario' className='nav-link' >{' Registro de Usuarios'} </NavLink>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="menu-section" >
+                                        <div className="menu-section-title" onClick={toggleEncuesta} style={fontsizeH}>
+                                            {isEncuestaOpen ? '▾' : '▸'} Encuestas</div><div style={separatorStyles}></div>
+                                        {isEncuestaOpen && (
+                                            <div style={fontsize}>
+                                                <NavLink onClick={closeMenu} to='/FrmEncuesta' className='nav-link' >{' Captura Resultado'} </NavLink>
                                             </div>
                                         )}
                                     </div>
@@ -194,8 +211,7 @@ export const SideBar = () => {
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/Prueba' element={<FrmPrueba />} /></Route>
 
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmUsuario' element={<FrmUsuario />} /></Route>
-
-
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuesta' element={<FrmEncuesta />} /></Route>
                         {/* <ProtectedRoute path="/Liga" element={<CatLiga />} profile={perfil} requiredProfile={2}/> */}
                         {/* <Route path="/Liga" element={<ProtectedRoute profile={perfil} requiredProfile={2} />}/> */}
 
