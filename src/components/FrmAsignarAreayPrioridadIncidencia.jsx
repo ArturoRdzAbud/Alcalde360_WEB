@@ -118,7 +118,6 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
                         // Asegúrate de que response.data sea una cadena antes de asignarla
                         setAlertaMensaje(JSON.stringify(response.data));
                     } else {
-                        console.log(idAlcaldia, idIncidencia, idArea, idPrioridad, 'guardo correctamente');
                         inicializaCampos();
                         setEsEditar(false); // regresa al grid
                     }
