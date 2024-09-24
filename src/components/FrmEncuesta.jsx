@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import SimpleTable from './SimpleTable';
 import { ElementoCampo } from './ElementoCampo';
@@ -8,16 +8,19 @@ import { SideBarHeader } from './SideBarHeader';
 import config from '../config'; // archivo configs globales del proy
 import { useNavigate } from 'react-router-dom';
 import { ElementoToastNotification } from './ElementoToastNotification';
-
+import { PerfilContext } from './PerfilContext'; // Importa el contexto
 
 //TIP: TENER SIEMPRE PRENDIDO EL INSPECTOR WEB (CONSOLA) EN EL NAVEGADOR PARA VER TODOS LOS ERRORES EN VIVO 
 const FrmEncuesta = () => {
+  const { perfil, esConLicencia, idAlcaldia } = useContext(PerfilContext);
   const [datosEncuestaBD, setDatosEncuestaBD] = useState([]);
   const [datosEncuesta, setDatosEncuesta] = useState([]);
+  const [datosEncuestaPreguntaBD, setDatosEncuestaPreguntaBD] = useState([]);
+  const [datosEncuestaPregunta, setDatosEncuestaPregunta] = useState([]);
   //Filtros
   const [esVerBaja, setEsVerBaja] = useState(false);
   const [esVerCamposFiltro, setEsVerCamposFiltro] = useState(false);
-  
+
   //pais estado municipo
   const [datosP1, setDatosP1] = useState([]);
   const [datosP2, setDatosP2] = useState([]);
@@ -40,8 +43,13 @@ const FrmEncuesta = () => {
 
   //DatosPantalla
   const [activo, setActivo] = useState(false);
-  // const [claLiga, setClaLiga] = useState(-1);
-  // const [ligaNombre, setLigaNombre] = useState('');
+  const [claEncuesta, setClaEncuesta] = useState(-1);
+  const [claTipoEncuesta, setClaTipoEncuesta] = useState(1);
+  const [idIncidencia, setIdIncidencia] = useState(1);
+  const [v1, setV1] = useState(-1);
+  const [v2, setV2] = useState(-1);
+  const [v3, setV3] = useState(-1);
+  const [v4, setV4] = useState(-1);
   // const [ligaRepresentante, setLigaRepresentante] = useState('');
   // const [ligaTelefono, setLigaTelefono] = useState('');
   // const [ligaCorreo, setLigaCorreo] = useState('');
@@ -57,7 +65,7 @@ const FrmEncuesta = () => {
   const [alertaMensaje, setAlertaMensaje] = useState('');
 
   // const history = useHistory();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const onAceptar = () => {
     setEsMuestraCamposReq(false)
@@ -84,9 +92,10 @@ const FrmEncuesta = () => {
     e.preventDefault();
 
     const data = {
-      pnClaAlcaldia: claAlcaldia,
+      pnIdAlcaldia: idAlcaldia,
+      pnIdIncidencia: idIncidencia,
       pnClaEncuesta: claEncuesta,
-      pnClaTipoEncuesta: ClaTipoEncuesta,
+      pnClaTipoEncuesta: 1,
       psv1: v1,
       psv2: v2,
       psv3: v3,
@@ -97,12 +106,13 @@ const FrmEncuesta = () => {
     const apiReq = config.apiUrl + '/GuardarEncuesta';
     try {
 
-      if (ligaNombre.trim() === '') { setEsMuestraCamposReq(true); return }
-      if (!ligaPais > 0) { setEsMuestraCamposReq(true); return }
-      if (!ligaEstado > 0) { setEsMuestraCamposReq(true); return }
-      if (!ligaMunicipio > 0) { setEsMuestraCamposReq(true); return }
+      // if (ligaNombre.trim() === '') { setEsMuestraCamposReq(true); return }
+      if (!v1 > 0) { setEsMuestraCamposReq(true); return }
+      if (!v2 > 0) { setEsMuestraCamposReq(true); return }
+      if (!v3 > 0) { setEsMuestraCamposReq(true); return }
+      if (!v4 > 0) { setEsMuestraCamposReq(true); return }
 
-      console.log('Guardando Liga', data);
+      console.log('Guardando Encuesta', data);
       await axios.post(apiReq, { data }, { 'Access-Control-Allow-Origin': '*' })
         .then(response => {
           if (!response.data == '') {
@@ -123,7 +133,7 @@ const FrmEncuesta = () => {
 
 
     } catch (error) {
-      console.error('Error al guardar LIGA', error);
+      console.error('Error al guardar Encuesta', error);
     }
 
   };
@@ -133,17 +143,13 @@ const FrmEncuesta = () => {
     // console.log('Inicializa')
     setEsVerBaja(true)
     //Campos 
-    setLigaNombre('')
-    setLigaRepresentante('')
-    setLigaTelefono('')
-    setLigaCorreo('')
-
-    setLigaPais(1)
-    setLigaEstado(-1)
-    setLigaMunicipio(-1)
-
+    setClaEncuesta(1)
+    setV1(-1)
+    setV2(-1)
+    setV3(-1)
+    setV4(-1)
     //DatosPantalla
-    setClaLiga(-1)
+    setIdIncidencia(-1)
 
     setActivo(true)
     setAccion(0)
@@ -162,44 +168,51 @@ const FrmEncuesta = () => {
     setAccion(1)//0 para MODIF 1 para nuevo
   };
 
-  const handlePais = (value, claPais) => {//limpia combos hijo 
-    setLigaPaisF(value)
-    setLigaEstado(-1)
-    setLigaMunicipio(-1)
-  };
-  const handleEstado = (value, claEstado) => {//limpia combos hijo 
-    setLigaEstadoF(value)
-    setLigaMunicipio(-1)
-  };
-  const handleMunicipio = (value, claMunicipio) => {//limpia combos hijo 
-    setLigaMunicipioF(value)
-  };
+  //DEPENDENCIA DE COMBOS
+  // const handlePais = (value, claPais) => {//limpia combos hijo 
+  //   setLigaPaisF(value)
+  //   setLigaEstado(-1)
+  //   setLigaMunicipio(-1)
+  // };
+  // const handleEstado = (value, claEstado) => {//limpia combos hijo 
+  //   setLigaEstadoF(value)
+  //   setLigaMunicipio(-1)
+  // };
+  // const handleMunicipio = (value, claMunicipio) => {//limpia combos hijo 
+  //   setLigaMunicipioF(value)
+  // };
 
 
-  const filtraLocalCombo = (pais, estado) => {
-    console.log(pais)
+  // const filtraLocalCombo = (pais, estado) => {
+  //   // console.log(pais)
 
-    var datosFiltrados = datosEstadoBD
-    datosFiltrados = pais > 0 ? datosFiltrados.filter(item => item.IdPais == pais) : [];
-    // console.log(datosFiltrados)
-    setDatosEstado(datosFiltrados);
+  //   var datosFiltrados = datosEstadoBD
+  //   datosFiltrados = pais > 0 ? datosFiltrados.filter(item => item.IdPais == pais) : [];
+  //   // console.log(datosFiltrados)
+  //   setDatosEstado(datosFiltrados);
 
-    datosFiltrados = datosMunicipioBD
-    datosFiltrados = estado > 0 ? datosFiltrados.filter(item => item.IdPais == pais && item.IdEstados == estado) : [];
-    // console.log(datosFiltrados)
-    setDatosMunicipio(datosFiltrados);
-  }
+  //   datosFiltrados = datosMunicipioBD
+  //   datosFiltrados = estado > 0 ? datosFiltrados.filter(item => item.IdPais == pais && item.IdEstados == estado) : [];
+  //   // console.log(datosFiltrados)
+  //   setDatosMunicipio(datosFiltrados);
+  // }
   const filtraLocal = () => {
-    console.log('filtraLocal')
-    filtraLocalCombo(ligaPaisF, ligaEstadoF)//Asigna la Dependencia de combos 
-    var datosFiltrados = datosLigaBD
-    datosFiltrados = !esVerBaja ? datosLigaBD.filter(item => item.ActivoChk) : datosLigaBD;
-    datosFiltrados = claLiga > 0 ? datosFiltrados.filter(item => item.IdLiga == claLiga) : datosFiltrados;
-    datosFiltrados = ligaPaisF > 0 ? datosFiltrados.filter(item => item.IdPais == ligaPaisF) : datosFiltrados;
-    datosFiltrados = ligaEstadoF > 0 ? datosFiltrados.filter(item => item.IdEstado == ligaEstadoF) : datosFiltrados;
-    datosFiltrados = ligaMunicipioF > 0 ? datosFiltrados.filter(item => item.IdMunicipio == ligaMunicipioF) : datosFiltrados;
+    console.log('Filtra Local...')
+    // filtraLocalCombo(ligaPaisF, ligaEstadoF)//Asigna la Dependencia de combos 
+    var datosFiltrados = datosEncuestaBD
+    datosFiltrados = !esVerBaja ? datosEncuestaBD.filter(item => item.ActivoChk) : datosEncuestaBD;
+    datosFiltrados = idAlcaldia > 0 ? datosFiltrados.filter(item => item.idAlcaldia == idAlcaldia) : datosFiltrados;
+    // datosFiltrados = ligaPaisF > 0 ? datosFiltrados.filter(item => item.IdPais == ligaPaisF) : datosFiltrados;
+    // datosFiltrados = ligaEstadoF > 0 ? datosFiltrados.filter(item => item.IdEstado == ligaEstadoF) : datosFiltrados;
+    // datosFiltrados = ligaMunicipioF > 0 ? datosFiltrados.filter(item => item.IdMunicipio == ligaMunicipioF) : datosFiltrados;
+    setDatosEncuesta(datosFiltrados);
 
-    setDatosLiga(datosFiltrados);
+    datosFiltrados = datosEncuestaPreguntaBD
+    datosFiltrados = !esVerBaja ? datosEncuestaPreguntaBD.filter(item => item.ActivoChk) : datosFiltrados;
+    datosFiltrados = claTipoEncuesta > 0 ? datosEncuestaPreguntaBD.filter(item => item.claTipoEncuesta == 1) : datosFiltrados;
+    setDatosEncuestaPregunta(datosEncuestaPreguntaBD);
+
+    // console.log(datosEncuestaPreguntaBD)
   };
 
   //-------------------------------------------------------------------SECCION USE EFFFECT
@@ -240,120 +253,122 @@ const FrmEncuesta = () => {
 
   }, []);// se ejecuta 1 vez al inicio solamente
 
-  //Carga equipos desde BD
-
+  //Carga desde BD
   useEffect(() => {
     if (esEditar) return//sale si es modo edicion
-    var apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22BuscarEncuesta%22';
-    axios.get(apiUrl)
-      .then(response => {
-        // console.log('Carga equipos desde BD')
-        setDatosLigaBD(response.data);
-        // console.log(datosLigaBD)
-        // console.log(response.data)
-        // setDatosLiga(response.data);
-      })
-
-      // .then(() => {
-      //     filtraLocal()
-      // })
-
-      .catch(error => console.error('Error al obtener datos:', error))
-      .finally(() => {
-        inicializaCampos()
-      });
+    // console.log('Carga desde BD...')
 
 
+    const cargarDatos = async () => {
+      try {
+        console.log('Carga desde BD...');
+        let apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22BuscarEncuesta%22';
+        const responseEncuesta = await axios.get(apiUrl);
+        setDatosEncuestaBD(responseEncuesta.data);
 
+        apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22BuscarEncuestaPregunta%22';
+        const responsePregunta = await axios.get(apiUrl);
+        setDatosEncuestaPreguntaBD(responsePregunta.data);
+
+        inicializaCampos();
+      } catch (error) {
+        console.error('Error al obtener datos:', error);
+      }
+    };
+
+
+    // var apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22BuscarEncuesta%22';
+    // axios.get(apiUrl)
+    //   .then(response => {
+    //     setDatosEncuestaBD(response.data);
+    //   })
+    //   .catch(error => console.error('Error al obtener datos:', error))
+    //   .finally(() => {
+    //     inicializaCampos()
+    //   });
+    // apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22BuscarEncuestaPregunta%22';
+    // axios.get(apiUrl)
+    //   .then(response => {
+    //     setDatosEncuestaPreguntaBD(response.data);
+    //   })
+    //   .catch(error => console.error('Error al obtener datos:', error))
+    //   .finally(() => {
+    //     inicializaCampos()
+    //   });
+
+      cargarDatos();
   }, [esEditar]); // Se EJECUTA CUANDO CAMBIA la bandera esEditar
 
   useEffect(() => {
-    filtraLocalCombo(ligaPaisF, ligaEstadoF)
-  }, [ligaPaisF, ligaEstadoF, ligaMunicipioF]);//Se llama al modificar el combo liga modo edicion/nuevo
-  useEffect(() => {
-    filtraLocalCombo(ligaPais, ligaEstado)
-  }, [ligaPais, ligaEstado, ligaMunicipio]);//Se llama al modificar el combo liga modo edicion/nuevo
+    if (datosEncuestaPregunta.length > 0) {
+      // console.log('Datos de Encuesta Pregunta:', datosEncuestaPreguntaBD[0].NomPregunta);
+      console.log(datosEncuestaPregunta)
+    }
+  }, [datosEncuestaPregunta]);
+
+  // useEffect(() => {
+  //   filtraLocalCombo(ligaPaisF, ligaEstadoF)
+  // }, [ligaPaisF, ligaEstadoF, ligaMunicipioF]);//Se llama al modificar el combo liga modo edicion/nuevo
+  // useEffect(() => {
+  //   filtraLocalCombo(ligaPais, ligaEstado)
+  // }, [ligaPais, ligaEstado, ligaMunicipio]);//Se llama al modificar el combo liga modo edicion/nuevo
 
 
   useEffect(() => {
     filtraLocal()
-  }, [esVerBaja, ligaPaisF, ligaEstadoF, ligaMunicipioF, datosLigaBD]); //Se invoca al interactuar con los filtros arriba del grid
+  }, [esVerBaja]); //Se invoca al interactuar con los filtros arriba del grid
+  // }, [esVerBaja, ligaPaisF, ligaEstadoF, ligaMunicipioF, datosLigaBD]); //Se invoca al interactuar con los filtros arriba del grid
 
 
 
   const columns = [
     {
-      header: 'IdLiga',
-      accessorKey: 'IdLiga',
-      footer: 'IdLiga'
+      header: 'IdAlcaldia',
+      accessorKey: 'IdAlcaldia',
+      footer: 'IdAlcaldia'
       , visible: false
     },
     {
       header: 'Nombre',
-      accessorKey: 'Nombre',
-      footer: 'Nombre'
+      accessorKey: 'IdIncidencia',
+      footer: ''
       , visible: true
     },
     {
-      header: 'Representante',
-      accessorKey: 'Representante',
-      footer: 'Representante'
+      header: 'Id Encuesta',
+      accessorKey: 'ClaEncuesta',
+      footer: ''
       , visible: true
     },
     {
-      header: 'Telefono',
-      accessorKey: 'Telefono',
-      footer: 'Telefono'
+      header: 'Tipo Encuesta',
+      accessorKey: 'ClaTipoEncuesta',
+      footer: ''
       , visible: true
     },
     {
-      header: 'Correo',
-      accessorKey: 'Correo',
-      footer: 'Correo'
+      header: 'valor1',
+      accessorKey: 'valor1',
+      footer: ''
       , visible: true
     },
     {
-      header: 'País',
-      accessorKey: 'Pais',
-      footer: 'País'
-      , visible: esVerCamposFiltro
-    },
-    {
-      header: 'Estado',
-      accessorKey: 'Estado',
-      footer: 'Estado'
-      , visible: esVerCamposFiltro
-    },
-    {
-      header: 'Municipio',
-      accessorKey: 'Municipio',
-      footer: 'Municipio'
-      , visible: esVerCamposFiltro
-    },
-
-    {
-      header: 'Activo',
-      accessorKey: 'ActivoChk',
-      footer: 'Activo'
+      header: 'valor2',
+      accessorKey: 'valor2',
+      footer: ''
       , visible: true
     },
     {
-      header: 'idPais',
-      accessorKey: 'idPais',
-      footer: 'idPais'
-      , visible: false
+      header: 'valor3',
+      accessorKey: 'valor3',
+      footer: ''
+      , visible: true
     },
     {
-      header: 'IdEstado',
-      accessorKey: 'IdEstado',
-      footer: 'IdEstado'
-      , visible: false
-    },
-    {
-      header: 'IdMunicipio',
-      accessorKey: 'IdMunicipio',
-      footer: 'IdMunicipio'
-      , visible: false
+      header: 'valor4',
+      accessorKey: 'valor4',
+      footer: ''
+      , visible: true
     }
   ];
 
@@ -363,21 +378,20 @@ const FrmEncuesta = () => {
     // console.log(cellId)
     setEsEditar(true)
 
-    setClaLiga(rowData.original.IdLiga)
-    setLigaNombre(rowData.original.Nombre)
-    setLigaRepresentante(rowData.original.Representante)
-    setLigaTelefono(rowData.original.Telefono)
-    setLigaCorreo(rowData.original.Correo)
-    setLigaPais(rowData.original.IdPais)
-    setLigaEstado(rowData.original.IdEstado)
-    setLigaMunicipio(rowData.original.IdMunicipio)
+    setIdIncidencia(rowData.original.idIncidencia)
+    setClaEncuesta(rowData.original.claEncuesta)
+    setClaTipoEncuesta(rowData.original.claTipoEncuesta)
+    setV1(rowData.original.v1)
+    setV2(rowData.original.v2)
+    setV3(rowData.original.v3)
+    setV4(rowData.original.v4)
     if (rowData.original.ActivoChk == false) { setActivo(false) } else { setActivo(true) }
     setAccion(0)//0 para MODIF 1 para nuevo
   }
 
   return (
     <>
-      <SideBarHeader titulo={esNuevo ? ('Nueva Liga') : esEditar ? 'Edita Liga' : 'Ligas'}></SideBarHeader>
+      <SideBarHeader titulo={esNuevo ? ('Nueva Encuesta') : esEditar ? 'Edita Encuesta' : 'Encuesta de Satisfacción Ciudadana'}></SideBarHeader>
       <br /><br /><br /><br />
 
       <div>
@@ -386,7 +400,7 @@ const FrmEncuesta = () => {
             <ElementoCampo type='checkbox' lblCampo="Ver filtros en Tabla:" claCampo="activo" nomCampo={esVerCamposFiltro} onInputChange={setEsVerCamposFiltro} />
             <ElementoCampo type='checkbox' lblCampo="Ver Inactivos :" claCampo="activo" nomCampo={esVerBaja} onInputChange={setEsVerBaja} />
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ flexGrow: 1 }}>
                 <ElementoCampo type="select" lblCampo="País: " claCampo="campo" nomCampo={ligaPaisF} options={datosPais} onInputChange={(value) => handlePais(value, ligaPaisF)} />
               </span>
@@ -396,21 +410,21 @@ const FrmEncuesta = () => {
               <span style={{ flexGrow: 1 }}>
                 <ElementoCampo type="select" lblCampo="Estado: " claCampo="campo" nomCampo={ligaEstadoF} options={datosEstado} onInputChange={(value) => handleEstado(value, ligaEstadoF)} />
               </span>
-            </div>
+            </div> 
             <ElementoCampo type="select" lblCampo="Municipio: " claCampo="campo" nomCampo={ligaMunicipioF} options={datosMunicipio} onInputChange={(value) => handleMunicipio(value, ligaMunicipioF)} />
-
-            <SimpleTable data={datosLiga} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} />
+            */}
+            <SimpleTable data={datosEncuesta} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} />
           </>
           ://----------------------------MODO EDICION/NUEVO REGISTRO
           <div>
-            <form onSubmit={guardarLiga}>
+            <form onSubmit={guardarEncuesta}>
               <br />
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <ElementoBotones cancelar={cancelar}></ElementoBotones>
               </div>
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ flexGrow: 1 }}>
+                  {/* <span style={{ flexGrow: 1 }}>
                     <ElementoCampo type='text' lblCampo="Nombre* :" claCampo="nombre" onInputChange={setLigaNombre} nomCampo={ligaNombre} tamanioString="100" />
                     <ElementoCampo type='text' lblCampo="Representante :" claCampo="nombre" onInputChange={setLigaRepresentante} nomCampo={ligaRepresentante} tamanioString="100" />
                     <ElementoCampo type='tel' lblCampo="Telefono :" claCampo="nombre" onInputChange={setLigaTelefono} nomCampo={ligaTelefono} tamanioString="100" />
@@ -423,7 +437,14 @@ const FrmEncuesta = () => {
                     <ElementoCampo type="select" lblCampo="País*: " claCampo="campo" nomCampo={ligaPais} options={datosPais} onInputChange={setLigaPais} />
                     <ElementoCampo type="select" lblCampo="Estado*: " claCampo="campo" nomCampo={ligaEstado} options={datosEstado} onInputChange={setLigaEstado} />
                     <ElementoCampo type="select" lblCampo="Municipio*: " claCampo="campo" nomCampo={ligaMunicipio} options={datosMunicipio} onInputChange={setLigaMunicipio} />
-                  </span>
+                  </span> */}
+
+                  {/* <ElementoCampo type="select" lblCampo={""+datosEncuestaPreguntaBD[0].NomPregunta+"*:"} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} /> */}
+                  <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[0].NomPregunta}*:`} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} />
+                  <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[1].NomPregunta}*:`} claCampo="campo" nomCampo={v2} options={datosP2} onInputChange={setV2} />
+                  <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[2].NomPregunta}*:`} claCampo="campo" nomCampo={v3} options={datosP3} onInputChange={setV3} />
+                  <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[3].NomPregunta}*:`} claCampo="campo" nomCampo={v4} options={datosP4} onInputChange={setV4} />
+
                 </div>
 
                 <ElementoCampo type='checkbox' lblCampo="Activo :" claCampo="activo" nomCampo={activo} onInputChange={setActivo} />
