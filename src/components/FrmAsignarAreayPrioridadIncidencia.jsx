@@ -118,9 +118,10 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
                         // Asegúrate de que response.data sea una cadena antes de asignarla
                         setAlertaMensaje(JSON.stringify(response.data));
                     } else {
-                        console.log(idAlcaldia, idIncidencia, idArea, idPrioridad, 'guardo correctamente');
-                        inicializaCampos();
-                        setEsEditar(false); // regresa al grid
+                        console.log('guardo correctamente')      
+                        setEsFin(true);
+                        //inicializaCampos();
+                        //setEsEditar(false); // regresa al grid
                     }
                 })
                 .catch(error => {
@@ -165,15 +166,11 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
                     onAceptar={onAceptar}
                 ></AlertaEmergente>
             }
-            {esFin &&
-                <AlertaEmergente
-                    titulo={'Alerta'}
-                    mensaje={'Los datos fueron guardados correctamente.'}
-                    mostrarBotonAceptar={true}
-                    mostrarBotonCancelar={false}
-                    onAceptar={onAceptar}
-                ></AlertaEmergente>
-                // : <p></p>
+           {esFin &&
+                    <ElementoToastNotification
+                        mensaje={'Los datos fueron guardados correctamente.'}
+                        onAceptar={onAceptar}
+                    ></ElementoToastNotification>
             }
             {alertaMensaje &&
                 <ElementoToastNotification
