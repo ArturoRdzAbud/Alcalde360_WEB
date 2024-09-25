@@ -15,6 +15,7 @@ import Login from './Login';
 import FrmArbitro from './FrmArbitro';
 import FrmUsuario from './FrmUsuario';
 import FrmConsultaIncidencia from './FrmConsultaIncidencia';
+import FrmReporteIncidencia from './FrmReporteIncidencia';
 import FrmPrueba from './FrmPrueba';
 import FrmEncuesta from './FrmEncuesta';
 
@@ -158,6 +159,7 @@ export const SideBar = () => {
                                     <div style={fontsize}>
                                         {perfil >= 4 && <NavLink onClick={closeMenu} to='/Arbitros' className='nav-link' > <Arbitros2vg />{'Catálogo de Árbitros'} </NavLink>}
                                         {perfil >= 4 && <NavLink onClick={closeMenu} to='/ConsultarIncidencia' className='nav-link' > <IconFlagvg />{'Consulta de Incidencias'} </NavLink>}
+                                        {perfil >= 4 && <NavLink onClick={closeMenu} to='/ReporteIncidencia' className='nav-link' > <IconFlagvg />{'Reporte de Incidencia'} </NavLink>}
                                         {perfil >= 4 && <NavLink onClick={closeMenu} to='/Prueba' className='nav-link' > <IconFlagvg />{'Prueba'} </NavLink>}
                                         {/*llamada temporal a pantalla asignar área y prioridad de incidencia (eliminar cuando se vaya a integrar)*/}
                                         {perfil >= 4 && <NavLink onClick={closeMenu} to='/AsignarAreayPrioridadIncidencia' className='nav-link' > <IconFlagvg />{'Asignar Área y Prioridad de la Incidencia'} </NavLink>}
@@ -213,6 +215,7 @@ export const SideBar = () => {
 
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/Arbitros' element={<FrmArbitro />} /></Route>
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/ConsultarIncidencia' element={<FrmConsultaIncidencia />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/ReporteIncidencia' element={<FrmReporteIncidencia />} /></Route>
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/Prueba' element={<FrmPrueba />} /></Route>
                         {/*llamada temporal a pantalla asignar área y prioridad de incidencia (eliminar cuando se vaya a integrar)*/}
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/AsignarAreayPrioridadIncidencia' element={<FrmAsignarAreayPrioridadIncidencia />} /></Route>

@@ -9,7 +9,7 @@ export const PerfilProvider = ({ children }) => {
   const [perfil, setPerfil] = useState(4);//devteam temporalmente default seras admin
   const [esConLicencia, setEsConLicencia] = useState(0);
   const [nombreUsuario, setNombreUsuario] = useState('');
-  const [idAlcaldia, setIdAlcaldia] = useState(0);
+  const [idAlcaldia, setIdAlcaldia] = useState(1);
   const [nomAlcaldia, setNomAlcaldia] = useState('');
 
   return (
