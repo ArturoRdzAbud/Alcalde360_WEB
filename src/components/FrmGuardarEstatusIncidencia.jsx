@@ -22,7 +22,7 @@ const FrmGuardarEstatusIncidencia = () => {
     //Parametros recibidos desde form Consultar Incidencia
     const location = useLocation();
     const dataParams = location.state;
-    //------------------------------
+    //---------------------------------------------------
 
     const { perfil, esConLicencia } = useContext(PerfilContext);
 
