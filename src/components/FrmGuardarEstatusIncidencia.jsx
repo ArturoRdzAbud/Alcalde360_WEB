@@ -25,12 +25,9 @@ const FrmGuardarEstatusIncidencia = () => {
     //------------------------------
 
     const { perfil, esConLicencia } = useContext(PerfilContext);
-    //const [datosUsuarioBd, setdatosUsuarioBd] = useState([]);
-    //const [datosUsuario, setdatosUsuario] = useState([]);
-    const [datosEstatus, setDatosEstatus] = useState([]);
 
     //combo
-    //const [dataPerfil, setDatosPerfil] = useState([]);
+    const [datosEstatus, setDatosEstatus] = useState([]);
 
     const [esNuevo, setEsNuevo] = useState(false);
     const [esEditar, setEsEditar] = useState(false);
@@ -45,6 +42,7 @@ const FrmGuardarEstatusIncidencia = () => {
     const [FechaReporte, setFechaReporte] =  useState(new Date());
     const [idUsuario, setIdUsuario] = useState(0);
 
+    //parametros enviados desde frmconsultaincidencia
     if (dataParams != null) {
         if (dataParams.idAlcaldia != null) {setIdAlcaldia(dataParams.idAlcaldia); }
         if (dataParams.idIncidencia != null) {setIdIncidencia(dataParams.idIncidencia); }
@@ -58,9 +56,7 @@ const FrmGuardarEstatusIncidencia = () => {
     }
 
     const [activo, setActivo] = useState(false);
-    //const [idPerfil, setIdPerfil] = useState(0);
     const [accion, setAccion] = useState(0);
-    //const [esNoCoinciden, setEsNoCoinciden] = useState(false);
     const [alertaMensaje, setAlertaMensaje] = useState('');
 
     const [esMuestraCamposReq, setEsMuestraCamposReq] = useState(false);
@@ -101,7 +97,7 @@ const FrmGuardarEstatusIncidencia = () => {
     }
 
     const inicializaCampos = () => {
-        //setEsVerBaja(true)
+
         setActivo(true)
 
         //Campos 
@@ -110,6 +106,7 @@ const FrmGuardarEstatusIncidencia = () => {
         setIdEstatus(0);
         setFechaEstimada(new Date());
         
+        //para que no la fecha no le reste un dia por problemas de zona horaria
         if (!FechaEstimada==null) {
              FechaEstimada.setMinutes(FechaEstimada.getMinutes() + FechaEstimada.getTimezoneOffset())
         }
