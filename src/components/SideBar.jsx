@@ -17,6 +17,7 @@ import FrmUsuario from './FrmUsuario';
 import FrmConsultaIncidencia from './FrmConsultaIncidencia';
 import FrmPrueba from './FrmPrueba';
 import FrmEncuesta from './FrmEncuesta';
+import FrmEncuestaIntermedia from './FrmEncuestaIntermedia';
 
 import ProtectedRoute from './ProtectedRoute';
 import AccessDeniedPage from './AccessDeniedPage';
@@ -60,12 +61,14 @@ export const SideBar = () => {
     };
     const [isAccesosOpen, setIsAccesosOpen] = useState(false);
     const [isEncuestaOpen, setIsEncuestaOpen] = useState(false);
+    const [isEncuestaIntermediaOpen, setIsEncuestaIntermediaOpen] = useState(false);
     const toggleAccesos = () => {
         setIsAccesosOpen(!isAccesosOpen);
     };
     const toggleEncuesta = () => {
         setIsEncuestaOpen(!isEncuestaOpen);
     };
+    
     // const toggleMenu = (setState,stateValue) => {
     //     setState(!stateValue);
     // };
@@ -191,7 +194,8 @@ export const SideBar = () => {
                                             {isEncuestaOpen ? '▾' : '▸'} Encuestas</div><div style={separatorStyles}></div>
                                         {isEncuestaOpen && (
                                             <div style={fontsize}>
-                                                <NavLink onClick={closeMenu} to='/FrmEncuesta' className='nav-link' >{' Captura Resultado'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/FrmEncuestaIntermedia' className='nav-link' >{' Intermedia'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/FrmEncuesta' className='nav-link' >{' Clausura'} </NavLink>
                                             </div>
                                         )}
                                     </div>
@@ -219,6 +223,7 @@ export const SideBar = () => {
 
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmUsuario' element={<FrmUsuario />} /></Route>
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuesta' element={<FrmEncuesta />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuestaIntermedia' element={<FrmEncuestaIntermedia />} /></Route>
                         {/* <ProtectedRoute path="/Liga" element={<CatLiga />} profile={perfil} requiredProfile={2}/> */}
                         {/* <Route path="/Liga" element={<ProtectedRoute profile={perfil} requiredProfile={2} />}/> */}
 

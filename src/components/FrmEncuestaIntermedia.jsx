@@ -11,7 +11,7 @@ import { ElementoToastNotification } from './ElementoToastNotification';
 import { PerfilContext } from './PerfilContext'; // Importa el contexto
 
 //TIP: TENER SIEMPRE PRENDIDO EL INSPECTOR WEB (CONSOLA) EN EL NAVEGADOR PARA VER TODOS LOS ERRORES EN VIVO 
-const FrmEncuesta = () => {
+const FrmEncuestaIntermedia = () => {
   const { perfil, esConLicencia, idAlcaldia } = useContext(PerfilContext);
   const [datosEncuestaBD, setDatosEncuestaBD] = useState([]);
   const [datosEncuesta, setDatosEncuesta] = useState([]);
@@ -44,7 +44,7 @@ const FrmEncuesta = () => {
   //DatosPantalla
   const [activo, setActivo] = useState(false);
   const [claEncuesta, setClaEncuesta] = useState(-1);
-  const [claTipoEncuesta, setClaTipoEncuesta] = useState(1);
+  const [claTipoEncuesta, setClaTipoEncuesta] = useState(2);
   const [idIncidencia, setIdIncidencia] = useState(1);
   const [v1, setV1] = useState(-1);
   const [v2, setV2] = useState(-1);
@@ -122,7 +122,7 @@ const FrmEncuesta = () => {
           if (!response.data == '') {
             console.log('REGRESA ERROR:')
             if (response.data.originalError === undefined) {
-              console.log(response.data)
+            //   console.log(response.data)
               setAlertaMensaje(response.data)
             }
             else {
@@ -205,26 +205,24 @@ const FrmEncuesta = () => {
     console.log('Filtra Local...')
     // filtraLocalCombo(ligaPaisF, ligaEstadoF)//Asigna la Dependencia de combos 
     var datosFiltrados = datosEncuestaBD
-      console.log(datosEncuestaBD)
+ 
 
     datosFiltrados = !esVerBaja ? datosFiltrados.filter(item => item.ActivoChk) : datosFiltrados;
     datosFiltrados = idAlcaldia > 0 ? datosFiltrados.filter(item => item.IdAlcaldia == idAlcaldia) : datosFiltrados;
     datosFiltrados = claTipoEncuesta > 0 ? datosFiltrados.filter(item => item.ClaTipoEncuesta == claTipoEncuesta) : datosFiltrados;
-    // datosFiltrados = ligaPaisF > 0 ? datosFiltrados.filter(item => item.IdPais == ligaPaisF) : datosFiltrados;
-    // datosFiltrados = ligaEstadoF > 0 ? datosFiltrados.filter(item => item.IdEstado == ligaEstadoF) : datosFiltrados;
-    // datosFiltrados = ligaMunicipioF > 0 ? datosFiltrados.filter(item => item.IdMunicipio == ligaMunicipioF) : datosFiltrados;
     setDatosEncuesta(datosFiltrados);
 
     datosFiltrados = datosEncuestaPreguntaBD
-    datosFiltrados = !esVerBaja ? datosEncuestaPreguntaBD.filter(item => item.ActivoChk) : datosFiltrados;
-    datosFiltrados = claTipoEncuesta > 0 ? datosEncuestaPreguntaBD.filter(item => item.claTipoEncuesta == 1) : datosFiltrados;
-    setDatosEncuestaPregunta(datosEncuestaPreguntaBD);
+    datosFiltrados = !esVerBaja ? datosFiltrados.filter(item => item.ActivoChk) : datosFiltrados;
+    datosFiltrados = claTipoEncuesta > 0 ? datosFiltrados.filter(item => item.ClaTipoEncuesta == claTipoEncuesta) : datosFiltrados;
+    setDatosEncuestaPregunta(datosFiltrados);
+    // console.log(datosFiltrados)
   };
 
   //-------------------------------------------------------------------SECCION USE EFFFECT
   // llena arreglos de combos
   useEffect(() => {
-    var apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta1Cmb%22';
+    var apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta5Cmb%22';
     axios.get(apiUrl)
       .then(response => {
         setDatosP1(response.data)
@@ -232,7 +230,7 @@ const FrmEncuesta = () => {
       )
       .catch(error => console.error('Error al obtener P1', error));
 
-    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta2Cmb%22';
+    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta62Cmb%22';
     axios.get(apiUrl)
       .then(response => {
         setDatosP2(response.data)
@@ -240,7 +238,7 @@ const FrmEncuesta = () => {
       )
       .catch(error => console.error('Error al obtener P2', error));
 
-    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta3Cmb%22';
+    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta7Cmb%22';
     axios.get(apiUrl)
       .then(response => {
         setDatosP3(response.data)
@@ -248,7 +246,7 @@ const FrmEncuesta = () => {
       )
       .catch(error => console.error('Error al obtener P3', error));
 
-    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta4Cmb%22';
+    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta8Cmb%22';
     axios.get(apiUrl)
       .then(response => {
         setDatosP4(response.data)
@@ -283,42 +281,8 @@ const FrmEncuesta = () => {
       }
     };
 
-
-    // var apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22BuscarEncuesta%22';
-    // axios.get(apiUrl)
-    //   .then(response => {
-    //     setDatosEncuestaBD(response.data);
-    //   })
-    //   .catch(error => console.error('Error al obtener datos:', error))
-    //   .finally(() => {
-    //     inicializaCampos()
-    //   });
-    // apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22BuscarEncuestaPregunta%22';
-    // axios.get(apiUrl)
-    //   .then(response => {
-    //     setDatosEncuestaPreguntaBD(response.data);
-    //   })
-    //   .catch(error => console.error('Error al obtener datos:', error))
-    //   .finally(() => {
-    //     inicializaCampos()
-    //   });
-
     cargarDatos();
   }, [esEditar]); // Se EJECUTA CUANDO CAMBIA la bandera esEditar
-
-  // useEffect(() => {
-  //   if (datosEncuestaPregunta.length > 0) {
-  //     // console.log('Datos de Encuesta Pregunta:', datosEncuestaPreguntaBD[0].NomPregunta);
-  //     console.log(datosEncuestaPregunta)
-  //   }
-  // }, [datosEncuestaPregunta]);
-
-  // useEffect(() => {
-  //   filtraLocalCombo(ligaPaisF, ligaEstadoF)
-  // }, [ligaPaisF, ligaEstadoF, ligaMunicipioF]);//Se llama al modificar el combo liga modo edicion/nuevo
-  // useEffect(() => {
-  //   filtraLocalCombo(ligaPais, ligaEstado)
-  // }, [ligaPais, ligaEstado, ligaMunicipio]);//Se llama al modificar el combo liga modo edicion/nuevo
 
 
   useEffect(() => {
@@ -540,4 +504,4 @@ const FrmEncuesta = () => {
   );
 };
 
-export default FrmEncuesta;
+export default FrmEncuestaIntermedia;
