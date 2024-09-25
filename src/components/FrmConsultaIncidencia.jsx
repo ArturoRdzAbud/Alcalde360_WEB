@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import SimpleTable from './SimpleTable';
 import { ElementoCampo } from './ElementoCampo';
@@ -9,8 +9,9 @@ import { ElementoImagen } from './ElementoImagen'
 import { ElementoToastNotification } from './ElementoToastNotification';
 import { ElementoBotones } from './ElementoBotones'
 import { useNavigate } from "react-router-dom";
+import { PerfilContext } from './PerfilContext'; // Importa el contexto
 
-export const FrmConsultaIncidencia = (Route) => {
+export const FrmConsultaIncidencia = () => {
   const [datosIncidencia, setDatosIncidencia] = useState([]);
   const [datosIncidenciaBd, setDatosIncidenciaBd] = useState([]);
 
@@ -28,6 +29,7 @@ export const FrmConsultaIncidencia = (Route) => {
   const [inicioF, setInicioF] = useState();
   const [finF, setFinF] = useState();
   const navigate = useNavigate();
+  const today = new Date();
 
   const [esEditar, setEsEditar] = useState(false);
   const [esNuevo, setEsNuevo] = useState(false);
@@ -35,7 +37,8 @@ export const FrmConsultaIncidencia = (Route) => {
 
 
   //datos de registro
-  const [idAlcaldia, setIdAlcaldia] = useState(1);
+  const { idAlcaldia } = useContext(PerfilContext);
+  //const [idAlcaldia, setIdAlcaldia] = useState(1);
   const [idIncidencia, setIdIncidencia] = useState(0);
 
   const [esMuestraCamposReq, setEsMuestraCamposReq] = useState(false);
@@ -55,7 +58,8 @@ export const FrmConsultaIncidencia = (Route) => {
     setAreaF(-1)
     setEstatusF(-1)
     setColoniaF(-1)
-    setIdAlcaldia(1)
+    //setIdAlcaldia(1)
+    setInicioF(null)
     //console.log({ idAlcaldia })
     /*
 
@@ -124,7 +128,7 @@ export const FrmConsultaIncidencia = (Route) => {
       .catch(error => console.error('Error al obtener datos:', error))
       .finally(() => {
         inicializaCampos()
-        console.log('Datos Incidencia:', datosIncidencia)
+        //console.log('Datos Incidencia:', datosIncidencia)
       });
   }, [esEditar]);  // useEffect se ejecuta cuando se modifica la propiedad esEditar
 
@@ -137,11 +141,17 @@ export const FrmConsultaIncidencia = (Route) => {
     //datosFiltrados = !esVerBaja ? datosIncidenciaBd.filter(item => item.ActivoChk) : datosIncidenciaBd;
     datosFiltrados = idAlcaldia > 0 ? datosFiltrados.filter(item => item.IdAlcaldia == idAlcaldia) : datosFiltrados;
     datosFiltrados = tipoF > 0 ? datosFiltrados.filter(item => item.IdTipoIncidencia == tipoF) : datosFiltrados;
+    datosFiltrados = coloniaF > 0 ? datosFiltrados.filter(item => item.IdColonia == coloniaF) : datosFiltrados;
     datosFiltrados = areaF > 0 ? datosFiltrados.filter(item => item.IdArea == areaF) : datosFiltrados;
     datosFiltrados = estatusF > 0 ? datosFiltrados.filter(item => item.IdEstatusIncidencia == estatusF) : datosFiltrados;
     datosFiltrados = nombreF != '' ? datosFiltrados.filter(item => item.Nombre == nombreF) : datosFiltrados;
     //datosFiltrados = nombreF != '' ? datosFiltrados.filter(item => item.Nombre.slice(0, nombreF.length).toLowerCase() === nombreF.toLowerCase()) : datosFiltrados;
     //datosFiltrados = nombreF != '' ? datosFiltrados.filter(item => item.Nombre.toLowerCase().includes(nombreF.toLowerCase())) : datosFiltrados;
+    if (inicioF != null && finF != null && finF < inicioF) {
+      setAlertaMensaje('El periodo final no debe ser menor al periodo inicial ')
+      //setFinF(inicioF)
+
+    };
     datosFiltrados = inicioF != null ? datosFiltrados.filter(item => item.FechaReporte >= inicioF) : datosFiltrados;
     datosFiltrados = finF != null ? datosFiltrados.filter(item => item.FechaReporte <= finF) : datosFiltrados;
 
@@ -150,7 +160,7 @@ export const FrmConsultaIncidencia = (Route) => {
 
   useEffect(() => {
     filtraLocal()
-  }, [tipoF, idAlcaldia, estatusF, nombreF, areaF, inicioF, finF]); //Se invoca al interactuar con los filtros arriba del grid
+  }, [tipoF, idAlcaldia, estatusF, nombreF, areaF, inicioF, finF, coloniaF]); //Se invoca al interactuar con los filtros arriba del grid
 
 
   const columns = [
@@ -158,7 +168,7 @@ export const FrmConsultaIncidencia = (Route) => {
       header: 'IdAlcaldia',
       accessorKey: 'IdAlcaldia',
       footer: 'IdAlcaldia'
-      , visible: true
+      , visible: false
     },
     {
       header: 'Folio',
@@ -169,6 +179,12 @@ export const FrmConsultaIncidencia = (Route) => {
     {
       header: 'Tipo',
       accessorKey: 'IdTipoIncidencia',
+      footer: 'Tipo'
+      , visible: false
+    },
+    {
+      header: 'Tipo',
+      accessorKey: 'TipoIncidencia',
       footer: 'Tipo'
       , visible: true
     },
@@ -195,6 +211,24 @@ export const FrmConsultaIncidencia = (Route) => {
       accessorKey: 'Correo',
       footer: 'Correo'
       , visible: true
+    },
+    {
+      header: 'Colonia',
+      accessorKey: 'IdColonia',
+      footer: 'Colonia'
+      , visible: true
+    },
+    {
+      header: 'Area',
+      accessorKey: 'IdArea',
+      footer: 'Area'
+      , visible: false
+    },
+    {
+      header: 'IdPrioridadIncidencia',
+      accessorKey: 'IdPrioridadIncidencia',
+      footer: 'IdPrioridadIncidencia'
+      , visible: false
     },
     {
       header: 'Fecha',
@@ -227,7 +261,7 @@ export const FrmConsultaIncidencia = (Route) => {
   const handleEdit = (rowData) => {
     setEsEditar(true)
     //setAccion(0)//0 para MODIF 1 para nuevo
-    setIdAlcaldia(rowData.original.IdAlcaldia)
+    //setIdAlcaldia(rowData.original.IdAlcaldia)
     setIdIncidencia(rowData.original.IdIncidencia)
     //console.log(idIncidencia)
     //console.log('IdBuena:', rowData.original.IdIncidencia)
@@ -235,10 +269,11 @@ export const FrmConsultaIncidencia = (Route) => {
     const data = {
       idAlcaldia: rowData.original.IdAlcaldia,
       idIncidencia: rowData.original.IdIncidencia,
-      descripcion: rowData.original.Descripcion1
+      idArea: rowData.original.IdArea,
+      idPrioridadIncidencia: rowData.original.IdPrioridadIncidencia
     };
 
-    navigate("/Prueba", { state: data });
+    navigate("/AsignarAreayPrioridadIncidencia", { state: data });
 
   };
 
@@ -268,7 +303,7 @@ export const FrmConsultaIncidencia = (Route) => {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ flexGrow: 2 }}>
+          <span style={{ flexGrow: 1 }}>
 
             <ElementoCampo type="select" lblCampo="Colonia: " claCampo="campo" nomCampo={coloniaF} options={datosColonia} onInputChange={setColoniaF} />
 
@@ -300,7 +335,7 @@ export const FrmConsultaIncidencia = (Route) => {
         </div>
 
 
-        <p>Parrafo temporal para ver parametros|@Alcaldia={idAlcaldia}|@Incidencia={idIncidencia}|@Tipo={tipoF}|@Area={areaF}|@Inicio={inicioF}|@Fin={finF}|</p>
+        <p>Parrafo temporal para ver parametros|@Alcaldia={idAlcaldia}|@Incidencia={idIncidencia}|@Tipo={tipoF}|@Area={areaF}|@Inicio={inicioF}|@Fin={finF}|@Colonia={coloniaF}</p>
         <SimpleTable data={datosIncidencia} columns={columns} esOcultaBotonNuevo={true} handleEdit={handleEdit} />
         {/* <SimpleTable data={datosIncidencia} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} /> */}
 
@@ -371,7 +406,7 @@ export const FrmConsultaIncidencia = (Route) => {
       {alertaMensaje &&
         <ElementoToastNotification
           mensaje={alertaMensaje}
-          onAceptar={onAceptarC}
+          onAceptar={onAceptar}
         ></ElementoToastNotification>
       }
     </div>

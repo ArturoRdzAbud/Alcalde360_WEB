@@ -13,13 +13,13 @@ export const PerfilProvider = ({ children }) => {
   const [nomAlcaldia, setNomAlcaldia] = useState('');
 
   return (
-    <PerfilContext.Provider value={{ 
-             perfil, setPerfil
-            ,esConLicencia, setEsConLicencia
-            ,nombreUsuario,setNombreUsuario
-            ,idAlcaldia,setIdAlcaldia
-            ,nomAlcaldia,setNomAlcaldia
-            }}>
+    <PerfilContext.Provider value={{
+      perfil, setPerfil
+      , esConLicencia, setEsConLicencia
+      , nombreUsuario, setNombreUsuario
+      , idAlcaldia, setIdAlcaldia
+      , nomAlcaldia, setNomAlcaldia
+    }}>
       {children}
     </PerfilContext.Provider>
   );

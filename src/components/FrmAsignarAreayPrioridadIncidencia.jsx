@@ -13,12 +13,15 @@ import { ElementoImagen } from './ElementoImagen'
 import { alignPropType } from 'react-bootstrap/esm/types';
 import { ElementoToastNotification } from './ElementoToastNotification';
 import { PerfilContext } from './PerfilContext'; // Importa el contexto
+import { useLocation } from "react-router-dom";
 
 
 const FrmAsignarAreayPrioridadIncidencia = () => {
     const { perfil, esConLicencia } = useContext(PerfilContext);
+    const location = useLocation();
+    const data = location.state;
     //Filtros
-    
+
     //combo
     const [datosArea, setDatosArea] = useState([]);
     const [datosPrioridad, setDatosPrioridad] = useState([]);
@@ -28,11 +31,11 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
 
 
     //datos de registro
-    const [idAlcaldia, setIdAlcaldia] = useState(1); //temporalmente se asignan valores para probar el guardado
-    const [idIncidencia, setIdIncidencia] = useState(2);  //temporalmente se asignan valores para probar el guardado
+    const [idAlcaldia, setIdAlcaldia] = useState(0); //temporalmente se asignan valores para probar el guardado
+    const [idIncidencia, setIdIncidencia] = useState(0);  //temporalmente se asignan valores para probar el guardado
     const [idArea, setIdArea] = useState(0);
     const [idPrioridad, setIdPrioridad] = useState(0);
-    const [idUsuario, setIdUsuario] = useState(10);  //asigna temporalmente 1 hasta que tengamos una variable global de usuario para pasar este dato al SP
+    const [idUsuario, setIdUsuario] = useState(1);  //asigna temporalmente 1 hasta que tengamos una variable global de usuario para pasar este dato al SP
     const [alertaMensaje, setAlertaMensaje] = useState('');
 
     const [esMuestraCamposReq, setEsMuestraCamposReq] = useState(false);
@@ -45,7 +48,7 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
         setAlertaMensaje('')
     };
 
-    
+
     useEffect(() => {
         var apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarAreaCmb%22';
         axios.get(apiUrl)
@@ -54,8 +57,8 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
             }
             )
             .catch(error => console.error('Error al obtener las áreas', error));
-        
-            
+
+
         apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPrioridadCmb%22';
         axios.get(apiUrl)
             .then(response => {
@@ -64,6 +67,10 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
             )
             .catch(error => console.error('Error al obtener el catálogo de prioridades', error));
 
+        setIdAlcaldia(data.idAlcaldia)
+        setIdIncidencia(data.idIncidencia)
+        setIdArea(data.idArea)
+        setIdPrioridad(data.idPrioridadIncidencia)
 
     }, []);
 
@@ -76,7 +83,7 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
     }
 
     const inicializaCampos = () => {
-        
+
         //Campos 
         setIdAlcaldia(1)  //temporalmente se asignan valores para probar el guardado
         setIdIncidencia(2)  //temporalmente se asignan valores para probar el guardado
@@ -95,7 +102,7 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
             pnIdIncidencia: idIncidencia,
             pnIdArea: idArea,
             pnIdPrioridad: idPrioridad,
-            pnIdUsuario: idUsuario, 
+            pnIdUsuario: idUsuario,
         };
 
 
@@ -109,7 +116,7 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
             if (idArea == 0) { setEsMuestraCamposReq(true); return }
             if (idPrioridad == 0) { setEsMuestraCamposReq(true); return }
             if (idUsuario == 0) { setEsMuestraCamposReq(true); return }
-            
+
             await axios.post(apiReq, { data }, { 'Access-Control-Allow-Origin': '*', "Content-Type": "multipart/form-data" })
                 .then(response => {
                     if (response.data && Object.keys(response.data).length !== 0) {
@@ -118,7 +125,7 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
                         // Asegúrate de que response.data sea una cadena antes de asignarla
                         setAlertaMensaje(JSON.stringify(response.data));
                     } else {
-                        console.log('guardo correctamente')      
+                        console.log('guardo correctamente')
                         setEsFin(true);
                         //inicializaCampos();
                         //setEsEditar(false); // regresa al grid
@@ -141,21 +148,24 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
             <SideBarHeader titulo={'Asignar área y prioridad de la Incidencia'}></SideBarHeader>
             <br /><br /><br /><br />
 
-                <>
-                    <form onSubmit={guardarAreayPrioridadIncidencia} autoComplete="off">
-                        <br />
-                        <ElementoBotones cancelar={cancelar}></ElementoBotones>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ flexGrow: 1 }}>
-                                {<ElementoCampo type="select" lblCampo="Área*: " claCampo="campo" nomCampo={idArea} options={datosArea} onInputChange={setIdArea} />}
-                                {<ElementoCampo type="select" lblCampo="Prioridad*: " claCampo="campo" nomCampo={idPrioridad} options={datosPrioridad} onInputChange={setIdPrioridad} />}
+            <>
+                <p>IdAlcaldia : {idAlcaldia}</p><br />
+                <p>IdIncicencia : {idIncidencia}</p><br />
 
-                            </span>
-                        </div>
+                <form onSubmit={guardarAreayPrioridadIncidencia} autoComplete="off">
+                    <br />
+                    <ElementoBotones cancelar={cancelar}></ElementoBotones>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ flexGrow: 1 }}>
+                            {<ElementoCampo type="select" lblCampo="Área*: " claCampo="campo" nomCampo={idArea} options={datosArea} onInputChange={setIdArea} />}
+                            {<ElementoCampo type="select" lblCampo="Prioridad*: " claCampo="campo" nomCampo={idPrioridad} options={datosPrioridad} onInputChange={setIdPrioridad} />}
 
-                      
-                    </form>
-                </>
+                        </span>
+                    </div>
+
+
+                </form>
+            </>
             {
                 esMuestraCamposReq &&
                 <AlertaEmergente
@@ -166,11 +176,11 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
                     onAceptar={onAceptar}
                 ></AlertaEmergente>
             }
-           {esFin &&
-                    <ElementoToastNotification
-                        mensaje={'Los datos fueron guardados correctamente.'}
-                        onAceptar={onAceptar}
-                    ></ElementoToastNotification>
+            {esFin &&
+                <ElementoToastNotification
+                    mensaje={'Los datos fueron guardados correctamente.'}
+                    onAceptar={onAceptar}
+                ></ElementoToastNotification>
             }
             {alertaMensaje &&
                 <ElementoToastNotification
