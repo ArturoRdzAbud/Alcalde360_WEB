@@ -40,6 +40,8 @@ export const FrmConsultaIncidencia = () => {
   const { idAlcaldia } = useContext(PerfilContext);
   //const [idAlcaldia, setIdAlcaldia] = useState(1);
   const [idIncidencia, setIdIncidencia] = useState(0);
+  const [idArea, setIdArea] = useState(0);
+  const [idPrioridad, setIdPrioridad] = useState(0);
 
   const [esMuestraCamposReq, setEsMuestraCamposReq] = useState(false);
   const [alertaMensaje, setAlertaMensaje] = useState('');
@@ -60,6 +62,7 @@ export const FrmConsultaIncidencia = () => {
     setColoniaF(-1)
     //setIdAlcaldia(1)
     setInicioF(null)
+    setFinF(null)
     //console.log({ idAlcaldia })
     /*
 
@@ -70,19 +73,9 @@ export const FrmConsultaIncidencia = () => {
 
   };
 
-  const cancelar = () => {
-    inicializaCampos()
-    setEsEditar(false)
-    setEsNuevo(false)
-  };
-  const nuevo = () => {
-    inicializaCampos()
-    setEsEditar(true)
-    setEsNuevo(true)
-    //setAccion(1)
-  };
 
-  useEffect(() => {
+
+  /* useEffect(() => {
     var apiUrl = 'http://localhost:3000/ConsultarCombo?psSpSel=%22ConsultarTipoIncidenciaCmb%22';
     axios.get(apiUrl)
       .then(response => {
@@ -115,8 +108,7 @@ export const FrmConsultaIncidencia = () => {
       )
       .catch(error => console.error('Error al obtener colonia', error));
 
-
-  }, []);
+  }, []); */
 
   useEffect(() => {
     // Cambia la URL a la de tu API
@@ -138,29 +130,28 @@ export const FrmConsultaIncidencia = () => {
 
     // TODO IR FILTRANDO LOCALMENTE CAMPO POR CAMPO SIN IR A BASE DE DATOS
     var datosFiltrados = datosIncidenciaBd
-    //datosFiltrados = !esVerBaja ? datosIncidenciaBd.filter(item => item.ActivoChk) : datosIncidenciaBd;
-    datosFiltrados = idAlcaldia > 0 ? datosFiltrados.filter(item => item.IdAlcaldia == idAlcaldia) : datosFiltrados;
+    /*datosFiltrados = idAlcaldia > 0 ? datosFiltrados.filter(item => item.IdAlcaldia == idAlcaldia) : datosFiltrados;
     datosFiltrados = tipoF > 0 ? datosFiltrados.filter(item => item.IdTipoIncidencia == tipoF) : datosFiltrados;
     datosFiltrados = coloniaF > 0 ? datosFiltrados.filter(item => item.IdColonia == coloniaF) : datosFiltrados;
     datosFiltrados = areaF > 0 ? datosFiltrados.filter(item => item.IdArea == areaF) : datosFiltrados;
     datosFiltrados = estatusF > 0 ? datosFiltrados.filter(item => item.IdEstatusIncidencia == estatusF) : datosFiltrados;
-    datosFiltrados = nombreF != '' ? datosFiltrados.filter(item => item.Nombre == nombreF) : datosFiltrados;
+    datosFiltrados = nombreF != '' ? datosFiltrados.filter(item => item.Nombre == nombreF) : datosFiltrados;*/
     //datosFiltrados = nombreF != '' ? datosFiltrados.filter(item => item.Nombre.slice(0, nombreF.length).toLowerCase() === nombreF.toLowerCase()) : datosFiltrados;
     //datosFiltrados = nombreF != '' ? datosFiltrados.filter(item => item.Nombre.toLowerCase().includes(nombreF.toLowerCase())) : datosFiltrados;
     if (inicioF != null && finF != null && finF < inicioF) {
       setAlertaMensaje('El periodo final no debe ser menor al periodo inicial ')
-      //setFinF(inicioF)
+      setFinF(inicioF)
 
     };
     datosFiltrados = inicioF != null ? datosFiltrados.filter(item => item.FechaReporte >= inicioF) : datosFiltrados;
-    datosFiltrados = finF != null ? datosFiltrados.filter(item => item.FechaReporte <= finF) : datosFiltrados;
+    datosFiltrados = finF != null ? datosFiltrados.filter(item => item.FechaReporte < finF + 1) : datosFiltrados;
 
     setDatosIncidencia(datosFiltrados);
   };
 
   useEffect(() => {
     filtraLocal()
-  }, [tipoF, idAlcaldia, estatusF, nombreF, areaF, inicioF, finF, coloniaF]); //Se invoca al interactuar con los filtros arriba del grid
+  }, [idAlcaldia, inicioF, finF/*,tipoF,  estatusF, nombreF, areaF, coloniaF*/]); //Se invoca al interactuar con los filtros arriba del grid
 
 
   const columns = [
@@ -190,7 +181,7 @@ export const FrmConsultaIncidencia = () => {
     },
     {
       header: 'Descripción',
-      accessorKey: 'Descripcion1',
+      accessorKey: 'Descripcion',
       footer: 'Descripción'
       , visible: true
     },
@@ -206,15 +197,21 @@ export const FrmConsultaIncidencia = () => {
       footer: 'Teléfono'
       , visible: true
     },
+    /*     {
+          header: 'Correo',
+          accessorKey: 'Correo',
+          footer: 'Correo'
+          , visible: true
+        }, 
     {
-      header: 'Correo',
-      accessorKey: 'Correo',
-      footer: 'Correo'
+      header: 'IdColonia',
+      accessorKey: 'IdColonia',
+      footer: 'IdColonia'
       , visible: true
-    },
+    },*/
     {
       header: 'Colonia',
-      accessorKey: 'IdColonia',
+      accessorKey: 'Colonia',
       footer: 'Colonia'
       , visible: true
     },
@@ -225,25 +222,44 @@ export const FrmConsultaIncidencia = () => {
       , visible: false
     },
     {
+      header: 'Area',
+      accessorKey: 'Area',
+      footer: 'Area'
+      , visible: true
+    },
+    {
+      header: 'Estatus',
+      accessorKey: 'IdEstatusIncidencia',
+      footer: 'Estatus'
+      , visible: false
+    },
+    {
+      header: 'Estatus',
+      accessorKey: 'EstatusIncidencia',
+      footer: 'Estatus'
+      , visible: true
+    },
+    {
       header: 'IdPrioridadIncidencia',
       accessorKey: 'IdPrioridadIncidencia',
       footer: 'IdPrioridadIncidencia'
       , visible: false
     },
     {
-      header: 'Fecha',
+      header: 'Fecha de Reporte',
       accessorKey: 'FechaReporte',
-      footer: 'Fecha'
+      footer: 'Fecha de Reporte'
       , cell: ({ getValue }) => (isNaN(getValue()) ? getValue() : '')
       , visible: true
     },
+    /*{
     {
       header: 'Asignar',
       accessorKey: 'Link',
       footer: 'Asignar'
       , visible: true
     },
-    /*{
+    
       header: 'IdMunicipio',
       accessorKey: 'IdMunicipio',
       footer: 'IdMunicipio'
@@ -257,6 +273,26 @@ export const FrmConsultaIncidencia = () => {
     },*/
   ];
 
+  const cancelar = () => {
+    inicializaCampos()
+    setEsEditar(false)
+    setEsNuevo(false)
+  };
+  const nuevo = () => {
+    inicializaCampos()
+    setEsEditar(true)
+    setEsNuevo(true)
+
+    const data = {
+      idAlcaldia: idAlcaldia
+      /*idIncidencia: idIncidencia,
+      idArea: idArea,
+      idPrioridadIncidencia: idPrioridad*/
+    };
+
+    navigate("/Prueba", { state: data });
+
+  };
 
   const handleEdit = (rowData) => {
     setEsEditar(true)
@@ -287,7 +323,7 @@ export const FrmConsultaIncidencia = () => {
         <h2>Alcalde 360 - !Cercanía con la gente a través de un click!</h2>
         {/*  <ElementoCampo type='checkbox' lblCampo="Ver Inactivos:" claCampo="activo" nomCampo={esVerBaja} onInputChange={setEsVerBaja} />*/}
 
-
+        {/*
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ flexGrow: 1 }}>
             <ElementoCampo type="select" lblCampo="Tipo: " claCampo="campo" nomCampo={tipoF} options={datosTipo} onInputChange={setTipoF} />
@@ -313,11 +349,11 @@ export const FrmConsultaIncidencia = () => {
           </span>
           <span style={{ flexGrow: 1 }}>
             <ElementoCampo type="select" lblCampo="Estatus: " claCampo="campo" nomCampo={estatusF} options={datosEstatus} onInputChange={setEstatusF} />
-            {/*<ElementoCampo type="text" lblCampo="Nombre: " claCampo="campo" nomCampo={nombreF} onInputChange={setNombreF} />*/}
+            
 
           </span>
         </div>
-
+        */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ flexGrow: 1 }}>
 
@@ -335,9 +371,9 @@ export const FrmConsultaIncidencia = () => {
         </div>
 
 
-        <p>Parrafo temporal para ver parametros|@Alcaldia={idAlcaldia}|@Incidencia={idIncidencia}|@Tipo={tipoF}|@Area={areaF}|@Inicio={inicioF}|@Fin={finF}|@Colonia={coloniaF}</p>
-        <SimpleTable data={datosIncidencia} columns={columns} esOcultaBotonNuevo={true} handleEdit={handleEdit} />
-        {/* <SimpleTable data={datosIncidencia} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} /> */}
+        {/*<p>Parrafo temporal para ver parametros|@Alcaldia={idAlcaldia}|@Incidencia={idIncidencia}|@Tipo={tipoF}|@Area={areaF}|@Inicio={inicioF}|@Fin={finF}|@Colonia={coloniaF}</p>*/}
+        <SimpleTable data={datosIncidencia} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} />
+
 
       </>
       {/*}:
@@ -384,7 +420,8 @@ export const FrmConsultaIncidencia = () => {
           </form>
         </>
       }*/}
-      {esMuestraCamposReq &&
+      {
+        esMuestraCamposReq &&
         <AlertaEmergente
           titulo={'Alerta'}
           mensaje={'Los datos con * son requeridos, favor de validar.'}
@@ -393,7 +430,8 @@ export const FrmConsultaIncidencia = () => {
           onAceptar={onAceptar}
         ></AlertaEmergente>
       }
-      {esFin &&
+      {
+        esFin &&
         <AlertaEmergente
           titulo={'Alerta'}
           mensaje={'Los datos fueron guardados correctamente.'}
@@ -403,13 +441,14 @@ export const FrmConsultaIncidencia = () => {
         ></AlertaEmergente>
         // : <p></p>
       }
-      {alertaMensaje &&
+      {
+        alertaMensaje &&
         <ElementoToastNotification
           mensaje={alertaMensaje}
           onAceptar={onAceptar}
         ></ElementoToastNotification>
       }
-    </div>
+    </div >
   );
 }
 

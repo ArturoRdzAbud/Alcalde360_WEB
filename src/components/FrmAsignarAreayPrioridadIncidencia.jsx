@@ -13,13 +13,14 @@ import { ElementoImagen } from './ElementoImagen'
 import { alignPropType } from 'react-bootstrap/esm/types';
 import { ElementoToastNotification } from './ElementoToastNotification';
 import { PerfilContext } from './PerfilContext'; // Importa el contexto
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 
 const FrmAsignarAreayPrioridadIncidencia = () => {
     const { perfil, esConLicencia } = useContext(PerfilContext);
     const location = useLocation();
     const data = location.state;
+    const navigate = useNavigate();
     //Filtros
 
     //combo
@@ -79,6 +80,7 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
     const cancelar = () => {
         inicializaCampos()
         setEsEditar(false)
+        navigate(-1)
         //console.log("foto:" + foto)
     }
 

@@ -1,12 +1,18 @@
 import React from 'react'
 import { Login } from './Login';
 import { SideBarHeader } from './SideBarHeader';
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export const FrmPrueba = () => {
     //const { id1, id2 } = Route.params
     const location = useLocation();
+    const navigate = useNavigate();
     const data = location.state;
+
+    const regresar = () => {
+        navigate(-1);
+    };
+
     return (
         <>
             <SideBarHeader titulo=''></SideBarHeader>
@@ -15,8 +21,12 @@ export const FrmPrueba = () => {
             <h1>Prueba !</h1>
             <br />
             <p>IdAlcaldia : {data.idAlcaldia}</p><br />
-            <p>IdIncicencia : {data.idIncidencia}</p>
-            <p>Descripción : {data.descripcion}</p>
+            {/*<p>IdIncicencia : {data.idIncidencia}</p>
+            <p>Descripción : {data.descripcion}</p>*/}
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button type="button" title="Cancelar" className="btn btn-danger" onClick={regresar} >Cancelar </button>
+                <button type="submit" title="Guardar" className="btn btn-primary" onClick={regresar} >Save </button>
+            </div>
 
 
         </>

@@ -68,7 +68,7 @@ export const SideBar = () => {
     const toggleEncuesta = () => {
         setIsEncuestaOpen(!isEncuestaOpen);
     };
-    
+
     // const toggleMenu = (setState,stateValue) => {
     //     setState(!stateValue);
     // };
@@ -161,10 +161,10 @@ export const SideBar = () => {
                                     <div style={fontsize}>
                                         {perfil >= 4 && <NavLink onClick={closeMenu} to='/Arbitros' className='nav-link' > <Arbitros2vg />{'Catálogo de Árbitros'} </NavLink>}
                                         {perfil >= 4 && <NavLink onClick={closeMenu} to='/ConsultarIncidencia' className='nav-link' > <IconFlagvg />{'Consulta de Incidencias'} </NavLink>}
-                                        {perfil >= 4 && <NavLink onClick={closeMenu} to='/Prueba' className='nav-link' > <IconFlagvg />{'Prueba'} </NavLink>}
+                                        {/*perfil >= 4 && <NavLink onClick={closeMenu} to='/Prueba' className='nav-link' > <IconFlagvg />{'Prueba'} </NavLink>*/}
                                         {/*llamada temporal a pantalla asignar área y prioridad de incidencia (eliminar cuando se vaya a integrar)*/}
                                         {perfil >= 4 && <NavLink onClick={closeMenu} to='/AsignarAreayPrioridadIncidencia' className='nav-link' > <IconFlagvg />{'Asignar Área y Prioridad de la Incidencia'} </NavLink>}
-                                        
+
                                     </div>
                                 )}
                             </div>
