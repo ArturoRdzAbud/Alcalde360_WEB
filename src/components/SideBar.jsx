@@ -15,6 +15,7 @@ import Login from './Login';
 import FrmArbitro from './FrmArbitro';
 import FrmUsuario from './FrmUsuario';
 import FrmConsultaIncidencia from './FrmConsultaIncidencia';
+import FrmReporteIncidencia from './FrmReporteIncidencia';
 import FrmPrueba from './FrmPrueba';
 import FrmEncuesta from './FrmEncuesta';
 import FrmEncuestaIntermedia from './FrmEncuestaIntermedia';
@@ -217,6 +218,7 @@ export const SideBar = () => {
 
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/Arbitros' element={<FrmArbitro />} /></Route>
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/ConsultarIncidencia' element={<FrmConsultaIncidencia />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/ReporteIncidencia' element={<FrmReporteIncidencia />} /></Route>
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/Prueba' element={<FrmPrueba />} /></Route>
                         {/*llamada temporal a pantalla asignar área y prioridad de incidencia (eliminar cuando se vaya a integrar)*/}
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/AsignarAreayPrioridadIncidencia' element={<FrmAsignarAreayPrioridadIncidencia />} /></Route>
