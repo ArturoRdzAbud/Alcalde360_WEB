@@ -68,6 +68,7 @@ const FrmEncuesta = () => {
   // const navigate = useNavigate();
 
   const onAceptar = () => {
+    console.log('onaceptar')
     setEsMuestraCamposReq(false)
     setEsMuestraConfirmacion(false)
     setEsFin(false)
@@ -132,7 +133,11 @@ const FrmEncuesta = () => {
           } else {
             console.log('guardo correctamente')
             // return
-            // setEsFin(true)
+            setEsFin(true)
+
+            // inicializaCampos()
+            // setEsEditar(false)//regresa al grid
+            // setEsNuevo(false)
           }
         })
 
@@ -188,7 +193,7 @@ const FrmEncuesta = () => {
   // };
 
 
-  // const filtraLocalCombo = (pais, estado) => {
+  // const filtraLocaxlCombo = (pais, estado) => {
   //   // console.log(pais)
 
   //   var datosFiltrados = datosEstadoBD
@@ -203,9 +208,9 @@ const FrmEncuesta = () => {
   // }
   const filtraLocal = () => {
     console.log('Filtra Local...')
-    // filtraLocalCombo(ligaPaisF, ligaEstadoF)//Asigna la Dependencia de combos 
+    // filtraLocaXlCombo(ligaPaisF, ligaEstadoF)//Asigna la Dependencia de combos 
     var datosFiltrados = datosEncuestaBD
-      console.log(datosEncuestaBD)
+    // console.log(datosEncuestaBD)
 
     datosFiltrados = !esVerBaja ? datosFiltrados.filter(item => item.ActivoChk) : datosFiltrados;
     datosFiltrados = idAlcaldia > 0 ? datosFiltrados.filter(item => item.IdAlcaldia == idAlcaldia) : datosFiltrados;
@@ -214,6 +219,7 @@ const FrmEncuesta = () => {
     // datosFiltrados = ligaEstadoF > 0 ? datosFiltrados.filter(item => item.IdEstado == ligaEstadoF) : datosFiltrados;
     // datosFiltrados = ligaMunicipioF > 0 ? datosFiltrados.filter(item => item.IdMunicipio == ligaMunicipioF) : datosFiltrados;
     setDatosEncuesta(datosFiltrados);
+    // console.log(datosFiltrados)
 
     datosFiltrados = datosEncuestaPreguntaBD
     datosFiltrados = !esVerBaja ? datosEncuestaPreguntaBD.filter(item => item.ActivoChk) : datosFiltrados;
@@ -277,10 +283,15 @@ const FrmEncuesta = () => {
         const responsePregunta = await axios.get(apiUrl);
         setDatosEncuestaPreguntaBD(responsePregunta.data);
 
+        console.log('ini')
         inicializaCampos();
+        // filtraLocaxl
       } catch (error) {
         console.error('Error al obtener datos:', error);
       }
+      // finally(() =>){
+
+      // }
     };
 
 
@@ -304,6 +315,7 @@ const FrmEncuesta = () => {
     //   });
 
     cargarDatos();
+    // inicializaCampos();
   }, [esEditar]); // Se EJECUTA CUANDO CAMBIA la bandera esEditar
 
   // useEffect(() => {
@@ -314,16 +326,16 @@ const FrmEncuesta = () => {
   // }, [datosEncuestaPregunta]);
 
   // useEffect(() => {
-  //   filtraLocalCombo(ligaPaisF, ligaEstadoF)
+  //   filtraLocaxlCombo(ligaPaisF, ligaEstadoF)
   // }, [ligaPaisF, ligaEstadoF, ligaMunicipioF]);//Se llama al modificar el combo liga modo edicion/nuevo
   // useEffect(() => {
-  //   filtraLocalCombo(ligaPais, ligaEstado)
+  //   filtraLocaxlCombo(ligaPais, ligaEstado)
   // }, [ligaPais, ligaEstado, ligaMunicipio]);//Se llama al modificar el combo liga modo edicion/nuevo
 
 
   useEffect(() => {
     filtraLocal()
-  }, [esVerBaja]); //Se invoca al interactuar con los filtros arriba del grid
+  }, [esVerBaja,datosEncuestaBD]); //Se invoca al interactuar con los filtros arriba del grid
   // }, [esVerBaja, ligaPaisF, ligaEstadoF, ligaMunicipioF, datosLigaBD]); //Se invoca al interactuar con los filtros arriba del grid
 
 
@@ -369,55 +381,55 @@ const FrmEncuesta = () => {
     //   header: 'Preguntas',
     //   footer: '',
     //   columns: [
-        {
-          header: 'Pregunta 1',
-          accessorKey: 'v1',
-          footer: '',
-          visible: false,
-        },
-        {
-          header: 'Pregunta 2',
-          accessorKey: 'v2',
-          footer: '',
-          visible: false,
-        },
-        {
-          header: 'Pregunta 3',
-          accessorKey: 'v3',
-          footer: '',
-          visible: false,
-        },
-        {
-          header: 'Pregunta 4',
-          accessorKey: 'v4',
-          footer: '',
-          visible: false,
-        },
-        {
-          header: 'Pregunta 1',
-          accessorKey: 'nomV1',
-          footer: '',
-          visible: true,
-        },
-        {
-          header: 'Pregunta 2',
-          accessorKey: 'nomV2',
-          footer: '',
-          visible: true,
-        },
-        {
-          header: 'Pregunta 3',
-          accessorKey: 'nomV3',
-          footer: '',
-          visible: true,
-        },
-        {
-          header: 'Pregunta 4',
-          accessorKey: 'nomV4',
-          footer: '',
-          visible: true,
-        },
-      ];
+    {
+      header: 'Pregunta 1',
+      accessorKey: 'v1',
+      footer: '',
+      visible: false,
+    },
+    {
+      header: 'Pregunta 2',
+      accessorKey: 'v2',
+      footer: '',
+      visible: false,
+    },
+    {
+      header: 'Pregunta 3',
+      accessorKey: 'v3',
+      footer: '',
+      visible: false,
+    },
+    {
+      header: 'Pregunta 4',
+      accessorKey: 'v4',
+      footer: '',
+      visible: false,
+    },
+    {
+      header: 'Pregunta 1',
+      accessorKey: 'nomV1',
+      footer: '',
+      visible: true,
+    },
+    {
+      header: 'Pregunta 2',
+      accessorKey: 'nomV2',
+      footer: '',
+      visible: true,
+    },
+    {
+      header: 'Pregunta 3',
+      accessorKey: 'nomV3',
+      footer: '',
+      visible: true,
+    },
+    {
+      header: 'Pregunta 4',
+      accessorKey: 'nomV4',
+      footer: '',
+      visible: true,
+    },
+  ];
 
   //   },
   // ];
@@ -425,12 +437,12 @@ const FrmEncuesta = () => {
 
 
   const handleEdit = (rowData, cellId) => {
-    // console.log(cellId)
+    console.log(cellId)
     setEsEditar(true)
 
-    setIdIncidencia(rowData.original.idIncidencia)
-    setClaEncuesta(rowData.original.claEncuesta)
-    setClaTipoEncuesta(rowData.original.claTipoEncuesta)
+    setIdIncidencia(rowData.original.IdIncidencia)
+    setClaEncuesta(rowData.original.ClaEncuesta)
+    setClaTipoEncuesta(rowData.original.ClaTipoEncuesta)
     setV1(rowData.original.v1)
     setV2(rowData.original.v2)
     setV3(rowData.original.v3)
@@ -441,7 +453,7 @@ const FrmEncuesta = () => {
 
   return (
     <>
-      <SideBarHeader titulo={esNuevo ? ('Nueva Encuesta') : esEditar ? 'Edita Encuesta' : 'Encuesta de Satisfacción Ciudadana'}></SideBarHeader>
+      <SideBarHeader titulo={esNuevo ? ('Nueva Encuesta') : esEditar ? 'Edita Encuesta' : 'Encuesta de Satisfacción Ciudadana ' + ((claTipoEncuesta==1) ? 'Clausura':'Intermedia')}></SideBarHeader>
       <br /><br /><br /><br />
 
       <div>

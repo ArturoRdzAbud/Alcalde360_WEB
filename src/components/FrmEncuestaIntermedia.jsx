@@ -46,7 +46,7 @@ const FrmEncuestaIntermedia = () => {
   const [claEncuesta, setClaEncuesta] = useState(-1);
   const [claTipoEncuesta, setClaTipoEncuesta] = useState(2);
   const [idIncidencia, setIdIncidencia] = useState(1);
-  const [v1, setV1] = useState(-1);
+  const [v1, setV1] = useState('');
   const [v2, setV2] = useState(-1);
   const [v3, setV3] = useState(-1);
   const [v4, setV4] = useState(-1);
@@ -98,7 +98,7 @@ const FrmEncuestaIntermedia = () => {
       pnIdAlcaldia: idAlcaldia,
       pnIdIncidencia: idIncidencia,
       pnClaEncuesta: claEncuesta,
-      pnClaTipoEncuesta: 1,
+      pnClaTipoEncuesta: 2,
       psV1: v1,
       psV2: v2,
       psV3: v3,
@@ -132,6 +132,7 @@ const FrmEncuestaIntermedia = () => {
           } else {
             console.log('guardo correctamente')
             // return
+            setEsFin(true)
             // setEsFin(true)
           }
         })
@@ -211,12 +212,15 @@ const FrmEncuestaIntermedia = () => {
     datosFiltrados = idAlcaldia > 0 ? datosFiltrados.filter(item => item.IdAlcaldia == idAlcaldia) : datosFiltrados;
     datosFiltrados = claTipoEncuesta > 0 ? datosFiltrados.filter(item => item.ClaTipoEncuesta == claTipoEncuesta) : datosFiltrados;
     setDatosEncuesta(datosFiltrados);
+    // console.log(datosFiltrados)
+
+    // console.log(datosEncuestaBD)
 
     datosFiltrados = datosEncuestaPreguntaBD
-    datosFiltrados = !esVerBaja ? datosFiltrados.filter(item => item.ActivoChk) : datosFiltrados;
-    datosFiltrados = claTipoEncuesta > 0 ? datosFiltrados.filter(item => item.ClaTipoEncuesta == claTipoEncuesta) : datosFiltrados;
+    datosFiltrados = !esVerBaja ? datosEncuestaPreguntaBD.filter(item => item.ActivoChk) : datosFiltrados;
+    datosFiltrados = claTipoEncuesta > 0 ? datosEncuestaPreguntaBD.filter(item => item.ClaTipoEncuesta == claTipoEncuesta) : datosFiltrados;
     setDatosEncuestaPregunta(datosFiltrados);
-    // console.log(datosFiltrados)
+    // console.log(datosEncuestaPregunta)
   };
 
   //-------------------------------------------------------------------SECCION USE EFFFECT
@@ -226,11 +230,12 @@ const FrmEncuestaIntermedia = () => {
     axios.get(apiUrl)
       .then(response => {
         setDatosP1(response.data)
+        // console.log(datosP1)
       }
       )
       .catch(error => console.error('Error al obtener P1', error));
 
-    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta62Cmb%22';
+    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta4Cmb%22';
     axios.get(apiUrl)
       .then(response => {
         setDatosP2(response.data)
@@ -238,7 +243,7 @@ const FrmEncuestaIntermedia = () => {
       )
       .catch(error => console.error('Error al obtener P2', error));
 
-    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta7Cmb%22';
+    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta1Cmb%22';
     axios.get(apiUrl)
       .then(response => {
         setDatosP3(response.data)
@@ -246,7 +251,7 @@ const FrmEncuestaIntermedia = () => {
       )
       .catch(error => console.error('Error al obtener P3', error));
 
-    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta8Cmb%22';
+    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta4Cmb%22';
     axios.get(apiUrl)
       .then(response => {
         setDatosP4(response.data)
@@ -274,7 +279,7 @@ const FrmEncuestaIntermedia = () => {
         apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22BuscarEncuestaPregunta%22';
         const responsePregunta = await axios.get(apiUrl);
         setDatosEncuestaPreguntaBD(responsePregunta.data);
-
+        // console.log(datosEncuestaPreguntaBD)
         inicializaCampos();
       } catch (error) {
         console.error('Error al obtener datos:', error);
@@ -287,10 +292,12 @@ const FrmEncuestaIntermedia = () => {
 
   useEffect(() => {
     filtraLocal()
-  }, [esVerBaja]); //Se invoca al interactuar con los filtros arriba del grid
+  }, [esVerBaja,datosEncuestaBD]); //Se invoca al interactuar con los filtros arriba del grid
   // }, [esVerBaja, ligaPaisF, ligaEstadoF, ligaMunicipioF, datosLigaBD]); //Se invoca al interactuar con los filtros arriba del grid
 
-
+  useEffect(() => {
+    console.log('es:'+v1)
+  }, [v1]);
 
   const columns = [
     {
@@ -392,9 +399,9 @@ const FrmEncuestaIntermedia = () => {
     // console.log(cellId)
     setEsEditar(true)
 
-    setIdIncidencia(rowData.original.idIncidencia)
-    setClaEncuesta(rowData.original.claEncuesta)
-    setClaTipoEncuesta(rowData.original.claTipoEncuesta)
+    setIdIncidencia(rowData.original.IdIncidencia)
+    setClaEncuesta(rowData.original.ClaEncuesta)
+    setClaTipoEncuesta(rowData.original.ClaTipoEncuesta)
     setV1(rowData.original.v1)
     setV2(rowData.original.v2)
     setV3(rowData.original.v3)
@@ -405,7 +412,7 @@ const FrmEncuestaIntermedia = () => {
 
   return (
     <>
-      <SideBarHeader titulo={esNuevo ? ('Nueva Encuesta') : esEditar ? 'Edita Encuesta' : 'Encuesta de Satisfacción Ciudadana'}></SideBarHeader>
+      <SideBarHeader titulo={esNuevo ? ('Nueva Encuesta') : esEditar ? 'Edita Encuesta' : 'Encuesta de Satisfacción Ciudadana ' + ((claTipoEncuesta==1) ? 'Clausura':'Intermedia')}></SideBarHeader>
       <br /><br /><br /><br />
 
       <div>
@@ -457,7 +464,7 @@ const FrmEncuestaIntermedia = () => {
 
                 </div>
 
-                <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[0].NomPregunta}*:`} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} />
+                <ElementoCampo type="radio" lblCampo={`${datosEncuestaPregunta[0].NomPregunta}*:`} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} />
                 <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[1].NomPregunta}*:`} claCampo="campo" nomCampo={v2} options={datosP2} onInputChange={setV2} />
                 <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[2].NomPregunta}*:`} claCampo="campo" nomCampo={v3} options={datosP3} onInputChange={setV3} />
                 <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[3].NomPregunta}*:`} claCampo="campo" nomCampo={v4} options={datosP4} onInputChange={setV4} />
