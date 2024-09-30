@@ -46,10 +46,11 @@ const FrmEncuestaIntermedia = () => {
   const [claEncuesta, setClaEncuesta] = useState(-1);
   const [claTipoEncuesta, setClaTipoEncuesta] = useState(2);
   const [idIncidencia, setIdIncidencia] = useState(1);
-  const [v1, setV1] = useState('');
+  const [v1, setV1] = useState(1);
   const [v2, setV2] = useState(-1);
   const [v3, setV3] = useState(-1);
   const [v4, setV4] = useState(-1);
+  const [v5, setV5] = useState(1);
   // const [ligaRepresentante, setLigaRepresentante] = useState('');
   // const [ligaTelefono, setLigaTelefono] = useState('');
   // const [ligaCorreo, setLigaCorreo] = useState('');
@@ -111,9 +112,9 @@ const FrmEncuestaIntermedia = () => {
 
       // if (ligaNombre.trim() === '') { setEsMuestraCamposReq(true); return }
       if (v1 <= 0) { setEsMuestraCamposReq(true); return }
-      if (v2 <= 0) { setEsMuestraCamposReq(true); return }
+      if (v2 <= 0 && v1 == 1) { setEsMuestraCamposReq(true); return }
       if (v3 <= 0) { setEsMuestraCamposReq(true); return }
-      if (v4 <= 0) { setEsMuestraCamposReq(true); return }
+      if (v4 <= 0 && v5 == 1) { setEsMuestraCamposReq(true); return }
 
       console.log('Guardando Encuesta', data);
       // return
@@ -122,7 +123,7 @@ const FrmEncuestaIntermedia = () => {
           if (!response.data == '') {
             console.log('REGRESA ERROR:')
             if (response.data.originalError === undefined) {
-            //   console.log(response.data)
+              //   console.log(response.data)
               setAlertaMensaje(response.data)
             }
             else {
@@ -150,10 +151,11 @@ const FrmEncuestaIntermedia = () => {
     setEsVerBaja(true)
     //Campos 
     setClaEncuesta(-1)
-    setV1(-1)
+    setV1(1)
     setV2(-1)
     setV3(-1)
     setV4(-1)
+    setV5(1)
     //DatosPantalla
     setIdIncidencia(1)
 
@@ -206,13 +208,13 @@ const FrmEncuestaIntermedia = () => {
     console.log('Filtra Local...')
     // filtraLocalCombo(ligaPaisF, ligaEstadoF)//Asigna la Dependencia de combos 
     var datosFiltrados = datosEncuestaBD
- 
+
 
     datosFiltrados = !esVerBaja ? datosFiltrados.filter(item => item.ActivoChk) : datosFiltrados;
     datosFiltrados = idAlcaldia > 0 ? datosFiltrados.filter(item => item.IdAlcaldia == idAlcaldia) : datosFiltrados;
     datosFiltrados = claTipoEncuesta > 0 ? datosFiltrados.filter(item => item.ClaTipoEncuesta == claTipoEncuesta) : datosFiltrados;
     setDatosEncuesta(datosFiltrados);
-    // console.log(datosFiltrados)
+    // console.log(datosEncuestaBD)
 
     // console.log(datosEncuestaBD)
 
@@ -271,7 +273,7 @@ const FrmEncuestaIntermedia = () => {
     const cargarDatos = async () => {
       try {
         console.log('Carga desde BD...');
-        let apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22BuscarEncuesta%22';
+        let apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22BuscarEncuestaIntermedia%22';
         // console.log(apiUrl)
         const responseEncuesta = await axios.get(apiUrl);
         setDatosEncuestaBD(responseEncuesta.data);
@@ -292,12 +294,17 @@ const FrmEncuestaIntermedia = () => {
 
   useEffect(() => {
     filtraLocal()
-  }, [esVerBaja,datosEncuestaBD]); //Se invoca al interactuar con los filtros arriba del grid
+  }, [esVerBaja, datosEncuestaBD]); //Se invoca al interactuar con los filtros arriba del grid
   // }, [esVerBaja, ligaPaisF, ligaEstadoF, ligaMunicipioF, datosLigaBD]); //Se invoca al interactuar con los filtros arriba del grid
 
   useEffect(() => {
-    console.log('es:'+v1)
+    console.log('es:' + v1)
+    setV2(-1)
   }, [v1]);
+    useEffect(() => {
+    console.log('es:' + v1)
+    setV4(-1)
+  }, [v5]);
 
   const columns = [
     {
@@ -340,55 +347,55 @@ const FrmEncuestaIntermedia = () => {
     //   header: 'Preguntas',
     //   footer: '',
     //   columns: [
-        {
-          header: 'Pregunta 1',
-          accessorKey: 'v1',
-          footer: '',
-          visible: false,
-        },
-        {
-          header: 'Pregunta 2',
-          accessorKey: 'v2',
-          footer: '',
-          visible: false,
-        },
-        {
-          header: 'Pregunta 3',
-          accessorKey: 'v3',
-          footer: '',
-          visible: false,
-        },
-        {
-          header: 'Pregunta 4',
-          accessorKey: 'v4',
-          footer: '',
-          visible: false,
-        },
-        {
-          header: 'Pregunta 1',
-          accessorKey: 'nomV1',
-          footer: '',
-          visible: true,
-        },
-        {
-          header: 'Pregunta 2',
-          accessorKey: 'nomV2',
-          footer: '',
-          visible: true,
-        },
-        {
-          header: 'Pregunta 3',
-          accessorKey: 'nomV3',
-          footer: '',
-          visible: true,
-        },
-        {
-          header: 'Pregunta 4',
-          accessorKey: 'nomV4',
-          footer: '',
-          visible: true,
-        },
-      ];
+    {
+      header: 'Pregunta 1',
+      accessorKey: 'v1',
+      footer: '',
+      visible: false,
+    },
+    {
+      header: 'Pregunta 2',
+      accessorKey: 'v2',
+      footer: '',
+      visible: false,
+    },
+    {
+      header: 'Pregunta 3',
+      accessorKey: 'v3',
+      footer: '',
+      visible: false,
+    },
+    {
+      header: 'Pregunta 4',
+      accessorKey: 'v4',
+      footer: '',
+      visible: false,
+    },
+    {
+      header: 'Pregunta 1',
+      accessorKey: 'nomV1',
+      footer: '',
+      visible: true,
+    },
+    {
+      header: 'Pregunta 2',
+      accessorKey: 'nomV2',
+      footer: '',
+      visible: true,
+    },
+    {
+      header: 'Pregunta 3',
+      accessorKey: 'nomV3',
+      footer: '',
+      visible: true,
+    },
+    {
+      header: 'Pregunta 4',
+      accessorKey: 'nomV4',
+      footer: '',
+      visible: true,
+    },
+  ];
 
   //   },
   // ];
@@ -412,7 +419,7 @@ const FrmEncuestaIntermedia = () => {
 
   return (
     <>
-      <SideBarHeader titulo={esNuevo ? ('Nueva Encuesta') : esEditar ? 'Edita Encuesta' : 'Encuesta de Satisfacción Ciudadana ' + ((claTipoEncuesta==1) ? 'Clausura':'Intermedia')}></SideBarHeader>
+      <SideBarHeader titulo={esNuevo ? ('Encuesta de Proceso de Atención') : esEditar ? 'Edita Encuesta' : 'Encuesta de Satisfacción Ciudadana ' + ((claTipoEncuesta == 1) ? 'Clausura' : 'Intermedia')}></SideBarHeader>
       <br /><br /><br /><br />
 
       <div>
@@ -464,12 +471,43 @@ const FrmEncuestaIntermedia = () => {
 
                 </div>
 
-                <ElementoCampo type="radio" lblCampo={`${datosEncuestaPregunta[0].NomPregunta}*:`} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} />
-                <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[1].NomPregunta}*:`} claCampo="campo" nomCampo={v2} options={datosP2} onInputChange={setV2} />
-                <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[2].NomPregunta}*:`} claCampo="campo" nomCampo={v3} options={datosP3} onInputChange={setV3} />
-                <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[3].NomPregunta}*:`} claCampo="campo" nomCampo={v4} options={datosP4} onInputChange={setV4} />
 
-                <ElementoCampo type='checkbox' lblCampo="Activo :" claCampo="activo" nomCampo={activo} onInputChange={setActivo} />
+
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <span style={{ flexBasis: '60%', marginRight: '10px', flexShrink: 0 }}>
+                    <ElementoCampo type="radio" lblCampo={`${datosEncuestaPregunta[0].NomPregunta} *:`} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} />
+                  </span>
+                  <span style={{ flexGrow: 0.1 }}>
+                    <h2></h2>
+                  </span>
+                  {v1 == 1 &&
+                    <span style={{ flexBasis: '40%', flexShrink: 1 , marginTop: '40px'}}>
+                      <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[1].NomPregunta} *:`} claCampo="campo" nomCampo={v2} options={datosP2} onInputChange={setV2} />
+                    </span>}
+                </div>
+
+
+                <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[2].NomPregunta} *:`} claCampo="campo" nomCampo={v3} options={datosP3} onInputChange={setV3} />
+
+
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ flexGrow: 0 }}>
+                    <ElementoCampo type="radio" lblCampo={`${datosEncuestaPregunta[3].NomPregunta} *:`} claCampo="campo2" nomCampo={v5} options={datosP1} onInputChange={setV5} />
+                  </span>
+                  <span style={{ flexGrow: 0.1 }}>
+                    <h2></h2>
+                  </span>
+                  {v5 == 1 &&
+                    <span style={{ flexBasis: '40%', flexShrink: 1 , marginTop: '20px'}}>
+                      <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[1].NomPregunta} *:`} claCampo="campo" nomCampo={v4} options={datosP2} onInputChange={setV4} />
+                    </span>}
+                </div>
+
+
+
+                {/* <ElementoCampo type='checkbox' lblCampo="Activo :" claCampo="activo" nomCampo={activo} onInputChange={setActivo} /> */}
               </>
 
 

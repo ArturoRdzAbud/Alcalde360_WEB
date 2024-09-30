@@ -246,7 +246,7 @@ const FrmEncuesta = () => {
       )
       .catch(error => console.error('Error al obtener P2', error));
 
-    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta3Cmb%22';
+    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta1Cmb%22';
     axios.get(apiUrl)
       .then(response => {
         setDatosP3(response.data)
@@ -254,7 +254,7 @@ const FrmEncuesta = () => {
       )
       .catch(error => console.error('Error al obtener P3', error));
 
-    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta4Cmb%22';
+    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta3Cmb%22';
     axios.get(apiUrl)
       .then(response => {
         setDatosP4(response.data)
@@ -453,7 +453,7 @@ const FrmEncuesta = () => {
 
   return (
     <>
-      <SideBarHeader titulo={esNuevo ? ('Nueva Encuesta') : esEditar ? 'Edita Encuesta' : 'Encuesta de Satisfacción Ciudadana ' + ((claTipoEncuesta==1) ? 'Clausura':'Intermedia')}></SideBarHeader>
+      <SideBarHeader titulo={esNuevo ? ('Encuesta de Satisfacción') : esEditar ? 'Edita Encuesta' : 'Encuesta de Satisfacción Ciudadana ' + ((claTipoEncuesta==1) ? 'Clausura':'Intermedia')}></SideBarHeader>
       <br /><br /><br /><br />
 
       <div>
@@ -510,7 +510,7 @@ const FrmEncuesta = () => {
                 <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[2].NomPregunta}*:`} claCampo="campo" nomCampo={v3} options={datosP3} onInputChange={setV3} />
                 <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[3].NomPregunta}*:`} claCampo="campo" nomCampo={v4} options={datosP4} onInputChange={setV4} />
 
-                <ElementoCampo type='checkbox' lblCampo="Activo :" claCampo="activo" nomCampo={activo} onInputChange={setActivo} />
+                {/* <ElementoCampo type='checkbox' lblCampo="Activo :" claCampo="activo" nomCampo={activo} onInputChange={setActivo} /> */}
               </>
 
 
