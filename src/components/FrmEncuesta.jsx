@@ -1,17 +1,24 @@
 
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import axios from 'axios';
 import SimpleTable from './SimpleTable';
 import { ElementoCampo } from './ElementoCampo';
 import { ElementoBotones } from './ElementoBotones';
 import { SideBarHeader } from './SideBarHeader';
 import config from '../config'; // archivo configs globales del proy
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ElementoToastNotification } from './ElementoToastNotification';
 import { PerfilContext } from './PerfilContext'; // Importa el contexto
 
 //TIP: TENER SIEMPRE PRENDIDO EL INSPECTOR WEB (CONSOLA) EN EL NAVEGADOR PARA VER TODOS LOS ERRORES EN VIVO 
 const FrmEncuesta = () => {
+
+  // //parametros de URL
+  // const params = new URLSearchParams(location.search);
+  // const idincidencia = params.get('idincidencia') || '1';//defaultValue
+  // const eseditar = params.get('eseditar') || false;//defaultValue
+  // //>
+
   const { perfil, esConLicencia, idAlcaldia } = useContext(PerfilContext);
   const [datosEncuestaBD, setDatosEncuestaBD] = useState([]);
   const [datosEncuesta, setDatosEncuesta] = useState([]);
@@ -33,6 +40,17 @@ const FrmEncuesta = () => {
   // const [datosMunicipio, setDatosMunicipio] = useState([]);
   // const [datosMunicipioBD, setDatosMunicipioBD] = useState([]);//se guarda en otro arreglo para filtrarlo localmente
   //>
+
+  //param
+  const [searchParams] = useSearchParams();
+  const idincidencia = searchParams.get('idincidencia');
+  const eseditar = searchParams.get('eseditar') === 'true';
+  const buttonRefNuevo = useRef(null);
+  const [datosCargados, setDatosCargados] = useState(false); // Para saber si los datos están cargados
+  const [combosRenderizados, setCombosRenderizados] = useState(false); // Para saber si los combos están listos en pantalla
+  const [isLoading, setIsLoading] = useState(true); // Estado para controlar el renderizado
+  //>
+
   const [esEditar, setEsEditar] = useState(false);
   const [esNuevo, setEsNuevo] = useState(false);
   const [esFin, setEsFin] = useState(false);
@@ -46,6 +64,7 @@ const FrmEncuesta = () => {
   const [claEncuesta, setClaEncuesta] = useState(-1);
   const [claTipoEncuesta, setClaTipoEncuesta] = useState(1);
   const [idIncidencia, setIdIncidencia] = useState(1);
+  //const [idIncidencia, setIdIncidencia] = useState(idincidencia);//param
   const [v1, setV1] = useState(-1);
   const [v2, setV2] = useState(-1);
   const [v3, setV3] = useState(-1);
@@ -68,13 +87,14 @@ const FrmEncuesta = () => {
   // const navigate = useNavigate();
 
   const onAceptar = () => {
+    console.log('onaceptar')
     setEsMuestraCamposReq(false)
     setEsMuestraConfirmacion(false)
     setEsFin(false)
 
     inicializaCampos()
-    setEsEditar(false)
-    setEsNuevo(false)
+    // setEsEditar(false)
+    // setEsNuevo(false)
 
   };
   const onAceptarB = () => {
@@ -132,7 +152,11 @@ const FrmEncuesta = () => {
           } else {
             console.log('guardo correctamente')
             // return
-            // setEsFin(true)
+            setEsFin(true)
+
+            // inicializaCampos()
+            // setEsEditar(false)//regresa al grid
+            // setEsNuevo(false)
           }
         })
 
@@ -154,7 +178,9 @@ const FrmEncuesta = () => {
     setV3(-1)
     setV4(-1)
     //DatosPantalla
-    setIdIncidencia(1)
+    // setIdIncidencia(1)
+    setIdIncidencia(idincidencia)//param
+    
 
     setActivo(true)
     setAccion(0)
@@ -188,7 +214,7 @@ const FrmEncuesta = () => {
   // };
 
 
-  // const filtraLocalCombo = (pais, estado) => {
+  // const filtraLocaxlCombo = (pais, estado) => {
   //   // console.log(pais)
 
   //   var datosFiltrados = datosEstadoBD
@@ -203,9 +229,9 @@ const FrmEncuesta = () => {
   // }
   const filtraLocal = () => {
     console.log('Filtra Local...')
-    // filtraLocalCombo(ligaPaisF, ligaEstadoF)//Asigna la Dependencia de combos 
+    // filtraLocaXlCombo(ligaPaisF, ligaEstadoF)//Asigna la Dependencia de combos 
     var datosFiltrados = datosEncuestaBD
-      console.log(datosEncuestaBD)
+    // console.log(datosEncuestaBD)
 
     datosFiltrados = !esVerBaja ? datosFiltrados.filter(item => item.ActivoChk) : datosFiltrados;
     datosFiltrados = idAlcaldia > 0 ? datosFiltrados.filter(item => item.IdAlcaldia == idAlcaldia) : datosFiltrados;
@@ -214,11 +240,14 @@ const FrmEncuesta = () => {
     // datosFiltrados = ligaEstadoF > 0 ? datosFiltrados.filter(item => item.IdEstado == ligaEstadoF) : datosFiltrados;
     // datosFiltrados = ligaMunicipioF > 0 ? datosFiltrados.filter(item => item.IdMunicipio == ligaMunicipioF) : datosFiltrados;
     setDatosEncuesta(datosFiltrados);
+    // console.log(datosFiltrados)
 
     datosFiltrados = datosEncuestaPreguntaBD
     datosFiltrados = !esVerBaja ? datosEncuestaPreguntaBD.filter(item => item.ActivoChk) : datosFiltrados;
     datosFiltrados = claTipoEncuesta > 0 ? datosEncuestaPreguntaBD.filter(item => item.claTipoEncuesta == 1) : datosFiltrados;
     setDatosEncuestaPregunta(datosEncuestaPreguntaBD);
+
+    setCombosRenderizados(true);
   };
 
   //-------------------------------------------------------------------SECCION USE EFFFECT
@@ -240,7 +269,7 @@ const FrmEncuesta = () => {
       )
       .catch(error => console.error('Error al obtener P2', error));
 
-    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta3Cmb%22';
+    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta1Cmb%22';
     axios.get(apiUrl)
       .then(response => {
         setDatosP3(response.data)
@@ -248,13 +277,14 @@ const FrmEncuesta = () => {
       )
       .catch(error => console.error('Error al obtener P3', error));
 
-    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta4Cmb%22';
+    apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarPregunta3Cmb%22';
     axios.get(apiUrl)
       .then(response => {
         setDatosP4(response.data)
       }
       )
       .catch(error => console.error('Error al obtener P4', error));
+
 
 
   }, []);// se ejecuta 1 vez al inicio solamente
@@ -277,10 +307,16 @@ const FrmEncuesta = () => {
         const responsePregunta = await axios.get(apiUrl);
         setDatosEncuestaPreguntaBD(responsePregunta.data);
 
+        console.log('ini')
         inicializaCampos();
+        setDatosCargados(true);
+        // filtraLocaxl
       } catch (error) {
         console.error('Error al obtener datos:', error);
       }
+      // finally(() =>){
+
+      // }
     };
 
 
@@ -304,6 +340,8 @@ const FrmEncuesta = () => {
     //   });
 
     cargarDatos();
+
+    // inicializaCampos();
   }, [esEditar]); // Se EJECUTA CUANDO CAMBIA la bandera esEditar
 
   // useEffect(() => {
@@ -314,18 +352,28 @@ const FrmEncuesta = () => {
   // }, [datosEncuestaPregunta]);
 
   // useEffect(() => {
-  //   filtraLocalCombo(ligaPaisF, ligaEstadoF)
+  //   filtraLocaxlCombo(ligaPaisF, ligaEstadoF)
   // }, [ligaPaisF, ligaEstadoF, ligaMunicipioF]);//Se llama al modificar el combo liga modo edicion/nuevo
   // useEffect(() => {
-  //   filtraLocalCombo(ligaPais, ligaEstado)
+  //   filtraLocaxlCombo(ligaPais, ligaEstado)
   // }, [ligaPais, ligaEstado, ligaMunicipio]);//Se llama al modificar el combo liga modo edicion/nuevo
 
 
   useEffect(() => {
     filtraLocal()
-  }, [esVerBaja]); //Se invoca al interactuar con los filtros arriba del grid
+  }, [esVerBaja, datosEncuestaBD]); //Se invoca al interactuar con los filtros arriba del grid
   // }, [esVerBaja, ligaPaisF, ligaEstadoF, ligaMunicipioF, datosLigaBD]); //Se invoca al interactuar con los filtros arriba del grid
 
+
+  //param
+  useEffect(() => {
+    if (datosCargados && combosRenderizados) {
+      // buttonRefNuevo.current.click();
+      setEsEditar(eseditar)
+      setEsNuevo(eseditar)
+      setIsLoading(false)
+    }
+  }, [datosCargados, combosRenderizados]);
 
 
   const columns = [
@@ -369,55 +417,55 @@ const FrmEncuesta = () => {
     //   header: 'Preguntas',
     //   footer: '',
     //   columns: [
-        {
-          header: 'Pregunta 1',
-          accessorKey: 'v1',
-          footer: '',
-          visible: false,
-        },
-        {
-          header: 'Pregunta 2',
-          accessorKey: 'v2',
-          footer: '',
-          visible: false,
-        },
-        {
-          header: 'Pregunta 3',
-          accessorKey: 'v3',
-          footer: '',
-          visible: false,
-        },
-        {
-          header: 'Pregunta 4',
-          accessorKey: 'v4',
-          footer: '',
-          visible: false,
-        },
-        {
-          header: 'Pregunta 1',
-          accessorKey: 'nomV1',
-          footer: '',
-          visible: true,
-        },
-        {
-          header: 'Pregunta 2',
-          accessorKey: 'nomV2',
-          footer: '',
-          visible: true,
-        },
-        {
-          header: 'Pregunta 3',
-          accessorKey: 'nomV3',
-          footer: '',
-          visible: true,
-        },
-        {
-          header: 'Pregunta 4',
-          accessorKey: 'nomV4',
-          footer: '',
-          visible: true,
-        },
-      ];
+    {
+      header: 'Pregunta 1',
+      accessorKey: 'v1',
+      footer: '',
+      visible: false,
+    },
+    {
+      header: 'Pregunta 2',
+      accessorKey: 'v2',
+      footer: '',
+      visible: false,
+    },
+    {
+      header: 'Pregunta 3',
+      accessorKey: 'v3',
+      footer: '',
+      visible: false,
+    },
+    {
+      header: 'Pregunta 4',
+      accessorKey: 'v4',
+      footer: '',
+      visible: false,
+    },
+    {
+      header: 'Pregunta 1',
+      accessorKey: 'nomV1',
+      footer: '',
+      visible: true,
+    },
+    {
+      header: 'Pregunta 2',
+      accessorKey: 'nomV2',
+      footer: '',
+      visible: true,
+    },
+    {
+      header: 'Pregunta 3',
+      accessorKey: 'nomV3',
+      footer: '',
+      visible: true,
+    },
+    {
+      header: 'Pregunta 4',
+      accessorKey: 'nomV4',
+      footer: '',
+      visible: true,
+    },
+  ];
 
   //   },
   // ];
@@ -425,12 +473,12 @@ const FrmEncuesta = () => {
 
 
   const handleEdit = (rowData, cellId) => {
-    // console.log(cellId)
+    console.log(cellId)
     setEsEditar(true)
 
-    setIdIncidencia(rowData.original.idIncidencia)
-    setClaEncuesta(rowData.original.claEncuesta)
-    setClaTipoEncuesta(rowData.original.claTipoEncuesta)
+    setIdIncidencia(rowData.original.IdIncidencia)
+    setClaEncuesta(rowData.original.ClaEncuesta)
+    setClaTipoEncuesta(rowData.original.ClaTipoEncuesta)
     setV1(rowData.original.v1)
     setV2(rowData.original.v2)
     setV3(rowData.original.v3)
@@ -441,16 +489,17 @@ const FrmEncuesta = () => {
 
   return (
     <>
-      <SideBarHeader titulo={esNuevo ? ('Nueva Encuesta') : esEditar ? 'Edita Encuesta' : 'Encuesta de Satisfacción Ciudadana'}></SideBarHeader>
-      <br /><br /><br /><br />
+      {isLoading ? (<p>Cargando...</p>) : (<>
+        <SideBarHeader titulo={esNuevo ? ('Encuesta de Satisfacción Ciudadana') : esEditar ? 'Edita Encuesta' : 'Encuestas Contestadas ' + ((claTipoEncuesta == 1) ? 'Clausura' : 'Intermedia')}></SideBarHeader>
+        <br /><br /><br /><br />
 
-      <div>
-        {!esEditar ?//----------------------------MODO GRID pinta filtros al inicio
-          <>
-            <ElementoCampo type='checkbox' lblCampo="Ver filtros en Tabla:" claCampo="activo" nomCampo={esVerCamposFiltro} onInputChange={setEsVerCamposFiltro} />
-            <ElementoCampo type='checkbox' lblCampo="Ver Inactivos :" claCampo="activo" nomCampo={esVerBaja} onInputChange={setEsVerBaja} />
+        <div>
+          {!esEditar ?//----------------------------MODO GRID pinta filtros al inicio
+            <>
+              {/* <ElementoCampo type='checkbox' lblCampo="Ver filtros en Tabla:" claCampo="activo" nomCampo={esVerCamposFiltro} onInputChange={setEsVerCamposFiltro} /> */}
+              {/* <ElementoCampo type='checkbox' lblCampo="Ver Inactivos :" claCampo="activo" nomCampo={esVerBaja} onInputChange={setEsVerBaja} /> */}
 
-            {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ flexGrow: 1 }}>
                 <ElementoCampo type="select" lblCampo="País: " claCampo="campo" nomCampo={ligaPaisF} options={datosPais} onInputChange={(value) => handlePais(value, ligaPaisF)} />
               </span>
@@ -463,18 +512,18 @@ const FrmEncuesta = () => {
             </div> 
             <ElementoCampo type="select" lblCampo="Municipio: " claCampo="campo" nomCampo={ligaMunicipioF} options={datosMunicipio} onInputChange={(value) => handleMunicipio(value, ligaMunicipioF)} />
             */}
-            <SimpleTable data={datosEncuesta} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} esOcultaFooter={true} />
-          </>
-          ://----------------------------MODO EDICION/NUEVO REGISTRO
-          <div>
-            <form onSubmit={guardarEncuesta}>
-              <br />
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <ElementoBotones cancelar={cancelar}></ElementoBotones>
-              </div>
-              <>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  {/* <span style={{ flexGrow: 1 }}>
+              <SimpleTable data={datosEncuesta} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} esOcultaFooter={true} buttonRefNuevo={buttonRefNuevo} />
+            </>
+            ://----------------------------MODO EDICION/NUEVO REGISTRO
+            <div>
+              <form onSubmit={guardarEncuesta}>
+                <br />
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <ElementoBotones cancelar={cancelar} esOcultaCancelar={true}></ElementoBotones>
+                </div>
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {/* <span style={{ flexGrow: 1 }}>
                     <ElementoCampo type='text' lblCampo="Nombre* :" claCampo="nombre" onInputChange={setLigaNombre} nomCampo={ligaNombre} tamanioString="100" />
                     <ElementoCampo type='text' lblCampo="Representante :" claCampo="nombre" onInputChange={setLigaRepresentante} nomCampo={ligaRepresentante} tamanioString="100" />
                     <ElementoCampo type='tel' lblCampo="Telefono :" claCampo="nombre" onInputChange={setLigaTelefono} nomCampo={ligaTelefono} tamanioString="100" />
@@ -489,54 +538,61 @@ const FrmEncuesta = () => {
                     <ElementoCampo type="select" lblCampo="Municipio*: " claCampo="campo" nomCampo={ligaMunicipio} options={datosMunicipio} onInputChange={setLigaMunicipio} />
                   </span> */}
 
-                  {/* <ElementoCampo type="select" lblCampo={""+datosEncuestaPreguntaBD[0].NomPregunta+"*:"} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} /> */}
+                    {/* <ElementoCampo type="select" lblCampo={""+datosEncuestaPreguntaBD[0].NomPregunta+"*:"} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} /> */}
 
-                </div>
+                  </div>
 
-                <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[0].NomPregunta}*:`} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} />
-                <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[1].NomPregunta}*:`} claCampo="campo" nomCampo={v2} options={datosP2} onInputChange={setV2} />
-                <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[2].NomPregunta}*:`} claCampo="campo" nomCampo={v3} options={datosP3} onInputChange={setV3} />
-                <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[3].NomPregunta}*:`} claCampo="campo" nomCampo={v4} options={datosP4} onInputChange={setV4} />
+                  <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[0].NomPregunta}*:`} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} />
+                  <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[1].NomPregunta}*:`} claCampo="campo" nomCampo={v2} options={datosP2} onInputChange={setV2} />
+                  <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[2].NomPregunta}*:`} claCampo="campo" nomCampo={v3} options={datosP3} onInputChange={setV3} />
+                  <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[3].NomPregunta}*:`} claCampo="campo" nomCampo={v4} options={datosP4} onInputChange={setV4} />
 
-                <ElementoCampo type='checkbox' lblCampo="Activo :" claCampo="activo" nomCampo={activo} onInputChange={setActivo} />
-              </>
-
-
-            </form>
-          </div>
-        }
-
-        {esMuestraCamposReq &&
-          // <AlertaEmergente
-          //     titulo={'Alerta'}
-          //     mensaje={'Los datos con * son requeridos, favor de validar.'}
-          //     mostrarBotonAceptar={true}
-          //     mostrarBotonCancelar={false}
-          //     onAceptar={onAceptar}
-          // ></AlertaEmergente>
-          <ElementoToastNotification
-            mensaje={'Los datos con * son requeridos, favor de validar.'}
-            onAceptar={onAceptarB}
-          ></ElementoToastNotification>
-          // : <p></p>
-        }
-        {esFin &&
-          <ElementoToastNotification
-            mensaje={'Los datos fueron guardados correctamente.'}
-            onAceptar={onAceptar}
-          ></ElementoToastNotification>
-        }
-        {alertaMensaje &&
-          <ElementoToastNotification
-            mensaje={alertaMensaje}
-            onAceptar={onAceptarC}
-          ></ElementoToastNotification>
-        }
+                  {/* <ElementoCampo type='checkbox' lblCampo="Activo :" claCampo="activo" nomCampo={activo} onInputChange={setActivo} /> */}
+                </>
 
 
+              </form>
+            </div>
+          }
 
-      </div>
+          {esMuestraCamposReq &&
+            // <AlertaEmergente
+            //     titulo={'Alerta'}
+            //     mensaje={'Los datos con * son requeridos, favor de validar.'}
+            //     mostrarBotonAceptar={true}
+            //     mostrarBotonCancelar={false}
+            //     onAceptar={onAceptar}
+            // ></AlertaEmergente>
+            <ElementoToastNotification
+              mensaje={'Los datos con * son requeridos, favor de validar.'}
+              onAceptar={onAceptarB}
+            ></ElementoToastNotification>
+            // : <p></p>
+          }
+          {esFin &&
+            <ElementoToastNotification
+              mensaje={'Los datos fueron guardados correctamente.'}
+              onAceptar={onAceptar}
+            ></ElementoToastNotification>
+          }
+          {alertaMensaje &&
+            <ElementoToastNotification
+              mensaje={alertaMensaje}
+              onAceptar={onAceptarC}
+            ></ElementoToastNotification>
+          }
+
+
+
+        </div>
+
+      </>
+      )}
     </>
+
+
+
+
   );
 };
 

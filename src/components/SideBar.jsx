@@ -210,8 +210,10 @@ export const SideBar = () => {
                                             {isEncuestaOpen ? '▾' : '▸'} Encuestas</div><div style={separatorStyles}></div>
                                         {isEncuestaOpen && (
                                             <div style={fontsize}>
-                                                <NavLink onClick={closeMenu} to='/FrmEncuestaIntermedia' className='nav-link' >{' Intermedia'} </NavLink>
-                                                <NavLink onClick={closeMenu} to='/FrmEncuesta' className='nav-link' >{' Clausura'} </NavLink>
+                                                {/* <NavLink onClick={closeMenu} to='/FrmEncuestaIntermedia' className='nav-link' >{' Intermedia'} </NavLink> */}
+                                                <NavLink onClick={closeMenu} to='/EncuestaProcesoAtencion' className='nav-link' >{' Intermedia'} </NavLink>
+                                                {/* <NavLink onClick={closeMenu} to='/FrmEncuesta' className='nav-link' >{' Clausura'} </NavLink> */}
+                                                <NavLink onClick={closeMenu} to='/EncuestaSatisfaccionCiudadana' className='nav-link' >{' Clausura'} </NavLink>
                                             </div>
                                         )}
                                     </div>
@@ -240,8 +242,10 @@ export const SideBar = () => {
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/GuardarEstatusIncidencia' element={<FrmGuardarEstatusIncidencia />} /></Route>
 
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmUsuario' element={<FrmUsuario />} /></Route>
-                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuesta' element={<FrmEncuesta />} /></Route>
-                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuestaIntermedia' element={<FrmEncuestaIntermedia />} /></Route>
+                        {/* <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuesta' element={<FrmEncuesta />} /></Route> */}
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/EncuestaSatisfaccionCiudadana' element={<FrmEncuesta />} /></Route>
+                        {/* <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuestaIntermedia' element={<FrmEncuestaIntermedia />} /></Route> */}
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/EncuestaProcesoAtencion' element={<FrmEncuestaIntermedia />} /></Route>
                         {/* <ProtectedRoute path="/Liga" element={<CatLiga />} profile={perfil} requiredProfile={2}/> */}
                         {/* <Route path="/Liga" element={<ProtectedRoute profile={perfil} requiredProfile={2} />}/> */}
 
