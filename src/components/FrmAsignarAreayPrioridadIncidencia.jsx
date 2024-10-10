@@ -36,6 +36,7 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
     const [idIncidencia, setIdIncidencia] = useState(0);  //temporalmente se asignan valores para probar el guardado
     const [idArea, setIdArea] = useState(0);
     const [idPrioridad, setIdPrioridad] = useState(0);
+    const [descripcion, setDescripcion] = useState('');
     const [idUsuario, setIdUsuario] = useState(1);  //asigna temporalmente 1 hasta que tengamos una variable global de usuario para pasar este dato al SP
     const [alertaMensaje, setAlertaMensaje] = useState('');
 
@@ -72,6 +73,7 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
         setIdIncidencia(data.idIncidencia)
         setIdArea(data.idArea)
         setIdPrioridad(data.idPrioridadIncidencia)
+        setDescripcion(data.descripcion)
 
     }, []);
 
@@ -151,14 +153,17 @@ const FrmAsignarAreayPrioridadIncidencia = () => {
             <br /><br /><br /><br />
 
             <>
-                <p>IdAlcaldia : {idAlcaldia}</p><br />
-                <p>IdIncicencia : {idIncidencia}</p><br />
+                {/*<p>IdAlcaldia : {idAlcaldia}</p><br />
+                <p>Folio Incidencia : {idIncidencia}</p><br />
+                <p>Descripción : {descripcion}</p>*/}
 
                 <form onSubmit={guardarAreayPrioridadIncidencia} autoComplete="off">
                     <br />
                     <ElementoBotones cancelar={cancelar}></ElementoBotones>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ flexGrow: 1 }}>
+                            {<ElementoCampo type="text" lblCampo="Folio*: " claCampo="campo" nomCampo={idIncidencia} onInputChange={setIdIncidencia} editable={false} />}
+                            {<ElementoCampo type="text" lblCampo="Descripción*: " claCampo="campo" nomCampo={descripcion} onInputChange={setDescripcion} editable={false} />}
                             {<ElementoCampo type="select" lblCampo="Área*: " claCampo="campo" nomCampo={idArea} options={datosArea} onInputChange={setIdArea} />}
                             {<ElementoCampo type="select" lblCampo="Prioridad*: " claCampo="campo" nomCampo={idPrioridad} options={datosPrioridad} onInputChange={setIdPrioridad} />}
 

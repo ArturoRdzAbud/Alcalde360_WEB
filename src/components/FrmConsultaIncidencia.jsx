@@ -10,6 +10,8 @@ import { ElementoToastNotification } from './ElementoToastNotification';
 import { ElementoBotones } from './ElementoBotones'
 import { useNavigate } from "react-router-dom";
 import { PerfilContext } from './PerfilContext'; // Importa el contexto
+import { addYears, differenceInYears, format } from 'date-fns';
+import '../css/General.css';
 
 export const FrmConsultaIncidencia = () => {
   const [datosIncidencia, setDatosIncidencia] = useState([]);
@@ -26,18 +28,16 @@ export const FrmConsultaIncidencia = () => {
   const [nombreF, setNombreF] = useState('');
   const [coloniaF, setColoniaF] = useState(-1);
   const [datosColonia, setDatosColonia] = useState([]);
-  const [inicioF, setInicioF] = useState();
-  const [finF, setFinF] = useState();
+  const [inicioF, setInicioF] = useState(null);
+  const [finF, setFinF] = useState(null);
   const navigate = useNavigate();
-  const today = new Date();
-
+  const today = format(new Date(), 'yyyy-MM-dd');
   const [esEditar, setEsEditar] = useState(false);
   const [esNuevo, setEsNuevo] = useState(false);
   const [esFin, setEsFin] = useState(false);
 
-
   //datos de registro
-  const { idAlcaldia } = useContext(PerfilContext);
+  const { idAlcaldia } = useContext(PerfilContext); // variable global
   //const [idAlcaldia, setIdAlcaldia] = useState(1);
   const [idIncidencia, setIdIncidencia] = useState(0);
   const [idArea, setIdArea] = useState(0);
@@ -45,10 +45,16 @@ export const FrmConsultaIncidencia = () => {
 
   const [esMuestraCamposReq, setEsMuestraCamposReq] = useState(false);
   const [alertaMensaje, setAlertaMensaje] = useState('');
+  const [porVencer, setPorVencer] = useState(false);
+
 
   const onAceptar = () => {
     setEsMuestraCamposReq(false)
     setEsFin(false)
+  };
+
+  const onAceptarC = () => {
+    setAlertaMensaje('')
   };
 
 
@@ -63,13 +69,7 @@ export const FrmConsultaIncidencia = () => {
     //setIdAlcaldia(1)
     setInicioF(null)
     setFinF(null)
-    //console.log({ idAlcaldia })
-    /*
 
-    setAccion(0)//0 para MODIF 1 para nuevo
-    setEsFin(false)
-    /*setUserProfileImage('')
-    setFotografia(null)*/
 
   };
 
@@ -129,7 +129,7 @@ export const FrmConsultaIncidencia = () => {
   const filtraLocal = () => {
 
     // TODO IR FILTRANDO LOCALMENTE CAMPO POR CAMPO SIN IR A BASE DE DATOS
-    var datosFiltrados = datosIncidenciaBd
+    var datosFiltrados = datosIncidenciaBd;
     /*datosFiltrados = idAlcaldia > 0 ? datosFiltrados.filter(item => item.IdAlcaldia == idAlcaldia) : datosFiltrados;
     datosFiltrados = tipoF > 0 ? datosFiltrados.filter(item => item.IdTipoIncidencia == tipoF) : datosFiltrados;
     datosFiltrados = coloniaF > 0 ? datosFiltrados.filter(item => item.IdColonia == coloniaF) : datosFiltrados;
@@ -138,23 +138,69 @@ export const FrmConsultaIncidencia = () => {
     datosFiltrados = nombreF != '' ? datosFiltrados.filter(item => item.Nombre == nombreF) : datosFiltrados;*/
     //datosFiltrados = nombreF != '' ? datosFiltrados.filter(item => item.Nombre.slice(0, nombreF.length).toLowerCase() === nombreF.toLowerCase()) : datosFiltrados;
     //datosFiltrados = nombreF != '' ? datosFiltrados.filter(item => item.Nombre.toLowerCase().includes(nombreF.toLowerCase())) : datosFiltrados;
-    if (inicioF != null && finF != null && finF < inicioF) {
-      setAlertaMensaje('El periodo final no debe ser menor al periodo inicial ')
-      setFinF(inicioF)
+    datosFiltrados = porVencer ? datosFiltrados.filter(item => item.FechaEstimada == today) : datosFiltrados;
+    console.log(porVencer, today)
+    const result = differenceInYears(new Date(finF), new Date(inicioF));
+    //console.log(inicioF, '-', finF, '-', result);
+    //Al seleccionar borrar la fecha el valor es de dos espacios
+    if (inicioF == null || finF == null || inicioF == '' || finF == '' || inicioF == '  ' || finF == '  ') {
+      setDatosIncidencia(datosFiltrados);
+      return
+    } else if (finF < inicioF) {
+      setAlertaMensaje('El periodo final no debe ser menor al periodo inicial ');
+      setDatosIncidencia(datosFiltrados);
+      //setFinF(inicioF)
+      return
+    } else if (result >= 1) {
+      setAlertaMensaje('El periodo no debe ser mayor a un año');
+      setDatosIncidencia(datosFiltrados);
+      return
+    } else if (isNaN(result)) {
+      setDatosIncidencia(datosFiltrados);
+      return
+    }
 
-    };
-    datosFiltrados = inicioF != null ? datosFiltrados.filter(item => item.FechaReporte >= inicioF) : datosFiltrados;
-    datosFiltrados = finF != null ? datosFiltrados.filter(item => item.FechaReporte < finF + 1) : datosFiltrados;
+    datosFiltrados = inicioF != null || inicioF != '' ? datosFiltrados.filter(item => item.FechaReporte >= inicioF) : datosFiltrados;
+    datosFiltrados = finF != null || finF != '' ? datosFiltrados.filter(item => item.FechaReporte < finF + 1) : datosFiltrados;
 
     setDatosIncidencia(datosFiltrados);
+
   };
 
   useEffect(() => {
     filtraLocal()
-  }, [idAlcaldia, inicioF, finF/*,tipoF,  estatusF, nombreF, areaF, coloniaF*/]); //Se invoca al interactuar con los filtros arriba del grid
+  }, [idAlcaldia, inicioF, finF, porVencer/*,tipoF,  estatusF, nombreF, areaF, coloniaF*/]); //Se invoca al interactuar con los filtros arriba del grid
 
+  // Función para obtener la clase CSS según el valor
+  const obtenerClaseColor = (valorColor) => {
+    switch (valorColor) {
+      case 1:
+        return 'red';
+      case 2:
+        return 'orange';
+      case 3:
+        return 'green';
+      default:
+        return '';
+    }
+  };
 
   const columns = [
+    {
+      accessorKey: 'Color',
+      header: '',
+      //footer: 'C',
+      visible: true,
+      cell: ({ cell }) => {
+        const valorColor = cell.getValue();
+        // Y dentro de la columna personalizada:
+        return (
+          <div className={obtenerClaseColor(valorColor)}>
+            {''}
+          </div>
+        );
+      },
+    },
     {
       header: 'IdAlcaldia',
       accessorKey: 'IdAlcaldia',
@@ -197,18 +243,18 @@ export const FrmConsultaIncidencia = () => {
       footer: 'Teléfono'
       , visible: true
     },
-    /*     {
-          header: 'Correo',
-          accessorKey: 'Correo',
-          footer: 'Correo'
-          , visible: true
-        }, 
+    {
+      header: 'Correo',
+      accessorKey: 'Correo',
+      footer: 'Correo'
+      , visible: false
+    },
     {
       header: 'IdColonia',
       accessorKey: 'IdColonia',
       footer: 'IdColonia'
-      , visible: true
-    },*/
+      , visible: false
+    },
     {
       header: 'Colonia',
       accessorKey: 'Colonia',
@@ -240,10 +286,16 @@ export const FrmConsultaIncidencia = () => {
       , visible: true
     },
     {
-      header: 'IdPrioridadIncidencia',
+      header: 'Prioridad',
       accessorKey: 'IdPrioridadIncidencia',
-      footer: 'IdPrioridadIncidencia'
+      footer: 'Prioridad'
       , visible: false
+    },
+    {
+      header: 'Prioridad',
+      accessorKey: 'PrioridadIncidencia',
+      footer: 'Prioridad'
+      , visible: true
     },
     {
       header: 'Fecha de Reporte',
@@ -252,64 +304,100 @@ export const FrmConsultaIncidencia = () => {
       , cell: ({ getValue }) => (isNaN(getValue()) ? getValue() : '')
       , visible: true
     },
-    /*{
     {
-      header: 'Asignar',
-      accessorKey: 'Link',
-      footer: 'Asignar'
+      header: 'Fecha Estimada',
+      accessorKey: 'FechaEstimada',
+      footer: 'Fecha Estimada'
+      , cell: ({ getValue }) => (isNaN(getValue()) ? getValue() : '')
       , visible: true
     },
-    
-      header: 'IdMunicipio',
-      accessorKey: 'IdMunicipio',
-      footer: 'IdMunicipio'
+    {
+      header: 'Nombre',
+      accessorKey: 'Nombre2',
+      footer: 'Nombre'
       , visible: false
     },
     {
-      header: 'Activo',
-      accessorKey: 'ActivoChk',
-      footer: 'Activo'
-      , visible: true
-    },*/
+      header: 'ApellidoPaterno',
+      accessorKey: 'ApellidoPaterno',
+      footer: 'ApellidoPaterno'
+      , visible: false
+    },
+    {
+      header: 'ApellidoMaterno',
+      accessorKey: 'ApellidoMaterno',
+      footer: 'ApellidoMaterno'
+      , visible: false
+    },
+    {
+      header: 'Calle',
+      accessorKey: 'Calle',
+      footer: 'Calle'
+      , visible: false
+    },
+    {
+      header: 'Numero',
+      accessorKey: 'Numero',
+      footer: 'Numero'
+      , visible: false
+    },
+    {
+      header: 'CodigoPostal',
+      accessorKey: 'CodigoPostal',
+      footer: 'CodigoPostal'
+      , visible: false
+    },
+
   ];
 
-  const cancelar = () => {
-    inicializaCampos()
-    setEsEditar(false)
-    setEsNuevo(false)
-  };
   const nuevo = () => {
     inicializaCampos()
     setEsEditar(true)
     setEsNuevo(true)
 
     const data = {
-      idAlcaldia: idAlcaldia
-      /*idIncidencia: idIncidencia,
-      idArea: idArea,
-      idPrioridadIncidencia: idPrioridad*/
+      esNuevo: true
+      //idAlcaldia: idAlcaldia,
+
     };
 
-    navigate("/Prueba", { state: data });
+    navigate("/ReporteIncidencia", { state: data });
 
   };
 
   const handleEdit = (rowData) => {
     setEsEditar(true)
     //setAccion(0)//0 para MODIF 1 para nuevo
-    //setIdAlcaldia(rowData.original.IdAlcaldia)
-    setIdIncidencia(rowData.original.IdIncidencia)
-    //console.log(idIncidencia)
-    //console.log('IdBuena:', rowData.original.IdIncidencia)
 
     const data = {
+      esNuevo: false,
       idAlcaldia: rowData.original.IdAlcaldia,
       idIncidencia: rowData.original.IdIncidencia,
       idArea: rowData.original.IdArea,
-      idPrioridadIncidencia: rowData.original.IdPrioridadIncidencia
-    };
+      idPrioridadIncidencia: rowData.original.IdPrioridadIncidencia,
+      descripcion: rowData.original.Descripcion,
+      idTipoIncidencia: rowData.original.IdTipoIncidencia,
 
-    navigate("/AsignarAreayPrioridadIncidencia", { state: data });
+      idEstatusIncidencia: rowData.original.IdEstatusIncidencia,
+      fechaEstimada: rowData.original.FechaEstimada,
+      fechaReporte: rowData.original.FechaReporte,
+
+      telefono: rowData.original.Telefono,
+      correo: rowData.original.Correo,
+      idColonia: rowData.original.IdColonia,
+
+      nombre: rowData.original.Nombre2,
+      apellidoPaterno: rowData.original.ApellidoPaterno,
+      apellidoMaterno: rowData.original.ApellidoMaterno,
+
+      calle: rowData.original.Calle,
+      numero: rowData.original.Numero,
+      codigoPostal: rowData.original.CodigoPostal,
+
+    };
+    navigate("/ReporteIncidencia", { state: data });
+    //navigate("/AsignarAreayPrioridadIncidencia", { state: data });
+
 
   };
 
@@ -321,7 +409,7 @@ export const FrmConsultaIncidencia = () => {
       <>
         {/*<button type="button" className="btn btn-primary" onClick={nuevo}>Nuevo</button>*/}
         <h2>Alcalde 360 - !Cercanía con la gente a través de un click!</h2>
-        {/*  <ElementoCampo type='checkbox' lblCampo="Ver Inactivos:" claCampo="activo" nomCampo={esVerBaja} onInputChange={setEsVerBaja} />*/}
+        {<ElementoCampo type='checkbox' lblCampo="Por vencer:" claCampo="porVencer" nomCampo={porVencer} onInputChange={setPorVencer} />}
 
         {/*
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -369,7 +457,6 @@ export const FrmConsultaIncidencia = () => {
 
           </span>
         </div>
-
 
         {/*<p>Parrafo temporal para ver parametros|@Alcaldia={idAlcaldia}|@Incidencia={idIncidencia}|@Tipo={tipoF}|@Area={areaF}|@Inicio={inicioF}|@Fin={finF}|@Colonia={coloniaF}</p>*/}
         <SimpleTable data={datosIncidencia} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} />
@@ -445,7 +532,7 @@ export const FrmConsultaIncidencia = () => {
         alertaMensaje &&
         <ElementoToastNotification
           mensaje={alertaMensaje}
-          onAceptar={onAceptar}
+          onAceptar={onAceptarC}
         ></ElementoToastNotification>
       }
     </div >
