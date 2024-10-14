@@ -19,6 +19,7 @@ import FrmReporteIncidencia from './FrmReporteIncidencia';
 import FrmPrueba from './FrmPrueba';
 import FrmEncuesta from './FrmEncuesta';
 import FrmEncuestaIntermedia from './FrmEncuestaIntermedia';
+import FrmFichaTecnica from './FrmFichaTecnica';
 
 import ProtectedRoute from './ProtectedRoute';
 import AccessDeniedPage from './AccessDeniedPage';
@@ -106,6 +107,8 @@ export const SideBar = () => {
             //para que funcione en desarrollo comentar el strictmode en el archivo main.jsx
         //20240408 npm install react-bootstrap bootstrap
             // para que funcionene los modales bootstrap en react
+        //202410 npm i bootstrap-icons 
+                //para iconos bootstrap
 
         https://app.netlify.com/
         https://www.digitalocean.com/community/tutorials/react-react-burger-menu-sidebar  
@@ -174,6 +177,7 @@ export const SideBar = () => {
                             {esConLicencia == -1 &&
                                 <>
                                     <NavLink onClick={closeMenu} to='/CatUsuario' className='nav-link' > <JugadoresSvg />{' Usuarios'} </NavLink>
+                                    
                                 </>
                             }
 
@@ -187,6 +191,7 @@ export const SideBar = () => {
                                         {isAccesosOpen && (
                                             <div style={fontsize}>
                                                 <NavLink onClick={closeMenu} to='/FrmUsuario' className='nav-link' >{' Registro de Usuarios'} </NavLink>
+                                                
                                             </div>
                                         )}
                                     </div>
@@ -199,6 +204,16 @@ export const SideBar = () => {
                                                 <NavLink onClick={closeMenu} to='/EncuestaProcesoAtencion' className='nav-link' >{' Intermedia'} </NavLink>
                                                 {/* <NavLink onClick={closeMenu} to='/FrmEncuesta' className='nav-link' >{' Clausura'} </NavLink> */}
                                                 <NavLink onClick={closeMenu} to='/EncuestaSatisfaccionCiudadana' className='nav-link' >{' Clausura'} </NavLink>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="menu-section" >
+                                        <div className="menu-section-title" onClick={toggleEncuesta} style={fontsizeH}>
+                                            {isEncuestaOpen ? '▾' : '▸'} Ficha Técnica</div><div style={separatorStyles}></div>
+                                        {true && (
+                                            <div style={fontsize}>
+                                                <NavLink onClick={closeMenu} to='/FichaTecnicaReunion' className='nav-link' > {' Reunión'} </NavLink>
                                             </div>
                                         )}
                                     </div>
@@ -230,6 +245,7 @@ export const SideBar = () => {
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/EncuestaSatisfaccionCiudadana' element={<FrmEncuesta />} /></Route>
                         {/* <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuestaIntermedia' element={<FrmEncuestaIntermedia />} /></Route> */}
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/EncuestaProcesoAtencion' element={<FrmEncuestaIntermedia />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FichaTecnicaReunion' element={<FrmFichaTecnica />} /></Route>
                         {/* <ProtectedRoute path="/Liga" element={<CatLiga />} profile={perfil} requiredProfile={2}/> */}
                         {/* <Route path="/Liga" element={<ProtectedRoute profile={perfil} requiredProfile={2} />}/> */}
 
