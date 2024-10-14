@@ -11,6 +11,38 @@ export const FrmPrueba = () => {
 
     const regresar = () => {
         navigate(-1);
+
+        ////////////////
+        // Define las columnas
+        const columns = React.useMemo(
+            () => [
+                {
+                    accessorKey: 'id',
+                    header: 'ID',
+                },
+                {
+                    accessorKey: 'nombre',
+                    header: 'Nombre',
+                },
+                {
+                    accessorKey: 'color',
+                    header: 'Color',
+                    cell: ({ cell }) => {
+                        const valorColor = cell.getValue();
+                        // Y dentro de la columna personalizada:
+                        return (
+                            <div className={obtenerClaseColor(valorColor)}>
+                                {valorColor}
+                            </div>
+                        );
+                    },
+                },
+            ],
+            []
+        );
+
+
+        ///////////////
     };
 
     return (

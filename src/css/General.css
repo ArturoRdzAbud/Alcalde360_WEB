@@ -1,0 +1,23 @@
+.red {
+    background-color: red;
+    padding: 2px;
+    border-radius: 2px;
+    height: 30px;
+    text-align: center;
+}
+
+.orange {
+    background-color: orange;
+    padding: 2px;
+    border-radius: 2px;
+    height: 30px;
+    text-align: center;
+}
+
+.green {
+    background-color: green;
+    padding: 2px;
+    border-radius: 2px;
+    height: 30px;
+    text-align: center;
+}

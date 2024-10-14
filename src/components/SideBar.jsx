@@ -26,7 +26,7 @@ import AccessDeniedPage from './AccessDeniedPage';
 
 //llamada temporal a pantalla asignar área y prioridad de incidencia (eliminar cuando se vaya a integrar)
 import FrmAsignarAreayPrioridadIncidencia from './FrmAsignarAreayPrioridadIncidencia';
-
+import FrmGuardarEstatusIncidencia from './FrmGuardarEstatusIncidencia';
 
 //Iconos
 import HomeSvg from '../svg/icon-home.svg?react'
@@ -64,11 +64,15 @@ export const SideBar = () => {
     const [isAccesosOpen, setIsAccesosOpen] = useState(false);
     const [isEncuestaOpen, setIsEncuestaOpen] = useState(false);
     const [isEncuestaIntermediaOpen, setIsEncuestaIntermediaOpen] = useState(false);
+    const [isIncidenciasOpen, setIsIncidenciasOpen] = useState(false);
     const toggleAccesos = () => {
         setIsAccesosOpen(!isAccesosOpen);
     };
     const toggleEncuesta = () => {
         setIsEncuestaOpen(!isEncuestaOpen);
+    };
+    const toggleIncidencias = () => {
+        setIsIncidenciasOpen(!isIncidenciasOpen);
     };
 
     // const toggleMenu = (setState,stateValue) => {
@@ -163,11 +167,11 @@ export const SideBar = () => {
                                     {isAdminOpen ? '▾' : '▸'} Configuración</div><div style={separatorStyles}></div></>)}
                                 {isAdminOpen && (
                                     <div style={fontsize}>
-                                        {perfil >= 4 && <NavLink onClick={closeMenu} to='/Arbitros' className='nav-link' > <Arbitros2vg />{'Catálogo de Árbitros'} </NavLink>}
-                                        {perfil >= 4 && <NavLink onClick={closeMenu} to='/ConsultarIncidencia' className='nav-link' > <IconFlagvg />{'Consulta de Incidencias'} </NavLink>}
+                                        {/*perfil >= 4 && <NavLink onClick={closeMenu} to='/Arbitros' className='nav-link' > <Arbitros2vg />{'Catálogo de Árbitros'} </NavLink>*/}
+                                        {/*perfil >= 4 && <NavLink onClick={closeMenu} to='/ConsultarIncidencia' className='nav-link' > <IconFlagvg />{'Consulta de Incidencias'} </NavLink>*/}
                                         {/*perfil >= 4 && <NavLink onClick={closeMenu} to='/Prueba' className='nav-link' > <IconFlagvg />{'Prueba'} </NavLink>*/}
                                         {/*llamada temporal a pantalla asignar área y prioridad de incidencia (eliminar cuando se vaya a integrar)*/}
-                                        {perfil >= 4 && <NavLink onClick={closeMenu} to='/AsignarAreayPrioridadIncidencia' className='nav-link' > <IconFlagvg />{'Asignar Área y Prioridad de la Incidencia'} </NavLink>}
+                                        {/*perfil >= 4 && <NavLink onClick={closeMenu} to='/AsignarAreayPrioridadIncidencia' className='nav-link' > <IconFlagvg />{'Asignar Área y Prioridad de la Incidencia'} </NavLink>*/}
 
                                     </div>
                                 )}
@@ -195,6 +199,17 @@ export const SideBar = () => {
                                             </div>
                                         )}
                                     </div>
+
+                                    <div className="menu-section" >
+                                        <div className="menu-section-title" onClick={toggleIncidencias} style={fontsizeH}>
+                                            {isIncidenciasOpen ? '▾' : '▸'} Incidencias</div><div style={separatorStyles}></div>
+                                        {isIncidenciasOpen && (
+                                            <div style={fontsize}>
+                                                <NavLink onClick={closeMenu} to='/ConsultarIncidencia' className='nav-link' > <IconFlagvg />{'Consulta de Incidencias'} </NavLink>
+                                            </div>
+                                        )}
+                                    </div>
+
                                     <div className="menu-section" >
                                         <div className="menu-section-title" onClick={toggleEncuesta} style={fontsizeH}>
                                             {isEncuestaOpen ? '▾' : '▸'} Encuestas</div><div style={separatorStyles}></div>
@@ -239,6 +254,7 @@ export const SideBar = () => {
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/Prueba' element={<FrmPrueba />} /></Route>
                         {/*llamada temporal a pantalla asignar área y prioridad de incidencia (eliminar cuando se vaya a integrar)*/}
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/AsignarAreayPrioridadIncidencia' element={<FrmAsignarAreayPrioridadIncidencia />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/GuardarEstatusIncidencia' element={<FrmGuardarEstatusIncidencia />} /></Route>
 
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmUsuario' element={<FrmUsuario />} /></Route>
                         {/* <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuesta' element={<FrmEncuesta />} /></Route> */}
