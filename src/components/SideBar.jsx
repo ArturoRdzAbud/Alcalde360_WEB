@@ -113,6 +113,8 @@ export const SideBar = () => {
             // para que funcionene los modales bootstrap en react
         //202410 npm i bootstrap-icons 
                 //para iconos bootstrap
+        //20241014 npm install date-fns
+                //se usa en frmguardarestatusincidencia
 
         https://app.netlify.com/
         https://www.digitalocean.com/community/tutorials/react-react-burger-menu-sidebar  
