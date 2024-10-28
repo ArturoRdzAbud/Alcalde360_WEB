@@ -467,7 +467,7 @@ const FrmEncuestaIntermedia = () => {
             </div> 
             <ElementoCampo type="select" lblCampo="Municipio: " claCampo="campo" nomCampo={ligaMunicipioF} options={datosMunicipio} onInputChange={(value) => handleMunicipio(value, ligaMunicipioF)} />
             */}
-              <SimpleTable data={datosEncuesta} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} esOcultaFooter={true} />
+              <SimpleTable data={datosEncuesta} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} esOcultaFooter={true} esOcultaBotonNuevo={true}/>
             </>
             ://----------------------------MODO EDICION/NUEVO REGISTRO
             <div>
@@ -500,36 +500,36 @@ const FrmEncuestaIntermedia = () => {
 
 
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}> */}
                     <span style={{ flexBasis: '60%', marginRight: '10px', flexShrink: 0 }}>
                       <ElementoCampo type="radio" lblCampo={`${datosEncuestaPregunta[0].NomPregunta} *:`} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} />
                     </span>
-                    <span style={{ flexGrow: 0.1 }}>
+                    {/* <span style={{ flexGrow: 0.1 }}>
                       <h2></h2>
-                    </span>
+                    </span> */}
                     {v1 == 1 &&
                       <span style={{ flexBasis: '40%', flexShrink: 1, marginTop: '40px' }}>
                         <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[1].NomPregunta} *:`} claCampo="campo" nomCampo={v2} options={datosP2} onInputChange={setV2} />
                       </span>}
-                  </div>
+                  {/* </div> */}
 
 
                   <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[2].NomPregunta} *:`} claCampo="campo" nomCampo={v3} options={datosP3} onInputChange={setV3} />
 
 
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}> */}
                     <span style={{ flexGrow: 0 }}>
                       <ElementoCampo type="radio" lblCampo={`${datosEncuestaPregunta[3].NomPregunta} *:`} claCampo="campo2" nomCampo={v5} options={datosP1} onInputChange={setV5} />
                     </span>
-                    <span style={{ flexGrow: 0.1 }}>
+                    {/* <span style={{ flexGrow: 0.1 }}>
                       <h2></h2>
-                    </span>
+                    </span> */}
                     {v5 == 1 &&
                       <span style={{ flexBasis: '40%', flexShrink: 1, marginTop: '20px' }}>
                         <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[1].NomPregunta} *:`} claCampo="campo" nomCampo={v4} options={datosP2} onInputChange={setV4} />
                       </span>}
-                  </div>
+                  {/* </div> */}
 
 
 

@@ -7,6 +7,7 @@ import { SideBarHeader } from './SideBarHeader';
 import config from '../config'; // archivo configs globales del proy
 import { PerfilContext } from './PerfilContext'; // Importa el contexto
 import { ElementoBotones } from './ElementoBotones'
+import { FrmFichaTecnicaAcuerdo } from './FrmFichaTecnicaAcuerdo'
 import Frame from './ElementoFrame';
 // import '../css/Marco.css'; // Importa tu archivo de estilos
 import { ElementoToastNotification } from './ElementoToastNotification';
@@ -31,6 +32,10 @@ export const FrmFichaTecnica = () => {
     const [archivo, setArchivo] = useState(null);
     const [acuerdoNum, setAcuerdoNum] = useState('');
     const [esMuestraCamposReq, setEsMuestraCamposReq] = useState(false);
+
+    const [acuerdoIdAct, setAcuerdoIdAct] = useState(-1);
+    const [acuerdoNombreAct, setAcuerdoNombreAct] = useState('');
+    const [esModoActividad, setEsModoActividad] = useState(false);
 
     const [esEditar, setEsEditar] = useState(false);
     const [esNuevo, setEsNuevo] = useState(false);
@@ -85,6 +90,11 @@ export const FrmFichaTecnica = () => {
         {
             header: ('Num.'),
             accessorKey: 'Num',
+            visible: true,
+        },
+        {
+            header: (''),
+            accessorKey: 'handleDet',
             visible: true,
         },
         {
@@ -160,6 +170,12 @@ export const FrmFichaTecnica = () => {
     const handleDeleteArchivo = (row, cellId) => {
         const nuevosDatos = datosArchivos.filter(dato => dato.IdArchivo !== row.original.IdArchivo);
         setDatosArchivos(nuevosDatos);
+    };
+    const handleDetAcuerdo = (rowData, cellId) => {
+        setEsModoActividad(true)
+        setAcuerdoIdAct(rowData.original.IdAcuerdo)
+        setAcuerdoNombreAct(rowData.original.Descripcion)
+        // setAcuerdoNum(rowData.original.Num)
     };
     const agregarParticipante = (nuevoParticipante) => {
         setDatosParticipantes(prevDatos => [...prevDatos, nuevoParticipante]);
@@ -274,113 +290,128 @@ export const FrmFichaTecnica = () => {
 
     return (
         <>
-            <SideBarHeader titulo={esNuevo ? ('Ficha Técnica Reunion') : esEditar ? 'Editar Ficha Técnica Reunion' : 'Consulta'}></SideBarHeader>
+
+
+            <SideBarHeader titulo={esNuevo ? ('Ficha Técnica Reunión') : esEditar ? 'Editar Ficha Técnica Reunión' : 'Consulta'}></SideBarHeader>
             <br /><br /><br /><br />
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <ElementoBotones esOcultaCancelar={true}></ElementoBotones>
-            </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ flexBasis: '50%', flexGrow: 0 }}>
-                    <ElementoCampo type='text' lblCampo="Título* :" claCampo="Nombre" nomCampo={titulo} onInputChange={setTitulo} tamanioString={100} />
-                </span>
-                <span style={{ flexBasis: '15%', flexShrink: 1, marginTop: '0px' }}>
-                    <ElementoCampo type='date' lblCampo="Fecha*:" claCampo="fecha" nomCampo={fecha} onInputChange={setFecha} />
-                </span>
-                <span style={{ flexBasis: '15%', flexShrink: 1, marginTop: '0px' }}>
-                    <ElementoCampo type='time' lblCampo="Hora Inicio*:" claCampo="hora" nomCampo={hora} onInputChange={setHora} />
-                </span>
-                <span style={{ flexBasis: '15%', flexShrink: 1, marginTop: '0px' }}>
-                    <ElementoCampo type='time' lblCampo="Hora Fin*:" claCampo="horaFin" nomCampo={horaFin} onInputChange={setHoraFin} />
-                </span>
-            </div>
+            {esModoActividad ? <FrmFichaTecnicaAcuerdo acuerdoNombreAct={acuerdoNombreAct}></FrmFichaTecnicaAcuerdo> :
+                <>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ flexBasis: '49%', flexGrow: 0 }}>
-                    <ElementoCampo type='text' lblCampo="Tema*:" claCampo="" nomCampo={tema} onInputChange={setTema} />
-                </span>
-                <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
-                    <ElementoCampo type='text' lblCampo="Lugar*:" claCampo="" nomCampo={lugar} onInputChange={setLugar} />
-                </span>
-            </div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <ElementoBotones esOcultaCancelar={true}></ElementoBotones>
+                    </div>
 
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ flexBasis: '49%', flexGrow: 0 }}>
+                            <ElementoCampo type='text' lblCampo="Título* :" claCampo="Nombre" nomCampo={titulo} onInputChange={setTitulo} tamanioString={100} />
+                        </span>
+                        <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
+                            <ElementoCampo type='date' lblCampo="Fecha*:" claCampo="fecha" nomCampo={fecha} onInputChange={setFecha} />
+                        </span>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ flexBasis: '49%', flexGrow: 0 }}>
-                    <Frame title="Participantes">
+                    </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ flexBasis: '44%', flexGrow: 0 }}>
-                                <ElementoCampo type='text' lblCampo="Nombre*:" claCampo="" nomCampo={participanteNombre} onInputChange={setParticipanteNombre} />
-                            </span>
-                            <span style={{ flexBasis: '44%', flexShrink: 1, marginTop: '0px' }}>
-                                <ElementoCampo type='text' lblCampo="Puesto*:" claCampo="" nomCampo={participantePuesto} onInputChange={setParticipantePuesto} />
-                            </span>
-                            <span style={{ flexBasis: '4%', flexShrink: 1, marginTop: '0px' }}>
-                                {/* <button type="button" className="btn btn-primary" onClick={() => handleSave(1)} ><Pagenew /></button> */}
-                                <i className="bi bi-table fs-2" onClick={() => handleSave(1)}></i>
-                            </span>
-                        </div>
-                        <SimpleTable data={datosParticipantes} columns={columnsParticipantes} handleEdit={handleEditParticipantes}
-                            esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={true}
-                            // handleDelete={() => handleDelete(1,datosParticipantes,'idParticipante')} />
-                            handleDelete={handleDeleteParticipante} />
-                        {/* handleDelete={() => handleDelete('idParticipante')} /> */}
-                    </Frame >
-                </span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
+                            <ElementoCampo type='time' lblCampo="Hora Inicio*:" claCampo="hora" nomCampo={hora} onInputChange={setHora} />
+                        </span>
+                        <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
+                            <ElementoCampo type='time' lblCampo="Hora Fin*:" claCampo="horaFin" nomCampo={horaFin} onInputChange={setHoraFin} />
+                        </span>
+                    </div>
 
-                <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
-                    <Frame title="Acuerdos">
-
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ flexBasis: '44%', flexGrow: 0 }}>
-                                <ElementoCampo type='text' lblCampo="Descripción*:" claCampo="" nomCampo={acuerdoNombre} onInputChange={setAcuerdoNombre} />
-                            </span>
-                            <span style={{ flexBasis: '44%', flexShrink: 1, marginTop: '0px' }}>
-                                <ElementoCampo type='text' lblCampo="Num*:" claCampo="" nomCampo={acuerdoNum} onInputChange={setAcuerdoNum} />
-                            </span>
-                            <span style={{ flexBasis: '4%', flexShrink: 1, marginTop: '0px' }}>
-                                <i className="bi bi-table fs-2" onClick={() => handleSave(2)}></i>
-                            </span>
-                        </div>
-                        <SimpleTable data={datosAcuerdos} columns={columnsAcuerdos} handleEdit={handleEditAcuerdos}
-                            esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={true}
-                            handleDelete={handleDeleteAcuerdo} />
-                    </Frame >
-                </span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ flexBasis: '49%', flexGrow: 0 }}>
+                            <ElementoCampo type='text' lblCampo="Tema*:" claCampo="" nomCampo={tema} onInputChange={setTema} />
+                        </span>
+                        <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
+                            <ElementoCampo type='text' lblCampo="Lugar*:" claCampo="" nomCampo={lugar} onInputChange={setLugar} />
+                        </span>
+                    </div>
 
 
+                    {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}> */}
 
 
-            </div>
+                    <span style={{ flexBasis: '49%', flexGrow: 0 }}>
+                        <Frame title="Participantes">
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ flexBasis: '44%', flexGrow: 0 }}>
+                                    <ElementoCampo type='text' lblCampo="Nombre*:" claCampo="" nomCampo={participanteNombre} onInputChange={setParticipanteNombre} />
+                                </span>
+                                <span style={{ flexBasis: '44%', flexShrink: 1, marginTop: '0px' }}>
+                                    <ElementoCampo type='text' lblCampo="Puesto*:" claCampo="" nomCampo={participantePuesto} onInputChange={setParticipantePuesto} />
+                                </span>
+                                <span style={{ flexBasis: '4%', flexShrink: 1, marginTop: '0px' }}>
+                                    {/* <button type="button" className="btn btn-primary" onClick={() => handleSave(1)} ><Pagenew /></button> */}
+                                    <i className="bi bi-table fs-2" onClick={() => handleSave(1)}></i>
+                                </span>
+                            </div>
+                            <SimpleTable data={datosParticipantes} columns={columnsParticipantes} handleEdit={handleEditParticipantes}
+                                esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={true}
+                                // handleDelete={() => handleDelete(1,datosParticipantes,'idParticipante')} />
+                                handleDelete={handleDeleteParticipante} />
+                            {/* handleDelete={() => handleDelete('idParticipante')} /> */}
+                        </Frame >
+                    </span>
+
+                    <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
+                        <Frame title="Acuerdos">
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ flexBasis: '44%', flexGrow: 0 }}>
+                                    <ElementoCampo type='text' lblCampo="Descripción*:" claCampo="" nomCampo={acuerdoNombre} onInputChange={setAcuerdoNombre} />
+                                </span>
+                                <span style={{ flexBasis: '44%', flexShrink: 1, marginTop: '0px' }}>
+                                    <ElementoCampo type='text' lblCampo="Num*:" claCampo="" nomCampo={acuerdoNum} onInputChange={setAcuerdoNum} />
+                                </span>
+                                <span style={{ flexBasis: '4%', flexShrink: 1, marginTop: '0px' }}>
+                                    <i className="bi bi-table fs-2" onClick={() => handleSave(2)}></i>
+                                </span>
+                            </div>
+                            <SimpleTable data={datosAcuerdos} columns={columnsAcuerdos} handleEdit={handleEditAcuerdos}
+                                esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={true}
+                                handleDelete={handleDeleteAcuerdo} handleDet={handleDetAcuerdo} />
+                        </Frame >
+                    </span>
 
 
 
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ flexBasis: '49%', flexGrow: 0 }}>
+                    {/* </div> */}
 
-                    <Frame title="Archivos Adjuntos">
-                        <ElementoCampo type='text' lblCampo="Nombre Archivo*:" claCampo="" nomCampo={archivoNombre} onInputChange={setArchivoNombre} />
-                        <label style={{ textAlign: "left" }}>extensión : pdf | imagen</label>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ flexBasis: '79%', flexGrow: 0 }}>
-                                <input type='file' className='form-control' name="profile_pic" onChange={selectedFileHandler} accept=".pdf, .png, .jpg, .jpeg" />
-                            </span>
-                            <span style={{ flexBasis: '19%', flexShrink: 1, marginTop: '0px' }}>
-                                {/* <button type='button' onClick={guardarFile} className='btn btn-primary col-12'>Cargar</button> */}
-                                <i className="bi bi-cloud-upload fs-2" onClick={() => guardarFile}></i>
-                            </span>
-                        </div>
 
-                        <SimpleTable data={datosArchivos} columns={columnsArchivos}
-                            esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={true}
-                            handleDelete={handleDeleteArchivo} />
 
-                    </Frame >
-                </span>
 
-            </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ flexBasis: '100%', flexGrow: 0 }}>
+
+                            <Frame title="Archivos Adjuntos">
+                                <ElementoCampo type='text' lblCampo="Nombre Archivo*:" claCampo="" nomCampo={archivoNombre} onInputChange={setArchivoNombre} />
+                                <label style={{ textAlign: "left" }}>extensión : pdf | imagen</label>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ flexBasis: '79%', flexGrow: 0 }}>
+                                        <input type='file' className='form-control' name="profile_pic" onChange={selectedFileHandler} accept=".pdf, .png, .jpg, .jpeg" />
+                                    </span>
+                                    <span style={{ flexBasis: '19%', flexShrink: 1, marginTop: '0px' }}>
+                                        {/* <button type='button' onClick={guardarFile} className='btn btn-primary col-12'>Cargar</button> */}
+                                        <i className="bi bi-cloud-upload fs-2" onClick={() => guardarFile}></i>
+                                    </span>
+                                </div>
+
+                                <SimpleTable data={datosArchivos} columns={columnsArchivos}
+                                    esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={true}
+                                    handleDelete={handleDeleteArchivo} />
+
+                            </Frame >
+                        </span>
+
+                    </div>
+
+                </>
+            }
 
 
             {esMuestraCamposReq &&
