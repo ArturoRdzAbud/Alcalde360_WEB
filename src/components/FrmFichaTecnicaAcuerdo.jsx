@@ -10,7 +10,7 @@ import Frame from './ElementoFrame';
 import { ElementoToastNotification } from './ElementoToastNotification';
 import Pagenew from '../svg/icon-save.svg?react'
 
-export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct }) => {
+export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct,setEsModoActividad,datosActividad,setDatosActividad }) => {
     // const { perfil, esConLicencia } = useContext(PerfilContext);
     // const { titulo, setTitulo } = useState('');
     // const [fecha, setFecha] = useState('');
@@ -27,7 +27,15 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct }) => {
     const onAceptarB = () => {
         setEsMuestraCamposReq(false)
     };
-    const [datosActividad, setDatosActividad] = useState([]);
+    const [datosEstatus, setDatosEstatus] = useState([
+        // [0, 'Pendiente'],
+        // [1, 'Completado'],
+        // [2, 'Vencido']
+        { value: 1, label: 'Pendiente' },
+        { value: 2, label: 'Completado' },
+        { value: 3, label: 'Vencido' }
+    ]);
+    // const [datosActividad, setDatosActividad] = useState([]);
     const columnsActividad = [
         {
             header: 'IdActividad',
@@ -45,7 +53,7 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct }) => {
             visible: true,
         },
         {
-            header: ('Ini'),
+            header: ('Inicio'),
             accessorKey: 'FechaIni',
             visible: true,
         },
@@ -57,6 +65,11 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct }) => {
         {
             header: ('Estatus'),
             accessorKey: 'Estatus',
+            visible: false,
+        },
+        {
+            header: ('Estatus'),
+            accessorKey: 'NomEstatus',
             visible: true,
         },
         {
@@ -84,13 +97,23 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct }) => {
     const handleEditActividad = (rowData, cellId) => {
         setActividadId(rowData.original.IdActividad)
         setActividadNombre(rowData.original.Descripcion)
-        setActividadNum(rowData.original.Num)
+        setResponsable(rowData.original.Responsable)
+        setFechaIni(rowData.original.FechaIni)
+        setFechaFin(rowData.original.FechaFin)
+        setEstatus(rowData.original.Estatus)
+        // setActividadNum(rowData.original.Num)
     }
     const handleSave = (tipo) => {
         if (tipo == 11) {
-            if (ActividadNombre.trim() === '' || ActividadNum.trim() === '') { setEsMuestraCamposReq(true); return }
+            if (ActividadNombre.trim() === '' || responsable.trim() === ''
+                || fechaIni.trim() === '' || fechaFin.trim() === ''
+                || estatus === 0
+            ) { setEsMuestraCamposReq(true); return }
             if (ActividadId < 0) {
-                agregarActividad({ IdActividad: (datosActividad.length + 1), Descripcion: ActividadNombre, Num: ActividadNum })
+                agregarActividad({
+                    IdActividad: (datosActividad.length + 1), Descripcion: ActividadNombre, Responsable: responsable
+                    , FechaIni: fechaIni, FechaFin: fechaFin, Estatus: estatus,
+                })
             } else {
                 editarActividad()
             }
@@ -110,7 +133,7 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct }) => {
                 return {
                     ...elemento,
                     Descripcion: ActividadNombre,
-                    Num: ActividadNum,
+                    Responsable: responsable, FechaIni: fechaIni, FechaFin: fechaFin, Estatus: estatus,
                 };
             }
             return elemento; // Devolver el participante sin cambios si no coincide el ID
@@ -120,9 +143,20 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct }) => {
     };
     const inicializaActividad = () => {
         setActividadNombre('')
-        setActividadNum('')
+        // setActividadNum('')
         setActividadId(-1)
+        setResponsable('')
+        setFechaIni('')
+        setFechaFin('')
+        setEstatus(-1)
     }
+    const acuerdoGuarda = () => {
+        // console.log('xd')
+        setEsModoActividad(false)
+    }
+    // const acuerdoCancela = () => {
+
+    // }
 
     useEffect(() => {
         setEsNuevo(1)
@@ -134,7 +168,9 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct }) => {
             <br /><br /><br /><br /> */}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <ElementoBotones></ElementoBotones>
+                <ElementoBotones esOcultaCancelar={true}
+                    // cancelar={acuerdoCancela} 
+                    guardar={acuerdoGuarda}></ElementoBotones>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -164,10 +200,10 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct }) => {
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ flexBasis: '48%', flexGrow: 0 }}>
-                            <ElementoCampo type='text' lblCampo="Fecha ini*:" claCampo="" nomCampo={ActividadNombre} onInputChange={setActividadNombre} />
+                            <ElementoCampo type='date' lblCampo="Fecha ini*:" claCampo="" nomCampo={fechaIni} onInputChange={setFechaIni} />
                         </span>
                         <span style={{ flexBasis: '48%', flexShrink: 1, marginTop: '0px' }}>
-                            <ElementoCampo type='date' lblCampo="Fecha fin*:" claCampo="" nomCampo={fechaIni} onInputChange={setFechaIni} />
+                            <ElementoCampo type='date' lblCampo="Fecha fin*:" claCampo="" nomCampo={fechaFin} onInputChange={setFechaFin} />
                         </span>
                     </div>
 
@@ -177,12 +213,12 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct }) => {
                     </span>
 
                     <span style={{ flexBasis: '4%', flexShrink: 1, marginTop: '0px' }}>
-                        <i className="bi bi-table fs-2" onClick={() => handleSave(2)}></i>
+                        <i className="bi bi-table fs-2" onClick={() => handleSave(11)}></i>
                     </span>
 
                 </Frame >
                 <SimpleTable data={datosActividad} columns={columnsActividad} handleEdit={handleEditActividad}
-                    esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={true}
+                    esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={false}
                     handleDelete={handleDeleteActividad} />
             </span >
 

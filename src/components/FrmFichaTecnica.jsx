@@ -30,7 +30,7 @@ export const FrmFichaTecnica = () => {
     const [archivoId, setArchivoId] = useState(-1);
     const [archivoNombre, setArchivoNombre] = useState('');
     const [archivo, setArchivo] = useState(null);
-    const [acuerdoNum, setAcuerdoNum] = useState('');
+    const [acuerdoNum, setAcuerdoNum] = useState(0);
     const [esMuestraCamposReq, setEsMuestraCamposReq] = useState(false);
 
     const [acuerdoIdAct, setAcuerdoIdAct] = useState(-1);
@@ -50,6 +50,8 @@ export const FrmFichaTecnica = () => {
         // setEsMuestraConfirmacion(false)
         // setEsFin(false)
     };
+
+    const [datosActividad, setDatosActividad] = useState([]);
 
     const [datosParticipantes, setDatosParticipantes] = useState([]);
     const [datosAcuerdos, setDatosAcuerdos] = useState([]);
@@ -151,7 +153,7 @@ export const FrmFichaTecnica = () => {
             }
         }
         if (tipo == 2) {
-            if (acuerdoNombre.trim() === '' || acuerdoNum.trim() === '') { setEsMuestraCamposReq(true); return }
+            if (acuerdoNombre.trim() === '' || acuerdoNum <= 0) { setEsMuestraCamposReq(true); return }
             if (acuerdoId < 0) {
                 agregarAcuerdo({ IdAcuerdo: (datosAcuerdos.length + 1), Descripcion: acuerdoNombre, Num: acuerdoNum })
             } else {
@@ -295,7 +297,11 @@ export const FrmFichaTecnica = () => {
             <SideBarHeader titulo={esNuevo ? ('Ficha Técnica Reunión') : esEditar ? 'Editar Ficha Técnica Reunión' : 'Consulta'}></SideBarHeader>
             <br /><br /><br /><br />
 
-            {esModoActividad ? <FrmFichaTecnicaAcuerdo acuerdoNombreAct={acuerdoNombreAct}></FrmFichaTecnicaAcuerdo> :
+            {esModoActividad ? <FrmFichaTecnicaAcuerdo acuerdoNombreAct={acuerdoNombreAct}
+                setEsModoActividad={setEsModoActividad}
+                datosActividad={datosActividad}
+                setDatosActividad={setDatosActividad}
+            ></FrmFichaTecnicaAcuerdo > :
                 <>
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -365,7 +371,7 @@ export const FrmFichaTecnica = () => {
                                     <ElementoCampo type='text' lblCampo="Descripción*:" claCampo="" nomCampo={acuerdoNombre} onInputChange={setAcuerdoNombre} />
                                 </span>
                                 <span style={{ flexBasis: '44%', flexShrink: 1, marginTop: '0px' }}>
-                                    <ElementoCampo type='text' lblCampo="Num*:" claCampo="" nomCampo={acuerdoNum} onInputChange={setAcuerdoNum} />
+                                    <ElementoCampo type='number' lblCampo="Num*:" claCampo="" nomCampo={acuerdoNum} onInputChange={setAcuerdoNum} />
                                 </span>
                                 <span style={{ flexBasis: '4%', flexShrink: 1, marginTop: '0px' }}>
                                     <i className="bi bi-table fs-2" onClick={() => handleSave(2)}></i>
@@ -414,7 +420,8 @@ export const FrmFichaTecnica = () => {
             }
 
 
-            {esMuestraCamposReq &&
+            {
+                esMuestraCamposReq &&
                 <ElementoToastNotification
                     mensaje={'Los datos con * son requeridos, favor de validar.'}
                     onAceptar={onAceptarB}
