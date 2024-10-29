@@ -297,7 +297,7 @@ export const FrmFichaTecnica = () => {
             <SideBarHeader titulo={esNuevo ? ('Ficha Técnica Reunión') : esEditar ? 'Editar Ficha Técnica Reunión' : 'Consulta'}></SideBarHeader>
             <br /><br /><br /><br />
 
-            {esModoActividad ? <FrmFichaTecnicaAcuerdo acuerdoNombreAct={acuerdoNombreAct}
+            {esModoActividad ? <FrmFichaTecnicaAcuerdo acuerdoNombreAct={acuerdoNombreAct} acuerdoIdAct={acuerdoIdAct}
                 setEsModoActividad={setEsModoActividad}
                 datosActividad={datosActividad}
                 setDatosActividad={setDatosActividad}

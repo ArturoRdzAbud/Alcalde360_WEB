@@ -10,16 +10,23 @@ import Frame from './ElementoFrame';
 import { ElementoToastNotification } from './ElementoToastNotification';
 import Pagenew from '../svg/icon-save.svg?react'
 
-export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct,setEsModoActividad,datosActividad,setDatosActividad }) => {
+export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct, setEsModoActividad, datosActividad, setDatosActividad }) => {
     // const { perfil, esConLicencia } = useContext(PerfilContext);
     // const { titulo, setTitulo } = useState('');
     // const [fecha, setFecha] = useState('');
     const [ActividadId, setActividadId] = useState(-1);
     const [ActividadNombre, setActividadNombre] = useState('');
     const [responsable, setResponsable] = useState('');
-    const [fechaIni, setFechaIni] = useState('');
-    const [fechaFin, setFechaFin] = useState('');
-    const [estatus, setEstatus] = useState(0);
+    // const [fechaIni, setFechaIni] = useState('');
+    const [fechaIni, setFechaIni] = useState(() => {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); 
+        const dd = String(today.getDate()).padStart(2, '0'); 
+        return `${yyyy}-${mm}-${dd}`; 
+    });
+    const [fechaFin, setFechaFin] = useState(fechaIni);
+    const [estatus, setEstatus] = useState(1);
     const [esMuestraCamposReq, setEsMuestraCamposReq] = useState(false);
 
     const [esEditar, setEsEditar] = useState(false);
@@ -35,8 +42,13 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct,setEsMod
         { value: 2, label: 'Completado' },
         { value: 3, label: 'Vencido' }
     ]);
-    // const [datosActividad, setDatosActividad] = useState([]);
+    const [datosActividadLocal, setDatosActividadLocal] = useState([]);
     const columnsActividad = [
+        {
+            header: 'IdAcuerdo',
+            accessorKey: 'IdAcuerdo',
+            visible: false,
+        },
         {
             header: 'IdActividad',
             accessorKey: 'IdActividad',
@@ -111,17 +123,19 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct,setEsMod
             ) { setEsMuestraCamposReq(true); return }
             if (ActividadId < 0) {
                 agregarActividad({
-                    IdActividad: (datosActividad.length + 1), Descripcion: ActividadNombre, Responsable: responsable
+                    IdAcuerdo: acuerdoIdAct,IdActividad: (datosActividad.length + 1), Descripcion: ActividadNombre, Responsable: responsable
                     , FechaIni: fechaIni, FechaFin: fechaFin, Estatus: estatus,
                 })
             } else {
                 editarActividad()
             }
         }
+        filtraLocal()
     };
     const handleDeleteActividad = (row, cellId) => {
         const nuevosDatos = datosActividad.filter(dato => dato.IdActividad !== row.original.IdActividad);
         setDatosActividad(nuevosDatos);
+        filtraLocal()
     };
     const agregarActividad = (nuevo) => {
         setDatosActividad(prevDatos => [...prevDatos, nuevo]);
@@ -146,9 +160,15 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct,setEsMod
         // setActividadNum('')
         setActividadId(-1)
         setResponsable('')
-        setFechaIni('')
-        setFechaFin('')
-        setEstatus(-1)
+        setFechaIni(() => {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0'); 
+            const dd = String(today.getDate()).padStart(2, '0'); 
+            return `${yyyy}-${mm}-${dd}`; 
+        })
+        setFechaFin(fechaIni)
+        setEstatus(1)
     }
     const acuerdoGuarda = () => {
         // console.log('xd')
@@ -157,10 +177,22 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct,setEsMod
     // const acuerdoCancela = () => {
 
     // }
-
+    const filtraLocal = () => {
+        console.log('filtra local')
+        var datosFiltrados = datosActividad
+        datosFiltrados = acuerdoIdAct > 0 ? datosFiltrados.filter(item => item.IdAcuerdo == acuerdoIdAct) : [];
+        setDatosActividadLocal(datosFiltrados)
+        // console.log(acuerdoIdAct)
+        // console.log(datosActividad)
+        // console.log(datosActividadLocal)
+    }
     useEffect(() => {
         setEsNuevo(1)
+        filtraLocal()
     }, []);
+    useEffect(() => {
+        filtraLocal()
+    }, [datosActividad]);
 
     return (
         <>
@@ -217,7 +249,7 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct,setEsMod
                     </span>
 
                 </Frame >
-                <SimpleTable data={datosActividad} columns={columnsActividad} handleEdit={handleEditActividad}
+                <SimpleTable data={datosActividadLocal} columns={columnsActividad} handleEdit={handleEditActividad}
                     esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={false}
                     handleDelete={handleDeleteActividad} />
             </span >
