@@ -29,7 +29,7 @@ export const SideBarHeader = ({ titulo = 'Encabezado', esConLogin = true }) => {
 
 
   return (
-    <div className="header" hidden={false}>
+    <div className="header" hidden={true}>
 
       <h4 className="text">{titulo}</h4>
       {/* <ElementoHeader titulo={titulo}></ElementoHeader> */}

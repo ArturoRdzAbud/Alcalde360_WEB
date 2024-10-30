@@ -73,7 +73,7 @@ export const ElementoCampo = ({
                   value={option.value}
                   checked={parseInt(value) === option.value}  // Comprobar si está seleccionado
                   onChange={handleInputChange}
-                  // disabled={!editable}
+                // disabled={!editable}
                 />
                 <label className="form-check-label" htmlFor={`${claCampo}_${index}`}>
                   {option.label}
@@ -100,22 +100,28 @@ export const ElementoCampo = ({
 
         ) : type == 'select' ? ( // Si el tipo es 'select', mostrar un combo desplegable
 
-          <div className="form-floating mb-3">
-            <select className="form-select"
-              id={claCampo}
-              value={value}
-              onChange={handleInputChange}
-              disabled={!editable}
-              style={{ width: width }}            // ref={ref}
-            >
-              {[{ value: '-1', label: '' }, ...options].map((option, index) => (
-                // {options.map((option, index) => (
-                <option key={index} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            <label htmlFor={claCampo}>{lblCampo}</label>
-          </div>
+          <>
+            
+            {lblCampo.length>50&&<label htmlFor={claCampo} style={{whiteSpace: 'normal',width: width,}}>{lblCampo}</label>}
 
+            <div className="form-floating mb-3">
+              <select className="form-select"
+                id={claCampo}
+                value={value}
+                onChange={handleInputChange}
+                disabled={!editable}
+                style={{ width: width }}            // ref={ref}
+              >
+                {[{ value: '-1', label: '' }, ...options].map((option, index) => (
+                  // {options.map((option, index) => (
+                  <option key={index} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+
+              {lblCampo.length<=50&&<label htmlFor={claCampo}>{lblCampo}</label>}
+
+            </div>
+          </>
         ) : type == "password" ? ( // Si es una conttraseña o password
 
           <div className="form-floating mb-3">
