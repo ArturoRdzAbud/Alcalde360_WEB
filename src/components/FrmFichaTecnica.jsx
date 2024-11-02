@@ -11,25 +11,52 @@ import { FrmFichaTecnicaAcuerdo } from './FrmFichaTecnicaAcuerdo'
 import Frame from './ElementoFrame';
 // import '../css/Marco.css'; // Importa tu archivo de estilos
 import { ElementoToastNotification } from './ElementoToastNotification';
-import Pagenew from '../svg/icon-save.svg?react'
+// import Pagenew from '../svg/icon-save.svg?react'
+import { useSearchParams } from 'react-router-dom';
+
 
 
 export const FrmFichaTecnica = () => {
-    const { perfil, esConLicencia } = useContext(PerfilContext);
-    const { titulo, setTitulo } = useState('');
-    const [fecha, setFecha] = useState('');
-    const [hora, setHora] = useState('');
-    const [horaFin, setHoraFin] = useState('');
-    const [tema, setTema] = useState('');
-    const [lugar, setLugar] = useState('');
+    const { perfil, esConLicencia, idAlcaldia } = useContext(PerfilContext);
+
+    const [searchParams] = useSearchParams();
+    const ficha = searchParams.get('ficha');
+    const solicitud = searchParams.get('solicitud');
+
+    // const [ficha, setFicha] = useState(0);
+    const [titulo, setTitulo] = useState('RL_TITUTLO');
+    const [fecha, setFecha] = useState(() => {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    });
+    const [hora, setHora] = useState(() => {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        return `${hh}:${mm}`;
+    });
+    const [horaFin, setHoraFin] = useState(() => {
+        const now = new Date();
+        now.setHours(now.getHours() + 2);  //+2 hora
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        return `${hh}:${mm}`;
+    });
+    const [tema, setTema] = useState('RL_TEMA');
+    const [lugar, setLugar] = useState('RL_LUGAR');
     const [participanteId, setParticipanteId] = useState(-1);
-    const [participanteNombre, setParticipanteNombre] = useState('');
+    const [participanteIdCombo, setParticipanteIdCombo] = useState(-1);
+    // const [participanteNombre, setParticipanteNombre] = useState('');
     const [participantePuesto, setParticipantePuesto] = useState('');
     const [acuerdoId, setAcuerdoId] = useState(-1);
     const [acuerdoNombre, setAcuerdoNombre] = useState('');
     const [archivoId, setArchivoId] = useState(-1);
     const [archivoNombre, setArchivoNombre] = useState('');
     const [archivo, setArchivo] = useState(null);
+    const [archivoDownload, setArchivoDownload] = useState(null);
     const [acuerdoNum, setAcuerdoNum] = useState(0);
     const [esMuestraCamposReq, setEsMuestraCamposReq] = useState(false);
 
@@ -39,6 +66,7 @@ export const FrmFichaTecnica = () => {
 
     const [esEditar, setEsEditar] = useState(false);
     const [esNuevo, setEsNuevo] = useState(false);
+    const [alertaMensaje, setAlertaMensaje] = useState('');
     // const onAceptar = () => {
     //     setEsMuestraCamposReq(false)
     // setEsMuestraConfirmacion(false)
@@ -47,6 +75,8 @@ export const FrmFichaTecnica = () => {
     // };
     const onAceptarB = () => {
         setEsMuestraCamposReq(false)
+        setAlertaMensaje('')
+        // console.log('limpia')
         // setEsMuestraConfirmacion(false)
         // setEsFin(false)
     };
@@ -56,6 +86,9 @@ export const FrmFichaTecnica = () => {
     const [datosParticipantes, setDatosParticipantes] = useState([]);
     const [datosAcuerdos, setDatosAcuerdos] = useState([]);
     const [datosArchivos, setDatosArchivos] = useState([]);
+    const [datosUsuario, setDatosUsuario] = useState([]);
+    const [datosParticipante, setDatosParticipante] = useState([]);
+    const [datosFuncionario, setDatosFuncionario] = useState([]);
     const columnsParticipantes = [
         {
             header: 'IdParticipante',
@@ -66,6 +99,11 @@ export const FrmFichaTecnica = () => {
             header: ('Nombre'),
             accessorKey: 'Nombre',
             visible: true,
+        },
+        {
+            header: ('ParticipanteIdCombo'),
+            accessorKey: 'ParticipanteIdCombo',
+            visible: false,
         },
         {
             header: ('Puesto'),
@@ -122,9 +160,14 @@ export const FrmFichaTecnica = () => {
             visible: true,
         },
         {
+            header: ('ArchivoFile'),
+            accessorKey: 'ArchivoFile',
+            visible: false,
+        },
+        {
             header: ('ArchivoBin'),
             accessorKey: 'ArchivoBin',
-            visible: true,
+            visible: false,
         },
         {
             header: (''),
@@ -132,9 +175,11 @@ export const FrmFichaTecnica = () => {
             visible: true,
         },
     ];
+
     const handleEditParticipantes = (rowData, cellId) => {
         setParticipanteId(rowData.original.IdParticipante)
-        setParticipanteNombre(rowData.original.Nombre)
+        // setParticipanteNombre(rowData.original.Nombre)
+        setParticipanteIdCombo(rowData.original.ParticipanteIdCombo)
         setParticipantePuesto(rowData.original.Puesto)
     }
     const handleEditAcuerdos = (rowData, cellId) => {
@@ -142,18 +187,26 @@ export const FrmFichaTecnica = () => {
         setAcuerdoNombre(rowData.original.Descripcion)
         setAcuerdoNum(rowData.original.Num)
     }
+
     const handleSave = (tipo) => {
-        console.log(tipo)
+        // console.log(tipo)
         if (tipo == 1) {
-            if (participanteNombre.trim() === '' || participantePuesto.trim() === '') { setEsMuestraCamposReq(true); return }
+            if (participanteIdCombo <= 0 || participantePuesto.trim() === '') { setEsMuestraCamposReq(true); return }
             if (participanteId < 0) {
-                agregarParticipante({ IdParticipante: (datosParticipantes.length + 1), Nombre: participanteNombre, Puesto: participantePuesto })
+                const participante = datosParticipante.find(dato => dato.IdUsuario === participanteIdCombo);
+                const nombre = participante ? participante.Nombre : '';
+                agregarParticipante({ IdParticipante: (datosParticipantes.length + 1), Nombre: nombre, ParticipanteIdCombo: participanteIdCombo, Puesto: participantePuesto })
             } else {
                 editarParticipante()
             }
         }
         if (tipo == 2) {
             if (acuerdoNombre.trim() === '' || acuerdoNum <= 0) { setEsMuestraCamposReq(true); return }
+            const idRepetido = datosAcuerdos.find(dato => dato.Descripcion === acuerdoNombre.trim());
+            if (idRepetido) {
+                setAlertaMensaje('Descripción ya existe, favor de validar')
+                return
+            }
             if (acuerdoId < 0) {
                 agregarAcuerdo({ IdAcuerdo: (datosAcuerdos.length + 1), Descripcion: acuerdoNombre, Num: acuerdoNum })
             } else {
@@ -179,6 +232,7 @@ export const FrmFichaTecnica = () => {
         setAcuerdoNombreAct(rowData.original.Descripcion)
         // setAcuerdoNum(rowData.original.Num)
     };
+
     const agregarParticipante = (nuevoParticipante) => {
         setDatosParticipantes(prevDatos => [...prevDatos, nuevoParticipante]);
         inicializaParticipante()
@@ -192,12 +246,16 @@ export const FrmFichaTecnica = () => {
         inicializaArchivo()
     };
     const editarParticipante = () => {
-        console.log('edit')
+        // console.log('edit')
         const nuevosParticipantes = datosParticipantes.map((participante) => {
             if (participante.IdParticipante === participanteId) {
+                const participante = datosParticipante.find(dato => dato.IdUsuario === participanteIdCombo);
+                const nombre = participante ? participante.Nombre : '';
                 return {
                     ...participante, // Mantiene los datos existentes
-                    Nombre: participanteNombre, // Sobrescribe el campo de nombre
+                    participanteIdCombo: participanteIdCombo,
+                    // Nombre: participanteNombre, // Sobrescribe el campo de nombre
+                    Nombre: nombre, // Sobrescribe el campo de nombre
                     Puesto: participantePuesto, // Sobrescribe el campo de puesto
                 };
             }
@@ -221,7 +279,8 @@ export const FrmFichaTecnica = () => {
         inicializaAcuerdo()
     };
     const inicializaParticipante = () => {
-        setParticipanteNombre('')
+        // setParticipanteNombre('')
+        setParticipanteIdCombo(-1)
         setParticipantePuesto('')
         setParticipanteId(-1)
     }
@@ -247,7 +306,8 @@ export const FrmFichaTecnica = () => {
         setFile(e.target.files[0])
     }
     const guardarFile = async (e) => {
-        e.preventDefault();
+        console.log('guardar file')
+        // e.preventDefault();
 
         const apiReq = config.apiUrl + '/GuardarFile';
         const formData = new FormData()
@@ -268,32 +328,200 @@ export const FrmFichaTecnica = () => {
 
                 setArchivo(file)
                 // await axios.post(apiReq, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
-                if (archivoNombre.trim() === '') { setEsMuestraCamposReq(true); return }
-                if (acuerdoId < 0) {
-                    agregarArchivo({ IdArchivo: (datosArchivos.length + 1), Nombre: archivoNombre, Archivo: file.name, ArchivoBin: file })
-                } else {
-                    // editarAcuerdo()
-                }
+                if (archivoNombre.trim() === '') { setEsMuestraCamposReq(true); console.log('return'); return }
 
-                // console.log('guardo correctamente')
-                // setEsFin(true)
+                const nuevoArchivo = {
+                    IdArchivo: datosArchivos.length + 1,
+                    Nombre: archivoNombre,
+                    Archivo: file.name,
+                    ArchivoFile: file,
+                    ArchivoBin: null // Inicialmente vacío
+                };
 
+                // Usamos FileReader para leer el archivo como base64
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    nuevoArchivo.ArchivoBin = event.target.result.split(',')[1]; // Obtiene solo la cadena base64
+                    // Aquí puedes agregar `nuevoArchivo` al XML o enviarlo a la base de datos
+                    agregarArchivo(nuevoArchivo);
+                };
+                // Iniciar la lectura del archivo
+                reader.readAsDataURL(file);
             } catch (error) {
-                if (!error.message == '') {
-                    // setAlertaMensaje('Error al guardar archivo: ' + error.message)
+                if (error.message) {
+                    console.error('Error al guardar archivo:', error.message);
                 }
             }
         }
     };
+    const descargarArchivo = (idArchivo) => {
+        //En este no funcionaba ya que no veia el valor actualizado de idArchivo
+    };
+    const handleDownloadFile = (rowData, cellId) => {
+        // console.log(datosArchivos)
+        // const archivo = datosArchivos.find((archivo) => archivo.IdArchivo === archivoId);
+        const archivo = datosArchivos.find((archivo) => archivo.IdArchivo === rowData.original.IdArchivo);
+        setArchivoDownload(archivo)
+        // console.log(archivo)
+    };
 
+    function base64ToUint8Array(base64) {
+        const binaryString = window.atob(base64);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes;
+    }
+    useEffect(() => {
+        if (!archivoDownload) return;
+
+        const binario = typeof archivoDownload.ArchivoBin === 'string'
+            ? base64ToUint8Array(archivoDownload.ArchivoBin)
+            : archivoDownload.ArchivoBin;
+
+        const blob = new Blob([binario], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = archivoDownload.Nombre;
+        document.body.appendChild(link);
+        link.click();
+
+        URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+
+        setArchivoDownload(null);
+    }, [archivoDownload]);
     useEffect(() => {
         setEsNuevo(1)
+        cargarDatos()
     }, []);
+    const cargarDatos = async () => {
+        try {
+            var arreglo = []
+            console.log('Carga desde BD...');
+            let apiUrl = config.apiUrl + '/ConsultarUsuarios';
+            const response = await axios.get(apiUrl);
+            // setDatosUsuario(response.data);
+            arreglo = response.data
+            arreglo = arreglo.map(item => { return { ...item, value: item.IdUsuario }; });
+            arreglo = arreglo.map(item => { return { ...item, label: item.Nombre }; });
+            setDatosUsuario(arreglo);
+
+        } catch (error) {
+            console.error('Error al obtener datos:', error);
+        }
+    };
+    useEffect(() => {
+        filtraLocal()
+        // console.log(datosUsuario)
+    }, [datosUsuario]);
+
+    const filtraLocal = () => {
+        // console.log('filtra local')
+        var datosFiltrados = datosUsuario
+        datosFiltrados = datosFiltrados.filter(item => item.IdPerfil == 7)
+        setDatosParticipante(datosFiltrados)
+
+        datosFiltrados = datosUsuario
+        datosFiltrados = datosFiltrados.filter(item => item.IdPerfil == 8)
+        setDatosFuncionario(datosFiltrados)
+
+        // console.log(datosParticipante)
+    }
+    function convertirAxml(datos, rootName) {
+        const xmlDoc = document.implementation.createDocument(null, rootName);
+        const rootElement = xmlDoc.documentElement;
+
+        datos.forEach(item => {
+            const itemElement = xmlDoc.createElement("item");
+            for (const key in item) {
+                if (item.hasOwnProperty(key)) {
+                    const propElement = xmlDoc.createElement(key);
+                    propElement.textContent = item[key];
+                    itemElement.appendChild(propElement);
+                }
+            }
+            rootElement.appendChild(itemElement);
+        });
+
+        return new XMLSerializer().serializeToString(xmlDoc);
+    }
+    const guardaIU = (async () => {
+        // console.log('ini guardado ')
+        // setAlertaMensaje('Al')
+        // return
+        const xmlParticipante = convertirAxml(datosParticipantes, "data");
+        const xmlAcuerdos = convertirAxml(datosAcuerdos, "data");
+        const xmlActividades = convertirAxml(datosActividad, "data");
+        const xmlArchivos = convertirAxml(datosArchivos, "data");
+
+        const data = {
+            pnIdAlcaldia: idAlcaldia,
+            pnFicha: ficha,
+            pnIdSolicitudAgenda:solicitud,
+            psTitulo: titulo,
+            psFecha: fecha,
+            psHora: hora,
+            psHoraFin: horaFin,
+            psTema: tema,
+            psLugar: lugar,
+            // pnAccion: accion,
+            psXmlParticipante: xmlParticipante,
+            psXmlAcuerdo: xmlAcuerdos,
+            psXmlActividades: xmlActividades,
+            psXmlArchivos: xmlArchivos
+        };
+        const apiReq = config.apiUrl + '/GuardarFicha';
+        try {
+            // console.log(titulo)
+            // return
+            if (titulo.trim == '') { setEsMuestraCamposReq(true); return }
+            if (fecha.trim == '') { setEsMuestraCamposReq(true); return }
+            if (hora.trim == '') { setEsMuestraCamposReq(true); return }
+            if (horaFin.trim == '') { setEsMuestraCamposReq(true); return }
+            if (tema.trim == '') { setEsMuestraCamposReq(true); return }
+            if (lugar.trim == '') { setEsMuestraCamposReq(true); return }
+            if (datosParticipantes.length < 2) {
+                // console.log('a')
+                setAlertaMensaje('Al menos 2 participantes son requeridos, favor de validar')
+                return
+            }
+
+
+            // console.log('Guardando Jugadores x Equipo', data);
+            // return
+
+            await axios.post(apiReq, { data }, { 'Access-Control-Allow-Origin': '*' })
+                .then(response => {
+                    if (!response.data == '') {
+                        console.log('REGRESA ERROR:')
+                        if (response.data.originalError === undefined) {
+                            console.log('response.data: ' + response.data)
+                            setAlertaMensaje(response.data)
+                        }
+                        else {
+                            console.log('response.data.originalError.info.message: ' + response.data.originalError.info.message)
+                            setAlertaMensaje(response.data.originalError.info.message)
+                        }
+                    } else {
+                        console.log('guardo correctamente')
+                        // setEsEditar(false)
+                        // setEsFin(true)
+                        setAlertaMensaje('Operación Exitosa')
+                    }
+                })
+        } catch (error) {
+            console.error('Error al guardar los jugadores x equipo', error);
+        }
+    })
+
 
     return (
         <>
-
-
             <SideBarHeader titulo={esNuevo ? ('Ficha Técnica Reunión') : esEditar ? 'Editar Ficha Técnica Reunión' : 'Consulta'}></SideBarHeader>
             <br /><br /><br /><br />
 
@@ -301,11 +529,12 @@ export const FrmFichaTecnica = () => {
                 setEsModoActividad={setEsModoActividad}
                 datosActividad={datosActividad}
                 setDatosActividad={setDatosActividad}
+                datosFuncionario={datosFuncionario}
             ></FrmFichaTecnicaAcuerdo > :
                 <>
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <ElementoBotones esOcultaCancelar={true}></ElementoBotones>
+                        <ElementoBotones esOcultaCancelar={true} guardar={guardaIU}></ElementoBotones>
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -345,7 +574,8 @@ export const FrmFichaTecnica = () => {
 
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <span style={{ flexBasis: '44%', flexGrow: 0 }}>
-                                    <ElementoCampo type='text' lblCampo="Nombre*:" claCampo="" nomCampo={participanteNombre} onInputChange={setParticipanteNombre} />
+                                    {/* <ElementoCampo type='text' lblCampo="Nombre*:" claCampo="" nomCampo={participanteNombre} onInputChange={setParticipanteNombre} /> */}
+                                    <ElementoCampo type="selectBusqueda" lblCampo="Nombre*:" claCampo="Nombre" nomCampo={participanteIdCombo} options={datosParticipante} onInputChange={setParticipanteIdCombo} />
                                 </span>
                                 <span style={{ flexBasis: '44%', flexShrink: 1, marginTop: '0px' }}>
                                     <ElementoCampo type='text' lblCampo="Puesto*:" claCampo="" nomCampo={participantePuesto} onInputChange={setParticipantePuesto} />
@@ -396,20 +626,24 @@ export const FrmFichaTecnica = () => {
 
                             <Frame title="Archivos Adjuntos">
                                 <ElementoCampo type='text' lblCampo="Nombre Archivo*:" claCampo="" nomCampo={archivoNombre} onInputChange={setArchivoNombre} />
-                                <label style={{ textAlign: "left" }}>extensión : pdf | imagen</label>
+                                {/* <label style={{ textAlign: "left" }}>extensión : pdf | imagen</label> */}
+                                <label style={{ textAlign: "left" }}>extensión válida : pdf </label>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <span style={{ flexBasis: '79%', flexGrow: 0 }}>
-                                        <input type='file' className='form-control' name="profile_pic" onChange={selectedFileHandler} accept=".pdf, .png, .jpg, .jpeg" />
+                                        {/* <input type='file' className='form-control' name="profile_pic" onChange={selectedFileHandler} accept=".pdf, .png, .jpg, .jpeg" /> */}
+                                        <input type='file' className='form-control' name="profile_pic" onChange={selectedFileHandler} accept=".pdf" />
                                     </span>
                                     <span style={{ flexBasis: '19%', flexShrink: 1, marginTop: '0px' }}>
                                         {/* <button type='button' onClick={guardarFile} className='btn btn-primary col-12'>Cargar</button> */}
-                                        <i className="bi bi-cloud-upload fs-2" onClick={() => guardarFile}></i>
+                                        <i className="bi bi-cloud-upload fs-2" onClick={() => guardarFile()}></i>
                                     </span>
                                 </div>
 
                                 <SimpleTable data={datosArchivos} columns={columnsArchivos}
                                     esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={true}
-                                    handleDelete={handleDeleteArchivo} />
+                                    handleDelete={handleDeleteArchivo}
+                                    handleEdit={handleDownloadFile}
+                                />
 
                             </Frame >
                         </span>
@@ -424,6 +658,12 @@ export const FrmFichaTecnica = () => {
                 esMuestraCamposReq &&
                 <ElementoToastNotification
                     mensaje={'Los datos con * son requeridos, favor de validar.'}
+                    onAceptar={onAceptarB}
+                ></ElementoToastNotification>
+            }
+            {alertaMensaje &&
+                <ElementoToastNotification
+                    mensaje={alertaMensaje}
                     onAceptar={onAceptarB}
                 ></ElementoToastNotification>
             }

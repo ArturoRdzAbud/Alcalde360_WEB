@@ -1,5 +1,8 @@
 //componente para mostrar un campo
 import { useState, useEffect } from "react";
+import { BiLeftArrow } from "react-icons/bi";
+import Select from 'react-select';
+
 export const ElementoCampo = ({
   type = 'text'
   , lblCampo = 'lblCampo'
@@ -56,6 +59,12 @@ export const ElementoCampo = ({
     setValue(nomCampo);
   }, [nomCampo]);
 
+  const formattedOptions = options.map((option) => ({
+    value: option.value,
+    label: option.label,
+  }));
+
+
   return (
     <>
       {
@@ -101,8 +110,8 @@ export const ElementoCampo = ({
         ) : type == 'select' ? ( // Si el tipo es 'select', mostrar un combo desplegable
 
           <>
-            
-            {lblCampo.length>50&&<label htmlFor={claCampo} style={{whiteSpace: 'normal',width: width,}}>{lblCampo}</label>}
+
+            {lblCampo.length > 50 && <label htmlFor={claCampo} style={{ whiteSpace: 'normal', width: width, }}>{lblCampo}</label>}
 
             <div className="form-floating mb-3">
               <select className="form-select"
@@ -118,10 +127,35 @@ export const ElementoCampo = ({
                 ))}
               </select>
 
-              {lblCampo.length<=50&&<label htmlFor={claCampo}>{lblCampo}</label>}
+              {lblCampo.length <= 50 && <label htmlFor={claCampo}>{lblCampo}</label>}
 
             </div>
           </>
+        ) : type == 'selectBusqueda' ? (
+          <>
+            <label htmlFor={claCampo} style={{ whiteSpace: 'normal', width: width, textAlign:"left" }}>{lblCampo}</label>
+            <div className="form-floating mb-3" style={{ width: width}}>
+              <Select
+                id={claCampo}
+                // value={formattedOptions.find((opt) => opt.value === value)} // valor seleccionado
+                value={value !== -1 ? formattedOptions.find((opt) => opt.value === value) : null} // Si el valor es -1, se establece en null para limpiar
+                onChange={(selectedOption) => handleInputChange({ target: { value: selectedOption.value } })}
+                options={formattedOptions} // opciones
+                isDisabled={!editable} // deshabilita el select si no es editable
+                placeholder=""
+                classNamePrefix="react-select"
+                styles={{
+                  container: (base) => ({
+                    ...base,
+                    width: '100%',
+                    textAlign: 'left',
+                    zIndex: 10, 
+                  }),
+                }}
+              />
+            </div>
+          </>
+
         ) : type == "password" ? ( // Si es una conttraseña o password
 
           <div className="form-floating mb-3">

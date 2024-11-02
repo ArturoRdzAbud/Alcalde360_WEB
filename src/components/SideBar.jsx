@@ -115,6 +115,8 @@ export const SideBar = () => {
                 //para iconos bootstrap
         //20241014 npm install date-fns
                 //se usa en frmguardarestatusincidencia
+        //202410 npm install react-select
+                para que los combos puedan tener busqueda integrada
 
         https://app.netlify.com/
         https://www.digitalocean.com/community/tutorials/react-react-burger-menu-sidebar  
