@@ -20,6 +20,8 @@ import FrmPrueba from './FrmPrueba';
 import FrmEncuesta from './FrmEncuesta';
 import FrmEncuestaIntermedia from './FrmEncuestaIntermedia';
 import FrmFichaTecnica from './FrmFichaTecnica';
+import FrmConsultaSolicitudAgenda from './FrmConsultaSolicitudAgenda';
+import FrmSolicitudAgenda from './FrmSolicitudAgenda';
 
 import ProtectedRoute from './ProtectedRoute';
 import AccessDeniedPage from './AccessDeniedPage';
@@ -115,6 +117,10 @@ export const SideBar = () => {
             // para que funcionene los modales bootstrap en react
         //202410 npm i bootstrap-icons 
                 //para iconos bootstrap
+        //20241014 npm install date-fns
+                //se usa en frmguardarestatusincidencia
+        //202410 npm install react-select
+                para que los combos puedan tener busqueda integrada
 
         https://app.netlify.com/
         https://www.digitalocean.com/community/tutorials/react-react-burger-menu-sidebar  
@@ -183,7 +189,7 @@ export const SideBar = () => {
                             {esConLicencia == -1 &&
                                 <>
                                     <NavLink onClick={closeMenu} to='/CatUsuario' className='nav-link' > <JugadoresSvg />{' Usuarios'} </NavLink>
-                                    
+
                                 </>
                             }
 
@@ -197,17 +203,18 @@ export const SideBar = () => {
                                         {isAccesosOpen && (
                                             <div style={fontsize}>
                                                 <NavLink onClick={closeMenu} to='/FrmUsuario' className='nav-link' >{' Registro de Usuarios'} </NavLink>
-                                                
+
                                             </div>
                                         )}
                                     </div>
 
                                     <div className="menu-section" >
                                         <div className="menu-section-title" onClick={toggleIncidencias} style={fontsizeH}>
-                                            {isIncidenciasOpen ? '▾' : '▸'} Incidencias</div><div style={separatorStyles}></div>
+                                            {isIncidenciasOpen ? '▾' : '▸'} Consultar</div><div style={separatorStyles}></div>
                                         {isIncidenciasOpen && (
                                             <div style={fontsize}>
-                                                <NavLink onClick={closeMenu} to='/ConsultarIncidencia' className='nav-link' > <IconFlagvg />{'Consulta de Incidencias'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/ConsultarIncidencia' className='nav-link' > {'Consulta de Incidencias'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/ConsultarSolicitudAgenda' className='nav-link' > {'Consulta de Solicitud de Agenda'} </NavLink>
                                             </div>
                                         )}
                                     </div>
@@ -259,6 +266,8 @@ export const SideBar = () => {
                         {/*llamada temporal a pantalla asignar área y prioridad de incidencia (eliminar cuando se vaya a integrar)*/}
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/AsignarAreayPrioridadIncidencia' element={<FrmAsignarAreayPrioridadIncidencia />} /></Route>
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/GuardarEstatusIncidencia' element={<FrmGuardarEstatusIncidencia />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/ConsultarSolicitudAgenda' element={<FrmConsultaSolicitudAgenda />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/SolicitudAgenda' element={<FrmSolicitudAgenda />} /></Route>
 
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmUsuario' element={<FrmUsuario />} /></Route>
                         {/* <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuesta' element={<FrmEncuesta />} /></Route> */}

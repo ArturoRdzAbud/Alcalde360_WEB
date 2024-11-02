@@ -14,6 +14,7 @@ import Pagelast from '../svg/page-last.svg?react'
 import Pagenew from '../svg/page-new.svg?react'
 import Pagetop from '../svg/page-top.svg?react'
 import Delete from '../svg/icon-trash-red.svg?react'
+// import Det from '../svg/icon-config.svg?react'
 
 function SimpleTable({ data
     , columns
@@ -28,6 +29,8 @@ function SimpleTable({ data
     , setData
     , pageSize = 20
     , handleDelete
+    , handleDet
+    , handleDownload
     // , esConLink = true
 }) {
 
@@ -166,40 +169,43 @@ function SimpleTable({ data
                                     cell.column.columnDef.visible && (  //VALIDA SI ES VISIBLE
 
                                         <td key={cell.id}
-                                            style={cell.column.id === "handleDelete" ? { width: '50px', textAlign: 'center' } : {}}
+                                            style={cell.column.id === "handleDelete" || cell.column.id === "handleDet" || cell.column.id === "handleDet2" ? { width: '50px', textAlign: 'center' } : {}}
                                         >
                                             {
                                                 // let hasMeta = flexRender(cell.column.columnDef.cell, cell.getContext())
                                                 ((cell.column.id == "Nombre" || cell.column.id == "Descripcion" || cell.column.id == "Link")) ?    //VALIDA SI ES COLUMNA TIPO LINK
                                                     <a href="#" onClick={(e) => { e.preventDefault(); handleEdit(row, cell.column.id) }}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</a>
                                                     // : (cell.column.id == "Activo") ?
-                                                    :
-                                                    (cell.column.id == "handleDelete") ?
+                                                    : (cell.column.id == "handleDelete") ?
                                                         <a href="#" onClick={(e) => { e.preventDefault(); handleDelete(row, cell.column.id) }}><Delete /></a>
-                                                        : (cell.column.id.endsWith("Chk")) ?
+                                                        : (cell.column.id == "handleDet") ?
+                                                            <i className="bi bi-pencil-square" onClick={() => handleDet(row, cell.column.id)}></i>
+                                                            : (cell.column.id == "handleDownload") ?
+                                                                <i className="bi bi-download" onClick={() => handleDownload(row, cell.column.id)}></i>
+                                                                : (cell.column.id.endsWith("Chk")) ?
 
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={cell.renderValue().toString() == 'true' || cell.renderValue().toString() == '1'}
-                                                                onChange={(e) => {
-                                                                    handleCheckboxChange(row, e.target.checked, cell.column.id);
-                                                                }}
-                                                                disabled={!cell.column.id.endsWith("EditChk")}
-
-                                                            />
-                                                            : (cell.column.id == "btnAdd") ?
-                                                                <button type="button" className="btn btn-secondary" onClick={vuelveArriba}><Pagetop /></button>
-                                                                : (cell.column.id.endsWith("EditTxt")) ?
                                                                     <input
-                                                                        style={{ width: 50 }}//ancho de col
-                                                                        min="0"//Solo Positivos
-                                                                        type="number"//solo nums
-                                                                        value={cell.renderValue().toString()}//trae el valor de BD
-                                                                        onChange={(e) => {//asigna valor
-                                                                            handleTextboxChange(row, e.target.value, cell.column.id);
+                                                                        type="checkbox"
+                                                                        checked={cell.renderValue().toString() == 'true' || cell.renderValue().toString() == '1'}
+                                                                        onChange={(e) => {
+                                                                            handleCheckboxChange(row, e.target.checked, cell.column.id);
                                                                         }}
-                                                                    /> :
-                                                                    flexRender(cell.column.columnDef.cell, cell.getContext())
+                                                                        disabled={!cell.column.id.endsWith("EditChk")}
+
+                                                                    />
+                                                                    : (cell.column.id == "btnAdd") ?
+                                                                        <button type="button" className="btn btn-secondary" onClick={vuelveArriba}><Pagetop /></button>
+                                                                        : (cell.column.id.endsWith("EditTxt")) ?
+                                                                            <input
+                                                                                style={{ width: 50 }}//ancho de col
+                                                                                min="0"//Solo Positivos
+                                                                                type="number"//solo nums
+                                                                                value={cell.renderValue().toString()}//trae el valor de BD
+                                                                                onChange={(e) => {//asigna valor
+                                                                                    handleTextboxChange(row, e.target.value, cell.column.id);
+                                                                                }}
+                                                                            /> :
+                                                                            flexRender(cell.column.columnDef.cell, cell.getContext())
 
                                             }
                                         </td>

@@ -512,14 +512,14 @@ const FrmEncuesta = () => {
             </div> 
             <ElementoCampo type="select" lblCampo="Municipio: " claCampo="campo" nomCampo={ligaMunicipioF} options={datosMunicipio} onInputChange={(value) => handleMunicipio(value, ligaMunicipioF)} />
             */}
-              <SimpleTable data={datosEncuesta} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} esOcultaFooter={true} buttonRefNuevo={buttonRefNuevo} />
+              <SimpleTable data={datosEncuesta} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} esOcultaFooter={true} buttonRefNuevo={buttonRefNuevo} esOcultaBotonNuevo={true} />
             </>
             ://----------------------------MODO EDICION/NUEVO REGISTRO
             <div>
               <form onSubmit={guardarEncuesta}>
                 <br />
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <ElementoBotones cancelar={cancelar} esOcultaCancelar={true}></ElementoBotones>
+                  <ElementoBotones cancelar={cancelar} esOcultaCancelar={true} ></ElementoBotones>
                 </div>
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

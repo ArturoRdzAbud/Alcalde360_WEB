@@ -257,8 +257,8 @@ export const FrmReporteIncidencia = () => {
 
       const response = await axios.post(apiReq, { data }, { 'Access-Control-Allow-Origin': '*' })
       console.log("Response Data:", response.data);
-
-      const id = response.data[0].IdIncidencia; //se debe especificar el registro 0 ya que el response es un arreglo
+      //response.data[0].IdIncidencia //se debe especificar el registro 0 ya que el response es un arreglo
+      const id = response.data;  //Solo regresa IdIncidencia
       console.log("Id:", id);
 
 
@@ -411,32 +411,7 @@ export const FrmReporteIncidencia = () => {
 
   }, []);
 
-  /*
-   useEffect(() => {
-     //Código temporal para cargar los controles en modo edición
-     //setIdIncidencia(5)
-     //setDescripcion('problemas con una luz en mi calle')
-     //setIdTipoIncidencia(2)
-    
-         setNombre('Arturo')
-         setApellidoPaterno('Rodriguez')
-         setApellidoMaterno('Abud')
-         setTelefono('8121003020')
-         setCorreo('arturo.rodriguez.abud@gmail.com')
-         setUbicacion('')
-         setIdColonia(5)
-         setCalle('san josé')
-         setNumero('7946')
-         setCodigoPostal('87670')
-     
-         setAccion(1)//0 para MODIF 1 para nuevo
-     
-         consultarIncidenciaEvidencia(1);
-         consultarIncidenciaEvidencia(2);
-         consultarIncidenciaEvidencia(3);
-         
-   }, [esEditar]);
-  */
+
   const asignarArea = () => {
 
     const data = {
