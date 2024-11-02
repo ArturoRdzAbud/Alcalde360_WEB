@@ -28,13 +28,15 @@ import AccessDeniedPage from './AccessDeniedPage';
 import FrmAsignarAreayPrioridadIncidencia from './FrmAsignarAreayPrioridadIncidencia';
 import FrmGuardarEstatusIncidencia from './FrmGuardarEstatusIncidencia';
 
+import FrmConsultarEventos from './FrmConsultarEventos';
+import FrmFichaTecnicaEvento from './FrmFichaTecnicaEvento';
+
 //Iconos
 import HomeSvg from '../svg/icon-home.svg?react'
 import Arbitrosvg from '../svg/arbitro.svg?react'
 import Arbitros2vg from '../svg/arbitro.svg?react'
 import UsuarioSvg from '../svg/usuario.svg?react'
 import IconFlagvg from '../svg/icon-flag.svg?react'
-
 
 
 // export default props => {
@@ -229,6 +231,8 @@ export const SideBar = () => {
                                         {true && (
                                             <div style={fontsize}>
                                                 <NavLink onClick={closeMenu} to='/FichaTecnicaReunion' className='nav-link' > {' Reunión'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/ConsultarEventos' className='nav-link' > {' Eventos'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/Arbitros' className='nav-link' > {' Arbitros'} </NavLink>
                                             </div>
                                         )}
                                     </div>
@@ -262,6 +266,10 @@ export const SideBar = () => {
                         {/* <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuestaIntermedia' element={<FrmEncuestaIntermedia />} /></Route> */}
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/EncuestaProcesoAtencion' element={<FrmEncuestaIntermedia />} /></Route>
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FichaTecnicaReunion' element={<FrmFichaTecnica />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/ConsultarEventos' element={<FrmConsultarEventos />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FichaTecnicaEvento' element={<FrmFichaTecnicaEvento />} /></Route>
+                        
+                        
                         {/* <ProtectedRoute path="/Liga" element={<CatLiga />} profile={perfil} requiredProfile={2}/> */}
                         {/* <Route path="/Liga" element={<ProtectedRoute profile={perfil} requiredProfile={2} />}/> */}
 
