@@ -77,7 +77,7 @@ export const FrmFichaTecnicaEvento = () => {
     const [datosInvitados, setDatosInvitados] = useState([]);
     const [datosPresidium, setDatosPresidium] = useState([]);
     const [datosProgramas, setDatosProgramas] = useState([]);
-
+    
     const columnsInvitados = [
         {
             header: 'IdAlcaldia',
@@ -185,6 +185,7 @@ export const FrmFichaTecnicaEvento = () => {
         }
     ];
 
+  
     const onAceptarB = () => {
         setEsMuestraCamposReq(false)
     };
@@ -223,6 +224,34 @@ export const FrmFichaTecnicaEvento = () => {
         return horatmp
     }
 
+    useEffect(() => {
+        console.log("Ejecutando useEffect para cargar datos de programas");
+        const cargarDatos = async () => {
+            try {
+                let apiUrl = 'http://localhost:3000/ConsultarCombo?psSpSel=%22ConsultarOrigenAgendaCmb%22';
+                const response = await axios.get(apiUrl);
+                setDatosOrigen(response.data);
+    
+                if (!dataParams.esNuevo && dataParams.IdFichaTecEvento !== 0) {
+                    apiUrl = config.apiUrl + '/ConsultarEventoProgramas';
+                    const responseProgramas = await axios.get(apiUrl, {
+                        params: { pnIdAlcaldia: idAlcaldia, pnIdFichaTecnicaEvento: dataParams.IdFichaTecEvento },
+                    });
+                                        
+                    setDatosProgramas(Array.isArray(response.data) ? response.data : [response.data]);
+                  
+                    console.log('Response Programas:', responseProgramas.data);
+                }
+            } catch (error) {
+                console.error('Error al obtener los datos', error);
+            }
+        };
+    
+        cargarDatos();
+    }, [dataParams, idAlcaldia]); // Dependencias de datos que pueden cambiar
+
+    
+/*
     //-------------------------------------------------------------------SECCION USE EFFFECT
     // llena arreglos de combos
     useEffect(() => {
@@ -237,8 +266,9 @@ export const FrmFichaTecnicaEvento = () => {
 
             if (dataParams.IdFichaTecEvento == 0) return
 
-            var ApiUrl = config.apiUrl + '/ConsultarEventoParticipantes';
-    /*       
+            //quito la declaración de la variable ApiUrl
+            ApiUrl = config.apiUrl + '/ConsultarEventoParticipantes';
+           
             axios.get(ApiUrl, { params: { pnIdAlcaldia: idAlcaldia, pnIdFichaTecnicaEvento: IdFichaTecnicaEvento, pnIdTipoParticipanteEvento: 1 }})
             .then (response => {
                 setDatosInvitados(response.data)
@@ -263,20 +293,23 @@ export const FrmFichaTecnicaEvento = () => {
             .catch (error => {console.error('Error al obtener el Presidium',error)})
 
             console.log('CARGANDO GRIDS invitados', datosPresidium)
-    */
+    
 
             ApiUrl = config.apiUrl + '/ConsultarEventoProgramas';
             axios.get(ApiUrl, { params: { pnIdAlcaldia: idAlcaldia, pnIdFichaTecnicaEvento: dataParams.IdFichaTecEvento }})
-            .then ( response => { 
-                setDatosProgramas(response.data);
-                // copio la lista con [...list] y la ordeno con sort()
-                //const sortedList = [...datosProgramas].sort((a, b) => (a.IdPrograma > b.IdPrograma ? 1 : a.IdPrograma < b.IdPrograma ? -1 : 0))
-                // actualizo el estado con la nueva lista ya ordenada
-                //setDatosProgramas(sortedList)
-                console.log('CARGANDO GRIDS programas', response.data, 'lista de progs: ' + datosProgramas)
+            //axios.get(apiUrl, { params: { pnIdLiga: ligaF } })
+            //.then(response => { setDatosArbitro(response.data); setDatosArbitroBd(response.data) })
+            .then(response => { 
+                console.log('Response data:', response.data);
+                setDatosProgramas(response.data); 
             })
+             // copio la lista con [...list] y la ordeno con sort()
+             //const sortedList = [...datosProgramas].sort((a, b) => (a.IdPrograma > b.IdPrograma ? 1 : a.IdPrograma < b.IdPrograma ? -1 : 0))
+             // actualizo el estado con la nueva lista ya ordenada
+             //setDatosProgramas(sortedList)
             .catch (error => { console.error('Error al obtener los programas', error)})
-
+           
+  cambios Artur - 03/11/2024
             console.log('ACTUALIZANDO VALORES')
 
             console.log('1 ' + dataParams, dataParams.esNuevo, esNuevo, dataParams.IdFichaTecEvento, dataParams.FechaHoraInicioEvento, dataParams.FechaHoraFinalEvento)
@@ -321,8 +354,10 @@ export const FrmFichaTecnicaEvento = () => {
 
         }
 
-    },[]); // se ejecuta 1 vez al inicio solamente
+    },[dataParams, idAlcaldia]); // se ejecuta 1 vez al inicio solamente
 
+*/
+/*
      //Carga la consulta de resultados desde BD
     useEffect(() => {
  
@@ -331,7 +366,7 @@ export const FrmFichaTecnicaEvento = () => {
         console.log('5 CARGANDO GRIDS', esEditar)
 
         var ApiUrl = 'http://localhost:3000/ConsultarEventoParticipantes';
-/*
+
         console.log(idAlcaldia, IdFichaTecnicaEvento)
 
         var ApiUrl = config.apiUrl + '/ConsultarEventoParticipantes';
@@ -361,7 +396,7 @@ export const FrmFichaTecnicaEvento = () => {
 
         console.log('CARGANDO GRIDS invitados', datosPresidium)
 
-*/
+
 
         ApiUrl = config.apiUrl + '/ConsultarEventoProgramas';
         axios.get(ApiUrl, { params: { pnIdAlcaldia: idAlcaldia, pnIdFichaTecnicaEvento: dataParams.IdFichaTecEvento }})
@@ -379,7 +414,7 @@ export const FrmFichaTecnicaEvento = () => {
         //setEsEditar(false); // para que solo se ejecute al cargar la pantalla
 
     }, [esEditar]); // Se EJECUTA CUANDO CAMBIA la bandera esEditar // se ejecuta 1 vez al inicio solamente
-
+*/
     const enumTipoDeParticipante = {
         INVITADO: '1',
         PRESIDIUM: '2',
@@ -420,6 +455,15 @@ export const FrmFichaTecnicaEvento = () => {
     }
 
     const handleEditProgramas = (rowData, cellId) => {
+
+        setProgramaIdFichaTecnicaEvento(rowData.original.IdFichaTecnicaEvento)
+        setProgramaIdPrograma(rowData.original.IdPrograma)
+        setProgramaNum(rowData.original.Link)  
+        setProgramaTema(rowData.original.Programa)
+
+    }
+
+    const handleEditProgramasNuevo = (rowData, cellId) => {
 
         setProgramaIdFichaTecnicaEvento(rowData.original.IdFichaTecnicaEvento)
         setProgramaIdPrograma(rowData.original.IdPrograma)
@@ -514,6 +558,7 @@ export const FrmFichaTecnicaEvento = () => {
         //setDatosProgramas(nuevosDatos);
     };
 
+    
     const editInvitado = () => {
         console.log('editInvitado ')
         const nuevosParticipantes = datosInvitados.map((participante) => {
@@ -579,12 +624,12 @@ export const FrmFichaTecnicaEvento = () => {
         setProgramaTema('')
         setProgramaIdPrograma(0)
     }
-
+/*
     useEffect(() => {
         setEsNuevo(1)
     }, []);
 
-
+*/
     const guardarFichaTecnicaEvento = async (e) => {
         e.preventDefault();
 
@@ -999,7 +1044,8 @@ export const FrmFichaTecnicaEvento = () => {
                                     // handleDelete={() => handleDelete(1,datosInvitados,'idParticipante')} />
                                     handleDelete={handleDeletePrograma} 
                                     setData={setDatosProgramas}/>
-{/*
+                                
+                              {/*
                     <SimpleTable
                     // data={datosActividadLocal} 
                     data={datosActividad.filter(item => item.IdAcuerdo == acuerdoIdAct)}
@@ -1015,7 +1061,7 @@ export const FrmFichaTecnicaEvento = () => {
                     setData={setDatosActividad}
                 />*/}
                                                    
-                            </Frame >
+                            </Frame >                       
 
                         </Frame>
 
