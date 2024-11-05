@@ -127,6 +127,7 @@ export const FrmSolicitudAgenda = () => {
       //response.data[0].IdAgenda //se debe especificar el registro 0 ya que el response es un arreglo
       const id = response.data;  //Solo regresa IdAgenda
       console.log("Id:", id);
+      if (id == 0) { setAlertaMensaje('Ya existen registros que se cruzan en el mismo horario'); return }
 
       setEsFin(true);
 
@@ -243,6 +244,13 @@ export const FrmSolicitudAgenda = () => {
 
   }, []);
 
+  const handleChangeTelefono = (e) => {
+    // Filtra solo los caracteres numéricos del valor ingresado
+    const valor = e.target.value.replace(/\D/g, ''); // Elimina cualquier carácter que no sea dígito
+    console.log({ valor })
+    setTelefono(valor);
+  };
+
   return (
     <div>
       <SideBarHeader titulo={esNuevo ? 'Solicitud de Agenda' : 'Editar Solicitud de Agenda'}></SideBarHeader>
@@ -266,7 +274,7 @@ export const FrmSolicitudAgenda = () => {
 
                 <ElementoCampo type='text' lblCampo="Nombre* :" claCampo="Nombre" onInputChange={setNombre} nomCampo={nombre} tamanioString={100} />
                 <ElementoCampo type='text' lblCampo="Cargo* :" claCampo="Cargo" onInputChange={setCargo} nomCampo={cargo} />
-                <ElementoCampo type='text' lblCampo="Telefono* :" claCampo="Telefono" onInputChange={setTelefono} nomCampo={telefono} tamanioString={10} pattern={"\d*"} />
+                <ElementoCampo type='tel' lblCampo="Telefono* :" claCampo="Telefono" onInputChange={setTelefono} nomCampo={telefono} tamanioString={10} pattern="^\d{10}$" />
                 <ElementoCampo type='email' lblCampo="Correo :" claCampo="Correo" onInputChange={setCorreo} nomCampo={correo} tamanioString={50} />
                 <ElementoCampo type='datetime-local' lblCampo="Fecha Hora Inicial*:" claCampo="fechaInicial" nomCampo={fechaInicial} onInputChange={setFechaInicial} />
                 <ElementoCampo type='text' lblCampo="Asunto* :" claCampo="Descripcion" onInputChange={setDescripcion} nomCampo={descripcion} />

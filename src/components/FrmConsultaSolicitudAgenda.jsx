@@ -266,8 +266,8 @@ export const FrmConsultaSolicitudAgenda = () => {
 
     const data = {
       esNuevo: true,
-      idSolicitudAgenda: 0
-
+      idSolicitudAgenda: 0,
+      idEstatusAgenda: 2
     };
 
     navigate("/SolicitudAgenda", { state: data });
