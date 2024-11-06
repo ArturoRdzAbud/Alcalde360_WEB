@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import axios from 'axios';
 import SimpleTable from './SimpleTable';
 import { ElementoCampo } from './ElementoCampo';
@@ -14,17 +14,27 @@ import { ElementoToastNotification } from './ElementoToastNotification';
 // import Pagenew from '../svg/icon-save.svg?react'
 import { useSearchParams } from 'react-router-dom';
 
+//npm install html2pdf.js
+// import html2pdf from 'html2pdf.js'; 
 
+//npm install jspdf html2canvas
+// import { jsPDF } from 'jspdf';
+// import html2canvas from 'html2canvas';
+
+//npm install react-to-print
+import { useReactToPrint } from 'react-to-print';
 
 export const FrmFichaTecnica = () => {
     const { perfil, esConLicencia, idAlcaldia } = useContext(PerfilContext);
 
     const [searchParams] = useSearchParams();
-    const ficha = searchParams.get('ficha');
+    const ficha = parseInt(searchParams.get('ficha'));
     const solicitud = searchParams.get('solicitud');
-
+    // console.log(ficha)
+    // console.log(solicitud)
     // const [ficha, setFicha] = useState(0);
-    const [titulo, setTitulo] = useState('RL_TITUTLO');
+    // const [titulo, setTitulo] = useState('RL_TITUTLO');
+    const [titulo, setTitulo] = useState('');
     const [fecha, setFecha] = useState(() => {
         const today = new Date();
         const yyyy = today.getFullYear();
@@ -45,8 +55,10 @@ export const FrmFichaTecnica = () => {
         const mm = String(now.getMinutes()).padStart(2, '0');
         return `${hh}:${mm}`;
     });
-    const [tema, setTema] = useState('RL_TEMA');
-    const [lugar, setLugar] = useState('RL_LUGAR');
+    // const [tema, setTema] = useState('RL_TEMA');
+    // const [lugar, setLugar] = useState('RL_LUGAR');
+    const [tema, setTema] = useState('');
+    const [lugar, setLugar] = useState('');
     const [participanteId, setParticipanteId] = useState(-1);
     const [participanteIdCombo, setParticipanteIdCombo] = useState(-1);
     // const [participanteNombre, setParticipanteNombre] = useState('');
@@ -177,9 +189,8 @@ export const FrmFichaTecnica = () => {
     ];
 
     const handleEditParticipantes = (rowData, cellId) => {
-        setParticipanteId(rowData.original.IdParticipante)
-        // setParticipanteNombre(rowData.original.Nombre)
-        setParticipanteIdCombo(rowData.original.ParticipanteIdCombo)
+        setParticipanteId(parseInt(rowData.original.IdParticipante))
+        setParticipanteIdCombo(parseInt(rowData.original.ParticipanteIdCombo))
         setParticipantePuesto(rowData.original.Puesto)
     }
     const handleEditAcuerdos = (rowData, cellId) => {
@@ -235,6 +246,7 @@ export const FrmFichaTecnica = () => {
 
     const agregarParticipante = (nuevoParticipante) => {
         setDatosParticipantes(prevDatos => [...prevDatos, nuevoParticipante]);
+        // console.log(datosParticipantes)
         inicializaParticipante()
     };
     const agregarAcuerdo = (nuevo) => {
@@ -243,6 +255,7 @@ export const FrmFichaTecnica = () => {
     };
     const agregarArchivo = (nuevo) => {
         setDatosArchivos(prevDatos => [...prevDatos, nuevo]);
+        // console.log(datosArchivos)
         inicializaArchivo()
     };
     const editarParticipante = () => {
@@ -344,6 +357,7 @@ export const FrmFichaTecnica = () => {
                     nuevoArchivo.ArchivoBin = event.target.result.split(',')[1]; // Obtiene solo la cadena base64
                     // Aquí puedes agregar `nuevoArchivo` al XML o enviarlo a la base de datos
                     agregarArchivo(nuevoArchivo);
+                    // console.log(nuevoArchivo)
                 };
                 // Iniciar la lectura del archivo
                 reader.readAsDataURL(file);
@@ -362,7 +376,7 @@ export const FrmFichaTecnica = () => {
         // const archivo = datosArchivos.find((archivo) => archivo.IdArchivo === archivoId);
         const archivo = datosArchivos.find((archivo) => archivo.IdArchivo === rowData.original.IdArchivo);
         setArchivoDownload(archivo)
-        // console.log(archivo)
+        // console.log(datosArchivos)
     };
 
     function base64ToUint8Array(base64) {
@@ -377,9 +391,23 @@ export const FrmFichaTecnica = () => {
     useEffect(() => {
         if (!archivoDownload) return;
 
-        const binario = typeof archivoDownload.ArchivoBin === 'string'
+        // console.log(archivoDownload)
+        // return
+
+        let binario = typeof archivoDownload.ArchivoBin === 'string'
             ? base64ToUint8Array(archivoDownload.ArchivoBin)
             : archivoDownload.ArchivoBin;
+
+        // console.log(binario.data)
+        // if (binario.data) {
+        //     binario = binario.data
+        //     binario = typeof binario === 'string'
+        //         ? base64ToUint8Array(binario)
+        //         : binario;
+        //     }
+
+        // console.log (binario)
+        // return
 
         const blob = new Blob([binario], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
@@ -402,14 +430,49 @@ export const FrmFichaTecnica = () => {
     const cargarDatos = async () => {
         try {
             var arreglo = []
-            console.log('Carga desde BD...');
             let apiUrl = config.apiUrl + '/ConsultarUsuarios';
-            const response = await axios.get(apiUrl);
+            // const response = await axios.get(apiUrl);
+            let response = await axios.get(apiUrl);
             // setDatosUsuario(response.data);
             arreglo = response.data
             arreglo = arreglo.map(item => { return { ...item, value: item.IdUsuario }; });
             arreglo = arreglo.map(item => { return { ...item, label: item.Nombre }; });
             setDatosUsuario(arreglo);
+
+            if (ficha > 0) {
+                // console.log('Carga desde BD...');
+                apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22ConsultarFicha%22';
+                response = await axios.get(apiUrl);
+                console.log(ficha)
+                arreglo = response.data.find(dato => dato.IdFichaTecnica === ficha && dato.IdAlcaldia === idAlcaldia);
+                if (arreglo) {
+                    setTitulo(arreglo.Titulo)
+                    setFecha(arreglo.FechaVarchar)
+                    setHora(arreglo.HoraIni)
+                    setHoraFin(arreglo.HoraFin)
+                    setTema(arreglo.Tema)
+                    setLugar(arreglo.Lugar)
+                    apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22ConsultarFichaParticipantes%22';
+                    response = await axios.get(apiUrl);
+                    arreglo = response.data.filter(dato => dato.IdFichaTecnica === ficha && dato.IdAlcaldia === idAlcaldia);
+                    setDatosParticipantes(arreglo)
+                    apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22ConsultarFichaAcuerdos%22';
+                    response = await axios.get(apiUrl);
+                    arreglo = response.data.filter(dato => dato.IdFichaTecnica === ficha && dato.IdAlcaldia === idAlcaldia);
+                    setDatosAcuerdos(arreglo)
+                    apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22ConsultarFichaAcuerdosActividades%22';
+                    response = await axios.get(apiUrl);
+                    arreglo = response.data.filter(dato => dato.IdFichaTecnica === ficha && dato.IdAlcaldia === idAlcaldia);
+                    setDatosActividad(arreglo)
+                    apiUrl = config.apiUrl + '/ConsultarGrid?psSpSel=%22ConsultarFichaArchivos%22';
+                    response = await axios.get(apiUrl);
+                    arreglo = response.data.filter(dato => dato.IdFichaTecnica === ficha && dato.IdAlcaldia === idAlcaldia);
+                    setDatosArchivos(arreglo)
+                    //console.log(arreglo)
+                } else {
+                    console.error('Sin cargo de arreglo');
+                }
+            }
 
         } catch (error) {
             console.error('Error al obtener datos:', error);
@@ -431,6 +494,7 @@ export const FrmFichaTecnica = () => {
         setDatosFuncionario(datosFiltrados)
 
         // console.log(datosParticipante)
+        // setDatosParticipantes(datosParticipantes)
     }
     function convertirAxml(datos, rootName) {
         const xmlDoc = document.implementation.createDocument(null, rootName);
@@ -450,6 +514,7 @@ export const FrmFichaTecnica = () => {
 
         return new XMLSerializer().serializeToString(xmlDoc);
     }
+
     const guardaIU = (async () => {
         // console.log('ini guardado ')
         // setAlertaMensaje('Al')
@@ -462,7 +527,7 @@ export const FrmFichaTecnica = () => {
         const data = {
             pnIdAlcaldia: idAlcaldia,
             pnFicha: ficha,
-            pnIdSolicitudAgenda:solicitud,
+            pnIdSolicitudAgenda: solicitud,
             psTitulo: titulo,
             psFecha: fecha,
             psHora: hora,
@@ -515,145 +580,145 @@ export const FrmFichaTecnica = () => {
                     }
                 })
         } catch (error) {
-            console.error('Error al guardar los jugadores x equipo', error);
+            console.error('Error al guardar la Ficha', error);
         }
     })
 
+    const contentRef = useRef(null);
+
+    const reactToPrintFn2 = useReactToPrint({
+        // content: () => contentRef.current,
+        // documentTitle: 'pagina-exportada',
+        // onAfterPrint: () => console.log('Exportación completada')
+        // window.print()
+    });
+
+    const reactToPrintFn = () => {
+        window.print()
+    };
 
     return (
+
+        // <div>
+        //     <button onClick={reactToPrintFn}>Exportar a PDF</button>
+
+        //     {/* Contenido a exportar */}
+        //     <div ref={contentRef} style={{ padding: '20px', border: '1px solid #000' }}>
+        //         <h2>Contenido para exportar</h2>
+        //         <p>Este es el contenido que se incluirá en el PDF.</p>
+        //         {/* Otros componentes o contenido */}
+        //     </div>
+        // </div>
         <>
-            <SideBarHeader titulo={esNuevo ? ('Ficha Técnica Reunión') : esEditar ? 'Editar Ficha Técnica Reunión' : 'Consulta'}></SideBarHeader>
-            <br /><br /><br /><br />
+            <div ref={contentRef}>
+                <SideBarHeader titulo={esNuevo ? ('Ficha Técnica Reunión') : esEditar ? 'Editar Ficha Técnica Reunión' : 'Consulta'}></SideBarHeader>
+                <br /><br /><br /><br />
 
-            {esModoActividad ? <FrmFichaTecnicaAcuerdo acuerdoNombreAct={acuerdoNombreAct} acuerdoIdAct={acuerdoIdAct}
-                setEsModoActividad={setEsModoActividad}
-                datosActividad={datosActividad}
-                setDatosActividad={setDatosActividad}
-                datosFuncionario={datosFuncionario}
-            ></FrmFichaTecnicaAcuerdo > :
-                <>
+                {esModoActividad ? <FrmFichaTecnicaAcuerdo acuerdoNombreAct={acuerdoNombreAct} acuerdoIdAct={acuerdoIdAct}
+                    setEsModoActividad={setEsModoActividad}
+                    datosActividad={datosActividad}
+                    setDatosActividad={setDatosActividad}
+                    datosFuncionario={datosFuncionario}
+                ></FrmFichaTecnicaAcuerdo > :
+                    <>
 
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <ElementoBotones esOcultaCancelar={true} guardar={guardaIU}></ElementoBotones>
-                    </div>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <button type="button" title="Exportar" className="btn btn-primary" onClick={reactToPrintFn}>Imprimir</button>
+                            <ElementoBotones esOcultaCancelar={true} guardar={guardaIU}></ElementoBotones>
+                        </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ flexBasis: '49%', flexGrow: 0 }}>
+                                <ElementoCampo type='text' lblCampo="Título* :" claCampo="Nombre" nomCampo={titulo} onInputChange={setTitulo} tamanioString={100} />
+                            </span>
+                            <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
+                                <ElementoCampo type='date' lblCampo="Fecha*:" claCampo="fecha" nomCampo={fecha} onInputChange={setFecha} />
+                            </span>
+
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
+                                <ElementoCampo type='time' lblCampo="Hora Inicio*:" claCampo="hora" nomCampo={hora} onInputChange={setHora} />
+                            </span>
+                            <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
+                                <ElementoCampo type='time' lblCampo="Hora Fin*:" claCampo="horaFin" nomCampo={horaFin} onInputChange={setHoraFin} />
+                            </span>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ flexBasis: '49%', flexGrow: 0 }}>
+                                <ElementoCampo type='text' lblCampo="Tema*:" claCampo="" nomCampo={tema} onInputChange={setTema} />
+                            </span>
+                            <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
+                                <ElementoCampo type='text' lblCampo="Lugar*:" claCampo="" nomCampo={lugar} onInputChange={setLugar} />
+                            </span>
+                        </div>
                         <span style={{ flexBasis: '49%', flexGrow: 0 }}>
-                            <ElementoCampo type='text' lblCampo="Título* :" claCampo="Nombre" nomCampo={titulo} onInputChange={setTitulo} tamanioString={100} />
-                        </span>
-                        <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
-                            <ElementoCampo type='date' lblCampo="Fecha*:" claCampo="fecha" nomCampo={fecha} onInputChange={setFecha} />
-                        </span>
+                            <Frame title="Participantes">
 
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
-                            <ElementoCampo type='time' lblCampo="Hora Inicio*:" claCampo="hora" nomCampo={hora} onInputChange={setHora} />
-                        </span>
-                        <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
-                            <ElementoCampo type='time' lblCampo="Hora Fin*:" claCampo="horaFin" nomCampo={horaFin} onInputChange={setHoraFin} />
-                        </span>
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ flexBasis: '49%', flexGrow: 0 }}>
-                            <ElementoCampo type='text' lblCampo="Tema*:" claCampo="" nomCampo={tema} onInputChange={setTema} />
-                        </span>
-                        <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
-                            <ElementoCampo type='text' lblCampo="Lugar*:" claCampo="" nomCampo={lugar} onInputChange={setLugar} />
-                        </span>
-                    </div>
-
-
-                    {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}> */}
-
-
-                    <span style={{ flexBasis: '49%', flexGrow: 0 }}>
-                        <Frame title="Participantes">
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ flexBasis: '44%', flexGrow: 0 }}>
-                                    {/* <ElementoCampo type='text' lblCampo="Nombre*:" claCampo="" nomCampo={participanteNombre} onInputChange={setParticipanteNombre} /> */}
-                                    <ElementoCampo type="selectBusqueda" lblCampo="Nombre*:" claCampo="Nombre" nomCampo={participanteIdCombo} options={datosParticipante} onInputChange={setParticipanteIdCombo} />
-                                </span>
-                                <span style={{ flexBasis: '44%', flexShrink: 1, marginTop: '0px' }}>
-                                    <ElementoCampo type='text' lblCampo="Puesto*:" claCampo="" nomCampo={participantePuesto} onInputChange={setParticipantePuesto} />
-                                </span>
-                                <span style={{ flexBasis: '4%', flexShrink: 1, marginTop: '0px' }}>
-                                    {/* <button type="button" className="btn btn-primary" onClick={() => handleSave(1)} ><Pagenew /></button> */}
-                                    <i className="bi bi-table fs-2" onClick={() => handleSave(1)}></i>
-                                </span>
-                            </div>
-                            <SimpleTable data={datosParticipantes} columns={columnsParticipantes} handleEdit={handleEditParticipantes}
-                                esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={true}
-                                // handleDelete={() => handleDelete(1,datosParticipantes,'idParticipante')} />
-                                handleDelete={handleDeleteParticipante} />
-                            {/* handleDelete={() => handleDelete('idParticipante')} /> */}
-                        </Frame >
-                    </span>
-
-                    <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
-                        <Frame title="Acuerdos">
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ flexBasis: '44%', flexGrow: 0 }}>
-                                    <ElementoCampo type='text' lblCampo="Descripción*:" claCampo="" nomCampo={acuerdoNombre} onInputChange={setAcuerdoNombre} />
-                                </span>
-                                <span style={{ flexBasis: '44%', flexShrink: 1, marginTop: '0px' }}>
-                                    <ElementoCampo type='number' lblCampo="Num*:" claCampo="" nomCampo={acuerdoNum} onInputChange={setAcuerdoNum} />
-                                </span>
-                                <span style={{ flexBasis: '4%', flexShrink: 1, marginTop: '0px' }}>
-                                    <i className="bi bi-table fs-2" onClick={() => handleSave(2)}></i>
-                                </span>
-                            </div>
-                            <SimpleTable data={datosAcuerdos} columns={columnsAcuerdos} handleEdit={handleEditAcuerdos}
-                                esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={true}
-                                handleDelete={handleDeleteAcuerdo} handleDet={handleDetAcuerdo} />
-                        </Frame >
-                    </span>
-
-
-
-
-                    {/* </div> */}
-
-
-
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ flexBasis: '100%', flexGrow: 0 }}>
-
-                            <Frame title="Archivos Adjuntos">
-                                <ElementoCampo type='text' lblCampo="Nombre Archivo*:" claCampo="" nomCampo={archivoNombre} onInputChange={setArchivoNombre} />
-                                {/* <label style={{ textAlign: "left" }}>extensión : pdf | imagen</label> */}
-                                <label style={{ textAlign: "left" }}>extensión válida : pdf </label>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <span style={{ flexBasis: '79%', flexGrow: 0 }}>
-                                        {/* <input type='file' className='form-control' name="profile_pic" onChange={selectedFileHandler} accept=".pdf, .png, .jpg, .jpeg" /> */}
-                                        <input type='file' className='form-control' name="profile_pic" onChange={selectedFileHandler} accept=".pdf" />
+                                    <span style={{ flexBasis: '44%', flexGrow: 0 }}>
+                                        <ElementoCampo type="selectBusqueda" lblCampo="Nombre*:" claCampo="Nombre" nomCampo={participanteIdCombo} options={datosParticipante} onInputChange={setParticipanteIdCombo} />
                                     </span>
-                                    <span style={{ flexBasis: '19%', flexShrink: 1, marginTop: '0px' }}>
-                                        {/* <button type='button' onClick={guardarFile} className='btn btn-primary col-12'>Cargar</button> */}
-                                        <i className="bi bi-cloud-upload fs-2" onClick={() => guardarFile()}></i>
+                                    <span style={{ flexBasis: '44%', flexShrink: 1, marginTop: '0px' }}>
+                                        <ElementoCampo type='text' lblCampo="Puesto*:" claCampo="" nomCampo={participantePuesto} onInputChange={setParticipantePuesto} />
+                                    </span>
+                                    <span style={{ flexBasis: '4%', flexShrink: 1, marginTop: '0px' }}>
+                                        <i className="bi bi-table fs-2" onClick={() => handleSave(1)}></i>
                                     </span>
                                 </div>
-
-                                <SimpleTable data={datosArchivos} columns={columnsArchivos}
+                                <SimpleTable data={datosParticipantes} columns={columnsParticipantes} handleEdit={handleEditParticipantes}
                                     esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={true}
-                                    handleDelete={handleDeleteArchivo}
-                                    handleEdit={handleDownloadFile}
-                                />
-
+                                    handleDelete={handleDeleteParticipante} />
                             </Frame >
                         </span>
 
-                    </div>
+                        <span style={{ flexBasis: '49%', flexShrink: 1, marginTop: '0px' }}>
+                            <Frame title="Acuerdos">
 
-                </>
-            }
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ flexBasis: '44%', flexGrow: 0 }}>
+                                        <ElementoCampo type='text' lblCampo="Descripción*:" claCampo="" nomCampo={acuerdoNombre} onInputChange={setAcuerdoNombre} />
+                                    </span>
+                                    <span style={{ flexBasis: '44%', flexShrink: 1, marginTop: '0px' }}>
+                                        <ElementoCampo type='number' lblCampo="Num*:" claCampo="" nomCampo={acuerdoNum} onInputChange={setAcuerdoNum} />
+                                    </span>
+                                    <span style={{ flexBasis: '4%', flexShrink: 1, marginTop: '0px' }}>
+                                        <i className="bi bi-table fs-2" onClick={() => handleSave(2)}></i>
+                                    </span>
+                                </div>
+                                <SimpleTable data={datosAcuerdos} columns={columnsAcuerdos} handleEdit={handleEditAcuerdos}
+                                    esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={true}
+                                    handleDelete={handleDeleteAcuerdo} handleDet={handleDetAcuerdo} />
+                            </Frame >
+                        </span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ flexBasis: '100%', flexGrow: 0 }}>
 
+                                <Frame title="Archivos Adjuntos">
+                                    <ElementoCampo type='text' lblCampo="Nombre Archivo*:" claCampo="" nomCampo={archivoNombre} onInputChange={setArchivoNombre} />
+                                    <label style={{ textAlign: "left" }}>extensión válida : pdf </label>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ flexBasis: '79%', flexGrow: 0 }}>
+                                            <input type='file' className='form-control' name="profile_pic" onChange={selectedFileHandler} accept=".pdf" />
+                                        </span>
+                                        <span style={{ flexBasis: '19%', flexShrink: 1, marginTop: '0px' }}>
+                                            <i className="bi bi-cloud-upload fs-2" onClick={() => guardarFile()}></i>
+                                        </span>
+                                    </div>
 
+                                    <SimpleTable data={datosArchivos} columns={columnsArchivos}
+                                        esOcultaFooter={true} esOcultaBotonNuevo={true} esOcultaFiltro={true} esOcultaBotonArriba={true}
+                                        handleDelete={handleDeleteArchivo}
+                                        handleEdit={handleDownloadFile}
+                                    />
+                                </Frame >
+                            </span>
+                        </div>
+                    </>
+                }
+            </div>
             {
                 esMuestraCamposReq &&
                 <ElementoToastNotification
