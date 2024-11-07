@@ -215,18 +215,18 @@ export const FrmReporteIncidencia = () => {
   const guardarIncidencia = async (e) => {
     e.preventDefault();
 
-    if (idAlcaldia == 0) { setEsMuestraCamposReq(true); return }
-    if (descripcion === null || descripcion.trim() == '') { setEsMuestraCamposReq(true); return }
-    if (idTipoIncidencia == 0) { setEsMuestraCamposReq(true); return }
-    if (nombre === null || nombre.trim() == '') { setEsMuestraCamposReq(true); return }
-    if (apellidoPaterno === null || apellidoPaterno.trim() == '') { setEsMuestraCamposReq(true); return }
-    if (apellidoMaterno === null || apellidoMaterno.trim() == '') { setEsMuestraCamposReq(true); return }
-    if (telefono === null || telefono.trim() == '') { setEsMuestraCamposReq(true); return }
+    if (idAlcaldia == null || idAlcaldia == 0) { setEsMuestraCamposReq(true); return }
+    if (descripcion == null || descripcion.trim() == '') { setEsMuestraCamposReq(true); return }
+    if (idTipoIncidencia == null || idTipoIncidencia == 0) { setEsMuestraCamposReq(true); return }
+    if (nombre == null || nombre.trim() == '') { setEsMuestraCamposReq(true); return }
+    if (apellidoPaterno == null || apellidoPaterno.trim() == '') { setEsMuestraCamposReq(true); return }
+    if (apellidoMaterno == null || apellidoMaterno.trim() == '') { setEsMuestraCamposReq(true); return }
+    if (telefono == null || telefono.trim() == '') { setEsMuestraCamposReq(true); return }
     if (idColonia == 0) { setEsMuestraCamposReq(true); return }
     //if (calle === null || calle.trim() == '') { setEsMuestraCamposReq(true); return }
     //if (numero === null || numero.trim() == '') { setEsMuestraCamposReq(true); return }
     //if (codigoPostal === null || codigoPostal.trim() == '') { setEsMuestraCamposReq(true); return }
-    if (idUsuario == 0) { setEsMuestraCamposReq(true); return }
+    if (idUsuario == null || idUsuario == 0) { setEsMuestraCamposReq(true); return }
 
 
     const data = {

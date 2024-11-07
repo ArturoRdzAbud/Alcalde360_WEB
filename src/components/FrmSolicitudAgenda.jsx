@@ -47,8 +47,8 @@ export const FrmSolicitudAgenda = () => {
   const [numero, setNumero] = useState('');
   const [codigoPostal, setCodigoPostal] = useState('');
 
-  const [fechaInicial, setFechaInicial] = useState(null);
-  const [fechaFinal, setFechaFinal] = useState(null);
+  const [fechaInicial, setFechaInicial] = useState('');
+  const [fechaFinal, setFechaFinal] = useState('');
 
   const [idUsuario, setIdUsuario] = useState(1);  //asigna temporalmente 1 hasta que tengamos una variable global de usuario para pasar este dato al SP
 
@@ -70,29 +70,37 @@ export const FrmSolicitudAgenda = () => {
     setAlertaMensaje('')
   };
 
+  const onAceptarFinal = () => {
+    setEsMuestraCamposReq(false)
+    setEsFin(false)
+    navigate(-1)
+  };
 
   const guardarSolicitudAgenda = async (e) => {
     e.preventDefault();
-    console.log(telefono, descripcion)
-    if (idAlcaldia == 0) { setEsMuestraCamposReq(true); return }
-    if (idOrigenAgenda == 0) { setEsMuestraCamposReq(true); return }
-    if (idClasificacionAgenda == 0) { setEsMuestraCamposReq(true); return }
-    if (idEstatusAgenda == 0) { setEsMuestraCamposReq(true); return }
-    if (idTipoAgenda == 0) { setEsMuestraCamposReq(true); return }
+    console.log(telefono, descripcion, idOrigenAgenda, { fechaInicial }, { fechaFinal })
+    //== null, ya que en JavaScript esta comparación cubre tanto null como undefined
+    if (idAlcaldia == null || idAlcaldia == 0) { setEsMuestraCamposReq(true); return }
+    if (idOrigenAgenda == null || idOrigenAgenda == 0) { setEsMuestraCamposReq(true); return }
+    if (idClasificacionAgenda == null || idClasificacionAgenda == 0) { setEsMuestraCamposReq(true); return }
+    if (idEstatusAgenda == null || idEstatusAgenda == 0) { setEsMuestraCamposReq(true); return }
+    if (idTipoAgenda == null || idTipoAgenda == 0) { setEsMuestraCamposReq(true); return }
 
-    if (nombre === null || nombre.trim() == '') { setEsMuestraCamposReq(true); return }
-    if (cargo === null || cargo.trim() == '') { setEsMuestraCamposReq(true); return }
-    if (telefono === null || telefono.trim() == '') { setEsMuestraCamposReq(true); return }
-    //if (correo === null || correo.trim() == '') { setEsMuestraCamposReq(true); return }
+    if (nombre == null || nombre.trim() === '') { setEsMuestraCamposReq(true); return }
+    if (cargo == null || cargo.trim() === '') { setEsMuestraCamposReq(true); return }
+    if (telefono == null || telefono.trim() === '') { setEsMuestraCamposReq(true); return }
+    //if (correo == null || correo.trim() == '') { setEsMuestraCamposReq(true); return }
     //if (idColonia == 0) { setEsMuestraCamposReq(true); return }
-    //if (calle === null || calle.trim() == '') { setEsMuestraCamposReq(true); return }
-    //if (numero === null || numero.trim() == '') { setEsMuestraCamposReq(true); return }
-    //if (codigoPostal === null || codigoPostal.trim() == '') { setEsMuestraCamposReq(true); return }
-    if (fechaInicial === null) { setEsMuestraCamposReq(true); return }
-    if (fechaFinal === null) { setEsMuestraCamposReq(true); return }
+    //if (calle == null || calle.trim() == '') { setEsMuestraCamposReq(true); return }
+    //if (numero == null || numero.trim() == '') { setEsMuestraCamposReq(true); return }
+    //if (codigoPostal == null || codigoPostal.trim() == '') { setEsMuestraCamposReq(true); return }
+    //las fechas deben tener este formato: 'yyyy-mm-ddThh:mi'
+    if (fechaInicial == null || fechaInicial.trim() === '') { setEsMuestraCamposReq(true); return }
+    if (fechaFinal == null || fechaFinal.trim() === '') { setEsMuestraCamposReq(true); return }
+    if (fechaInicial >= fechaFinal) { setAlertaMensaje('La fecha final debe ser mayor a la fecha inicial'); return }
 
-    if (descripcion === null || descripcion.trim() == '') { setEsMuestraCamposReq(true); return }
-    if (idUsuario == 0) { setEsMuestraCamposReq(true); return }
+    if (descripcion == null || descripcion.trim() === '') { setEsMuestraCamposReq(true); return }
+    if (idUsuario == null || idUsuario == 0) { setEsMuestraCamposReq(true); return }
 
     const data = {
       pnIdAlcaldia: idAlcaldia,
@@ -314,7 +322,7 @@ export const FrmSolicitudAgenda = () => {
           mensaje={'Los datos fueron guardados correctamente.'}
           mostrarBotonAceptar={true}
           mostrarBotonCancelar={false}
-          onAceptar={onAceptar}
+          onAceptar={onAceptarFinal}
         ></AlertaEmergente>
         // : <p></p>
       }
