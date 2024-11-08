@@ -234,7 +234,7 @@ export const FrmConsultaSolicitudAgenda = () => {
     },
     {
       header: 'Fecha y hora',
-      accessorKey: 'FechaHoraIni',
+      accessorKey: 'FechaHoraIni3',
       footer: 'Fecha y hora'
       , cell: ({ getValue }) => (isNaN(getValue()) ? getValue() : '')
       , visible: true
