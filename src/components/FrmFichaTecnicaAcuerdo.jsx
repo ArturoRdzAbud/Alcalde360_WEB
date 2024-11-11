@@ -38,7 +38,7 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct, setEsMo
     const [fechaFin, setFechaFin] = useState(fechaIni);
     const [estatus, setEstatus] = useState(1);
     // const [estatusColor, setEstatusColor] = useState(1);
-    
+
     const [esMuestraCamposReq, setEsMuestraCamposReq] = useState(false);
     const [alertaMensaje, setAlertaMensaje] = useState('');
 
@@ -61,7 +61,7 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct, setEsMo
         setActividadId(rowData.original.IdActividad)
         setActividadNombre(rowData.original.Descripcion)
         // setResponsable(rowData.original.Responsable)
-        setResponsableIdCombo(rowData.original.responsableIdCombo)
+        setResponsableIdCombo(parseInt(rowData.original.responsableIdCombo))
         setFechaIni(rowData.original.FechaIni)
         setFechaFin(rowData.original.FechaFin)
         setEstatus(rowData.original.Estatus)
@@ -112,7 +112,7 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct, setEsMo
                 return {
                     ...elemento,
                     Descripcion: ActividadNombre,
-                    responsableIdCombo: responsableIdCombo,
+                    responsableIdCombo: parseInt(responsableIdCombo),
                     Responsable: nombre, FechaIni: fechaIni, FechaFin: fechaFin, Estatus: estatus,
                     Dias: calcularDiferenciaDias(fechaIni, fechaFin)
                 };
@@ -174,10 +174,11 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct, setEsMo
 
     useEffect(() => {
         const actualizarEstatusColor = () => {
+            console.log('actualiza color')
             const nuevosDatos = datosActividad.map((actividad) => {
                 const { FechaIni, FechaFin, ListoEditChk } = actividad;
                 let EstatusColor;
-                if (ListoEditChk) {
+                if (ListoEditChk === 'true') {
                     EstatusColor = 3; // Completada
                 } else {
                     const diasRestantes = differenceInDays(new Date(FechaFin), new Date());
@@ -187,7 +188,7 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct, setEsMo
                         EstatusColor = 1; // Pendiente
                     }
                 }
-                console.log(EstatusColor)
+                // console.log(EstatusColor)
                 return { ...actividad, EstatusColor };
             });
             setDatosActividad(nuevosDatos);
@@ -207,7 +208,7 @@ export const FrmFichaTecnicaAcuerdo = ({ acuerdoIdAct, acuerdoNombreAct, setEsMo
         selectedFileHandler,
         guardarFile,
         handleDownloadFile,
-    } = useFrmFichaTecnicaAcuerdoArchivo(datosActividad, acuerdoIdAct, actividadId2, setDatosActividad,setActividadNombre2,setAlertaMensaje);
+    } = useFrmFichaTecnicaAcuerdoArchivo(datosActividad, acuerdoIdAct, actividadId2, setDatosActividad, setActividadNombre2, setAlertaMensaje);
     const handleDet = (rowData, cellId) => {
         // setEsModoActividadAdjuntar(true)
         setActividadId2(rowData.original.IdAcuerdo)

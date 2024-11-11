@@ -234,7 +234,7 @@ export const FrmConsultaSolicitudAgenda = () => {
     },
     {
       header: 'Fecha y hora',
-      accessorKey: 'FechaHoraIni',
+      accessorKey: 'FechaHoraIni3',
       footer: 'Fecha y hora'
       , cell: ({ getValue }) => (isNaN(getValue()) ? getValue() : '')
       , visible: true
@@ -266,8 +266,8 @@ export const FrmConsultaSolicitudAgenda = () => {
 
     const data = {
       esNuevo: true,
-      idSolicitudAgenda: 0
-
+      idSolicitudAgenda: 0,
+      idEstatusAgenda: 2
     };
 
     navigate("/SolicitudAgenda", { state: data });

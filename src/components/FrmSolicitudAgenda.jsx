@@ -47,8 +47,8 @@ export const FrmSolicitudAgenda = () => {
   const [numero, setNumero] = useState('');
   const [codigoPostal, setCodigoPostal] = useState('');
 
-  const [fechaInicial, setFechaInicial] = useState(null);
-  const [fechaFinal, setFechaFinal] = useState(null);
+  const [fechaInicial, setFechaInicial] = useState('');
+  const [fechaFinal, setFechaFinal] = useState('');
 
   const [idUsuario, setIdUsuario] = useState(1);  //asigna temporalmente 1 hasta que tengamos una variable global de usuario para pasar este dato al SP
 
@@ -70,29 +70,37 @@ export const FrmSolicitudAgenda = () => {
     setAlertaMensaje('')
   };
 
+  const onAceptarFinal = () => {
+    setEsMuestraCamposReq(false)
+    setEsFin(false)
+    navigate(-1)
+  };
 
   const guardarSolicitudAgenda = async (e) => {
     e.preventDefault();
-    console.log(telefono, descripcion)
-    if (idAlcaldia == 0) { setEsMuestraCamposReq(true); return }
-    if (idOrigenAgenda == 0) { setEsMuestraCamposReq(true); return }
-    if (idClasificacionAgenda == 0) { setEsMuestraCamposReq(true); return }
-    if (idEstatusAgenda == 0) { setEsMuestraCamposReq(true); return }
-    if (idTipoAgenda == 0) { setEsMuestraCamposReq(true); return }
+    console.log(telefono, descripcion, idOrigenAgenda, { fechaInicial }, { fechaFinal })
+    //== null, ya que en JavaScript esta comparación cubre tanto null como undefined
+    if (idAlcaldia == null || idAlcaldia == 0) { setEsMuestraCamposReq(true); return }
+    if (idOrigenAgenda == null || idOrigenAgenda == 0) { setEsMuestraCamposReq(true); return }
+    if (idClasificacionAgenda == null || idClasificacionAgenda == 0) { setEsMuestraCamposReq(true); return }
+    if (idEstatusAgenda == null || idEstatusAgenda == 0) { setEsMuestraCamposReq(true); return }
+    if (idTipoAgenda == null || idTipoAgenda == 0) { setEsMuestraCamposReq(true); return }
 
-    if (nombre === null || nombre.trim() == '') { setEsMuestraCamposReq(true); return }
-    if (cargo === null || cargo.trim() == '') { setEsMuestraCamposReq(true); return }
-    if (telefono === null || telefono.trim() == '') { setEsMuestraCamposReq(true); return }
-    //if (correo === null || correo.trim() == '') { setEsMuestraCamposReq(true); return }
+    if (nombre == null || nombre.trim() === '') { setEsMuestraCamposReq(true); return }
+    if (cargo == null || cargo.trim() === '') { setEsMuestraCamposReq(true); return }
+    if (telefono == null || telefono.trim() === '') { setEsMuestraCamposReq(true); return }
+    //if (correo == null || correo.trim() == '') { setEsMuestraCamposReq(true); return }
     //if (idColonia == 0) { setEsMuestraCamposReq(true); return }
-    //if (calle === null || calle.trim() == '') { setEsMuestraCamposReq(true); return }
-    //if (numero === null || numero.trim() == '') { setEsMuestraCamposReq(true); return }
-    //if (codigoPostal === null || codigoPostal.trim() == '') { setEsMuestraCamposReq(true); return }
-    if (fechaInicial === null) { setEsMuestraCamposReq(true); return }
-    if (fechaFinal === null) { setEsMuestraCamposReq(true); return }
+    //if (calle == null || calle.trim() == '') { setEsMuestraCamposReq(true); return }
+    //if (numero == null || numero.trim() == '') { setEsMuestraCamposReq(true); return }
+    //if (codigoPostal == null || codigoPostal.trim() == '') { setEsMuestraCamposReq(true); return }
+    //las fechas deben tener este formato: 'yyyy-mm-ddThh:mi'
+    if (fechaInicial == null || fechaInicial.trim() === '') { setEsMuestraCamposReq(true); return }
+    if (fechaFinal == null || fechaFinal.trim() === '') { setEsMuestraCamposReq(true); return }
+    if (fechaInicial >= fechaFinal) { setAlertaMensaje('La fecha final debe ser mayor a la fecha inicial'); return }
 
-    if (descripcion === null || descripcion.trim() == '') { setEsMuestraCamposReq(true); return }
-    if (idUsuario == 0) { setEsMuestraCamposReq(true); return }
+    if (descripcion == null || descripcion.trim() === '') { setEsMuestraCamposReq(true); return }
+    if (idUsuario == null || idUsuario == 0) { setEsMuestraCamposReq(true); return }
 
     const data = {
       pnIdAlcaldia: idAlcaldia,
@@ -127,6 +135,7 @@ export const FrmSolicitudAgenda = () => {
       //response.data[0].IdAgenda //se debe especificar el registro 0 ya que el response es un arreglo
       const id = response.data;  //Solo regresa IdAgenda
       console.log("Id:", id);
+      if (id == 0) { setAlertaMensaje('Ya existen registros que se cruzan en el mismo horario'); return }
 
       setEsFin(true);
 
@@ -243,6 +252,13 @@ export const FrmSolicitudAgenda = () => {
 
   }, []);
 
+  const handleChangeTelefono = (e) => {
+    // Filtra solo los caracteres numéricos del valor ingresado
+    const valor = e.target.value.replace(/\D/g, ''); // Elimina cualquier carácter que no sea dígito
+    console.log({ valor })
+    setTelefono(valor);
+  };
+
   return (
     <div>
       <SideBarHeader titulo={esNuevo ? 'Solicitud de Agenda' : 'Editar Solicitud de Agenda'}></SideBarHeader>
@@ -266,7 +282,7 @@ export const FrmSolicitudAgenda = () => {
 
                 <ElementoCampo type='text' lblCampo="Nombre* :" claCampo="Nombre" onInputChange={setNombre} nomCampo={nombre} tamanioString={100} />
                 <ElementoCampo type='text' lblCampo="Cargo* :" claCampo="Cargo" onInputChange={setCargo} nomCampo={cargo} />
-                <ElementoCampo type='text' lblCampo="Telefono* :" claCampo="Telefono" onInputChange={setTelefono} nomCampo={telefono} tamanioString={10} pattern={"\d*"} />
+                <ElementoCampo type='tel' lblCampo="Telefono* :" claCampo="Telefono" onInputChange={setTelefono} nomCampo={telefono} tamanioString={10} pattern="^\d{10}$" />
                 <ElementoCampo type='email' lblCampo="Correo :" claCampo="Correo" onInputChange={setCorreo} nomCampo={correo} tamanioString={50} />
                 <ElementoCampo type='datetime-local' lblCampo="Fecha Hora Inicial*:" claCampo="fechaInicial" nomCampo={fechaInicial} onInputChange={setFechaInicial} />
                 <ElementoCampo type='text' lblCampo="Asunto* :" claCampo="Descripcion" onInputChange={setDescripcion} nomCampo={descripcion} />
@@ -306,7 +322,7 @@ export const FrmSolicitudAgenda = () => {
           mensaje={'Los datos fueron guardados correctamente.'}
           mostrarBotonAceptar={true}
           mostrarBotonCancelar={false}
-          onAceptar={onAceptar}
+          onAceptar={onAceptarFinal}
         ></AlertaEmergente>
         // : <p></p>
       }

@@ -12,7 +12,7 @@ export default function useColumnsActividad() {
       {
         header: "IdActividad",
         accessorKey: "IdActividad",
-        visible: false,
+        visible: true,
       },
       {
         header: "Descripción",
@@ -39,16 +39,16 @@ export default function useColumnsActividad() {
         accessorKey: "FechaFin",
         visible: true,
       },
-      {
-        header: "Estatus",
-        accessorKey: "Estatus",
-        visible: false,
-      },
-      {
-        header: "Estatus",
-        accessorKey: "NomEstatus",
-        visible: false,
-      },
+      // {
+      //   header: "EstatusOld",
+      //   accessorKey: "Estatus",
+      //   visible: true,
+      // },
+      // {
+      //   header: "NomEstatus",
+      //   accessorKey: "NomEstatus",
+      //   visible: true,
+      // },
       // {
       //     header: 'Estatus',
       //     accessorKey: 'EstatusColor2',
@@ -59,7 +59,7 @@ export default function useColumnsActividad() {
         accessorKey: "EstatusColor",
         visible: true,
         cell: ({ getValue }) => {
-          const value=getValue();
+          const value=parseInt(getValue());
           // console.log('value es:'+value)
           const getColor = (status) => {
             if (status === 1) return "orange";
@@ -78,7 +78,7 @@ export default function useColumnsActividad() {
               }}
             >
               {value === 1 ? "Pendiente" : value === 2 ? "Vencida" : "Completada"}
-              {/* {'2'} */}
+              {/* {value} */}
             </div>
           );
         },

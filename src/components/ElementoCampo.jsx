@@ -15,6 +15,7 @@ export const ElementoCampo = ({
   , tamanioString = 255
   , width = '100%'
   , onInputChange2
+  , pattern = ''
   // , ref 
   // , setRef
   //,options = [{ value: '', label: 'Seleccionar' }, ...] // Agrega una opción por defecto al combo desplegable
@@ -133,8 +134,8 @@ export const ElementoCampo = ({
           </>
         ) : type == 'selectBusqueda' ? (
           <>
-            <label htmlFor={claCampo} style={{ whiteSpace: 'normal', width: width, textAlign:"left" }}>{lblCampo}</label>
-            <div className="form-floating mb-3" style={{ width: width}}>
+            <label htmlFor={claCampo} style={{ whiteSpace: 'normal', width: width, textAlign: "left" }}>{lblCampo}</label>
+            <div className="form-floating mb-3" style={{ width: width }}>
               <Select
                 id={claCampo}
                 // value={formattedOptions.find((opt) => opt.value === value)} // valor seleccionado
@@ -149,7 +150,7 @@ export const ElementoCampo = ({
                     ...base,
                     width: '100%',
                     textAlign: 'left',
-                    zIndex: 10, 
+                    zIndex: 10,
                   }),
                 }}
               />
@@ -168,6 +169,40 @@ export const ElementoCampo = ({
               disabled={!editable}
               maxLength={tamanioString}
               style={{ width: width }}            // ref={referencia}
+            />
+            <label htmlFor="floatingInput">{lblCampo}</label>
+          </div>
+
+          //PARTE ELSE DEL CONDICIONAL AQUI ENTRAN VARIOS TYPES COMUNES COMO TEXT,NUMBER,DATE,EMAIL, ETC VALIDAR SI FUNCIONA el de arriba "password"
+        ) : type == "password" ? ( // Si es una conttraseña o password
+
+          <div className="form-floating mb-3">
+            <input className="form-control"
+              type={type}    //{showPwd ? "text" : "password"}
+              id={claCampo}
+              placeholder={lblCampo}
+              value={value}
+              onChange={handleInputChange}
+              disabled={!editable}
+              maxLength={tamanioString}
+              style={{ width: width }}            // ref={referencia}
+            />
+            <label htmlFor="floatingInput">{lblCampo}</label>
+          </div>
+
+        ) : type == "tel" ? ( // Si es una conttraseña o password
+
+          <div className="form-floating mb-3">
+            <input className="form-control"
+              type={type}    //{showPwd ? "text" : "password"}
+              id={claCampo}
+              placeholder={lblCampo}
+              value={value}
+              onChange={handleInputChange}
+              disabled={!editable}
+              maxLength={tamanioString}
+              style={{ width: width }}            // ref={referencia}
+              pattern={pattern}
             />
             <label htmlFor="floatingInput">{lblCampo}</label>
           </div>

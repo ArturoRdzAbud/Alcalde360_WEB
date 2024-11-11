@@ -90,7 +90,7 @@ export const FrmFichaTecnicaEvento = () => {
     const [datosInvitados, setDatosInvitados] = useState([]);
     const [datosPresidium, setDatosPresidium] = useState([]);
     const [datosProgramas, setDatosProgramas] = useState([]);
-
+    
     const columnsInvitados = [
         {
             header: 'IdAlcaldia',
@@ -198,6 +198,7 @@ export const FrmFichaTecnicaEvento = () => {
         }
     ];
 
+  
     const onAceptarB = () => {
         setEsMuestraCamposReq(false)
         SetEsError(false)
@@ -294,7 +295,8 @@ export const FrmFichaTecnicaEvento = () => {
                 console.log('CARGANDO GRIDS programas', response4.data, 'lista de progs: ' + datosProgramas)
             })
             .catch (error => { console.error('Error al obtener los programas', error)})
-
+           
+  cambios Artur - 03/11/2024
             console.log('ACTUALIZANDO VALORES')
 
             console.log('1 ' + dataParams, dataParams.esNuevo, esNuevo, dataParams.IdSolicitudAgenda, dataParams.FechaHoraInicioEvento, dataParams.FechaHoraFinalEvento)
@@ -402,6 +404,16 @@ export const FrmFichaTecnicaEvento = () => {
         console.log(rowData.original.IdPrograma + ' ' + rowData.original.Programa)
     }
 
+    const handleEditProgramasNuevo = (rowData, cellId) => {
+
+        setProgramaIdSolicitudAgenda(rowData.original.IdSolicitudAgenda)
+        setProgramaIdPrograma(rowData.original.IdPrograma)
+        setProgramaNum(rowData.original.Link)  
+        setProgramaTema(rowData.original.Programa)
+
+        console.log(rowData.original.IdPrograma + ' ' + rowData.original.Programa)
+    }
+
     // falta validar bien los campos del grid para que agrege los valores al grid
     
     const handleSave = (tipo) => {
@@ -488,6 +500,7 @@ export const FrmFichaTecnicaEvento = () => {
         setDatosProgramas(nuevosDatos);
     };
 
+    
     const editInvitado = () => {
         console.log('editInvitado ')
         const nuevosParticipantes = datosInvitados.map((participante) => {
