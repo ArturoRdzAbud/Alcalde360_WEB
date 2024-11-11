@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import SimpleTable from './SimpleTable';
 import { ElementoCampo } from './ElementoCampo';
-
+import { AlertaEmergente } from './AlertaEmergente';
 import { SideBarHeader } from './SideBarHeader';
 import config from '../config'; // archivo configs globales del proy
 import { PerfilContext } from './PerfilContext'; // Importa el contexto
@@ -15,6 +15,7 @@ import Pagenew from '../svg/icon-save.svg?react'
 import { format, parseISO } from 'date-fns';
 
 import { useLocation, useNavigate } from "react-router-dom";
+
 
 export const FrmFichaTecnicaEvento = () => {
 
@@ -29,7 +30,7 @@ export const FrmFichaTecnicaEvento = () => {
 
     //variables de registro de la consulta para cargar los grids 
     const { idAlcaldia } = useContext(PerfilContext); // variable global
-    const [IdFichaTecnicaEvento, setIdFichaTecnicaEvento] = useState(0)
+    const [IdSolicitudAgenda, setIdSolicitudAgenda] = useState(0)
     const [IdParticipante, setIdParticipante] = useState(0)
     const [IdTipoParticipanteEvento, setIdTipoParticipanteEvento]= useState(0)
     
@@ -41,13 +42,25 @@ export const FrmFichaTecnicaEvento = () => {
     const [hora, setHora] = useState(null);
     const [horaFin, setHoraFin] = useState(null);
     const [lugar, setLugar] = useState('');
-    const [IdOrigenAgenda, setIdOrigenAgenda] = useState(-1);
-    //const [Origen, setOrigen] = useState('');
     const [Logistica, setLogistica] = useState('');
+    const [IdOrigenAgenda, setIdOrigenAgenda] = useState(-1);
+        
+    // variables de solo lectura de solicitud agenda
+    const [Asunto, SetAsunto] = useState('');
+    const [Nombre, SetNombre] = useState('');
+    const [Cargo, SetCargo] = useState('');
+    const [Clasificacion, SetClasificacion] = useState('');
+    const [Tipo, SetTipo] = useState('');
+    const [Estatus, SetEstatus] = useState('');
+    const [Origen, setOrigen] = useState('');
+    //---------------------------------------------------------
+
+    const [alertaMensaje, setAlertaMensaje] = useState('');
+    const [esError, SetEsError] = useState(false)
 
     // Variables de los invitados para la edicion del Grid
 
-    const [InvitadoIdFichaTecnicaEvento, setInvitadoIdFichaTecnicaEvento]= useState(0);
+    const [InvitadoIdSolicitudAgenda, setInvitadoIdSolicitudAgenda]= useState(0);
     const [InvitadoIdParticipante, setInvitadoIdParticipante]= useState(0);
     const [InvitadoIdTipoParticipanteEvento, setInvitadoIdTipoParticipanteEvento]= useState(0);
     const [InvitadoNombreParticipante, setInvitadoNombreParticipante] = useState('');
@@ -55,7 +68,7 @@ export const FrmFichaTecnicaEvento = () => {
 
     // Variables de los presidium para la edicion del Grid
 
-    const [PresidiumIdFichaTecnicaEvento, setPresidiumIdFichaTecnicaEvento]= useState(0);
+    const [PresidiumIdSolicitudAgenda, setPresidiumIdSolicitudAgenda]= useState(0);
     const [PresidiumIdParticipante, setPresidiumIdParticipante]= useState(0);
     const [PresidiumIdTipoParticipanteEvento, setPresidiumIdTipoParticipanteEvento]= useState(0);
     const [PresidiumNombreParticipante, setPresidiumNombreParticipante] = useState('');
@@ -63,7 +76,7 @@ export const FrmFichaTecnicaEvento = () => {
 
     // Variables de los Programas para la edicion del Grid
 
-    const [ProgramaIdFichaTecnicaEvento, setProgramaIdFichaTecnicaEvento]= useState(0);
+    const [ProgramaIdSolicitudAgenda, setProgramaIdSolicitudAgenda]= useState(0);
     const [ProgramaIdPrograma, setProgramaIdPrograma]= useState(0);
     const [ProgramaNum, setProgramaNum] = useState(0);
     const [ProgramaTema, setProgramaTema] = useState('');
@@ -86,8 +99,8 @@ export const FrmFichaTecnicaEvento = () => {
             , visible: false
         },
         {
-            header: 'IdFichaTecnicaEvento',
-            accessorKey: 'IdFichaTecnicaEvento',
+            header: 'IdSolicitudAgenda',
+            accessorKey: 'IdSolicitudAgenda',
             visible: false,
         },
         {
@@ -102,7 +115,7 @@ export const FrmFichaTecnicaEvento = () => {
         },
         {
             header: ('Nombre'),
-            accessorKey: 'NombreParticipante',
+            accessorKey: 'Nombre',
             visible: true,
         },
         {
@@ -125,8 +138,8 @@ export const FrmFichaTecnicaEvento = () => {
             , visible: false
         },
         {
-            header: 'IdFichaTecnicaEvento',
-            accessorKey: 'IdFichaTecnicaEvento',
+            header: 'IdSolicitudAgenda',
+            accessorKey: 'IdSolicitudAgenda',
             visible: false,
         },
         {
@@ -141,7 +154,7 @@ export const FrmFichaTecnicaEvento = () => {
         },
         {
             header: ('Nombre'),
-            accessorKey: 'NombreParticipante',
+            accessorKey: 'Nombre',
             visible: true,
         },
         {
@@ -164,8 +177,8 @@ export const FrmFichaTecnicaEvento = () => {
             , visible: false
         },
         {
-            header: 'IdFichaTecnicaEvento',
-            accessorKey: 'IdFichaTecnicaEvento',
+            header: 'IdSolicitudAgenda',
+            accessorKey: 'IdSolicitudAgenda',
             visible: false,
         },
         {
@@ -187,8 +200,13 @@ export const FrmFichaTecnicaEvento = () => {
 
     const onAceptarB = () => {
         setEsMuestraCamposReq(false)
+        SetEsError(false)
     };
 
+    const onAceptar = () => {
+        setEsMuestraCamposReq(false)
+        setEsFin(false)
+    };
 
                 /*
             if (fechaFintmp.getHours().toString().length == 1) {
@@ -223,8 +241,8 @@ export const FrmFichaTecnicaEvento = () => {
         return horatmp
     }
 
-    //-------------------------------------------------------------------SECCION USE EFFFECT
-    // llena arreglos de combos
+    //--------------SECCION USE EFFFECT
+    //Carga la consulta de resultados desde BD y llena arreglos de combos
     useEffect(() => {
 
         var ApiUrl = 'http://localhost:3000/ConsultarCombo?psSpSel=%22ConsultarOrigenAgendaCmb%22';
@@ -232,54 +250,54 @@ export const FrmFichaTecnicaEvento = () => {
         axios.get(ApiUrl)
         .then(response => { setDatosOrigen(response.data); })
         .catch( error => console.error('Error al obtener el Origen',error))
-
+       
+        console.log('0 ' + dataParams, dataParams.esNuevo, esNuevo, dataParams.IdSolicitudAgenda, dataParams.FechaHoraInicioEvento, dataParams.FechaHoraFinalEvento)
+        
         if (dataParams.esNuevo == false ) {
 
-            if (dataParams.IdFichaTecEvento == 0) return
+            if (dataParams.IdSolicitudAgenda == 0) return
 
             var ApiUrl = config.apiUrl + '/ConsultarEventoParticipantes';
-    /*       
-            axios.get(ApiUrl, { params: { pnIdAlcaldia: idAlcaldia, pnIdFichaTecnicaEvento: IdFichaTecnicaEvento, pnIdTipoParticipanteEvento: 1 }})
-            .then (response => {
-                setDatosInvitados(response.data)
+            
+            axios.get(ApiUrl, { params: { pnIdAlcaldia: idAlcaldia, pnIdSolicitudAgenda: dataParams.IdSolicitudAgenda, pnIdTipoParticipanteEvento: 1 }})
+            .then (response2 => {
+                setDatosInvitados(response2.data)
                 // copio la lista con [...list] y la ordeno con sort()
-                const sortedList = [...datosInvitados].sort((a, b) => (a.IdParticipante > b.IdParticipante ? 1 : a.IdParticipante < b.IdParticipante ? -1 : 0))
+                //const sortedList = [...datosInvitados].sort((a, b) => (a.IdParticipante > b.IdParticipante ? 1 : a.IdParticipante < b.IdParticipante ? -1 : 0))
                 // actualizo el estado con la nueva lista ya ordenada
-                setDatosInvitados(sortedList)
+                //setDatosInvitados(sortedList)
             })
             .catch (error => {console.error('Error al obtener los invitados', error)})
 
-            console.log('CARGANDO GRIDS invitados', datosInvitados)
+            console.log('CARGANDO GRIDS invitados : ', datosInvitados)
+
 
             ApiUrl = config.apiUrl + '/ConsultarEventoParticipantes';
-            axios.get(ApiUrl, {params: {pnIdAlcaldia: idAlcaldia, pnIdFichaTecnicaEvento: IdFichaTecnicaEvento, pnIdTipoParticipanteEvento: 2 }})
-            .then (response => {
-                setDatosPresidium(response.data)
-                // copio la lista con [...list] y la ordeno con sort()
-                const sortedList = [...datosPresidium].sort((a, b) => (a.IdParticipante > b.IdParticipante ? 1 : a.IdParticipante < b.IdParticipante ? -1 : 0))
-                // actualizo el estado con la nueva lista ya ordenada
-                setDatosPresidium(sortedList)
+            axios.get(ApiUrl, {params: {pnIdAlcaldia: idAlcaldia, pnIdSolicitudAgenda: dataParams.IdSolicitudAgenda, pnIdTipoParticipanteEvento: 2 }})
+            .then (response3 => {
+                setDatosPresidium(response3.data)
             })
             .catch (error => {console.error('Error al obtener el Presidium',error)})
 
-            console.log('CARGANDO GRIDS invitados', datosPresidium)
-    */
+            console.log('CARGANDO GRIDS presidium : ', datosPresidium)
+    
 
             ApiUrl = config.apiUrl + '/ConsultarEventoProgramas';
-            axios.get(ApiUrl, { params: { pnIdAlcaldia: idAlcaldia, pnIdFichaTecnicaEvento: dataParams.IdFichaTecEvento }})
-            .then ( response => { 
-                setDatosProgramas(response.data);
+           
+            axios.get(ApiUrl, { params: { pnIdAlcaldia: idAlcaldia, pnIdSolicitudAgenda: dataParams.IdSolicitudAgenda }})
+            .then ( response4 => { 
+                setDatosProgramas(response4.data);
                 // copio la lista con [...list] y la ordeno con sort()
                 //const sortedList = [...datosProgramas].sort((a, b) => (a.IdPrograma > b.IdPrograma ? 1 : a.IdPrograma < b.IdPrograma ? -1 : 0))
                 // actualizo el estado con la nueva lista ya ordenada
                 //setDatosProgramas(sortedList)
-                console.log('CARGANDO GRIDS programas', response.data, 'lista de progs: ' + datosProgramas)
+                console.log('CARGANDO GRIDS programas', response4.data, 'lista de progs: ' + datosProgramas)
             })
             .catch (error => { console.error('Error al obtener los programas', error)})
 
             console.log('ACTUALIZANDO VALORES')
 
-            console.log('1 ' + dataParams, dataParams.esNuevo, esNuevo, dataParams.IdFichaTecEvento, dataParams.FechaHoraInicioEvento, dataParams.FechaHoraFinalEvento)
+            console.log('1 ' + dataParams, dataParams.esNuevo, esNuevo, dataParams.IdSolicitudAgenda, dataParams.FechaHoraInicioEvento, dataParams.FechaHoraFinalEvento)
         
             const fechaInitmp = new Date(dataParams.FechaHoraInicioEvento)
             const fechaFintmp = new Date(dataParams.FechaHoraFinalEvento)
@@ -290,12 +308,12 @@ export const FrmFichaTecnicaEvento = () => {
     
             console.log('3 CARGANDO GRIDS', esEditar)
 
-            console.log(idAlcaldia, dataParams.IdFichaTecEvento)
+            console.log(idAlcaldia, dataParams.IdSolicitudAgenda)
 
             //setEsEditar(false); // para que solo se ejecute al cargar la pantalla
 
             //variables para cargar los grids
-            setIdFichaTecnicaEvento(dataParams.IdFichaTecEvento);
+            setIdSolicitudAgenda(dataParams.IdSolicitudAgenda);
 
             //mostrar la informacion consultada en la pantalla
             setTitulo(dataParams.TituloEvento);
@@ -316,70 +334,25 @@ export const FrmFichaTecnicaEvento = () => {
             setLugar(dataParams.Lugar);
             setLogistica(dataParams.Logistica);
 
+            // variables de solo lectura de la Solicitud de Agenda           
+            SetAsunto(dataParams.Asunto);
+            SetNombre(dataParams.NombreSolicitante);
+            SetCargo(dataParams.Cargo);
+            SetClasificacion(dataParams.Clasificacion);
+            SetTipo(dataParams.Tipo);
+            SetEstatus(dataParams.Estatus);
+            setOrigen(dataParams.Origen);
+            //--------------------------------------
+
             setEsNuevo(dataParams.esNuevo);
             setEsEditar(dataParams.esEditar);
 
         }
 
     },[]); // se ejecuta 1 vez al inicio solamente
+    //}, [esEditar]); // Se EJECUTA CUANDO CAMBIA la bandera esEditar // se ejecuta 1 vez al inicio solamente
 
-     //Carga la consulta de resultados desde BD
-    useEffect(() => {
- 
-        if (dataParams.IdFichaTecEvento == 0) return
-
-        console.log('5 CARGANDO GRIDS', esEditar)
-
-        var ApiUrl = 'http://localhost:3000/ConsultarEventoParticipantes';
-/*
-        console.log(idAlcaldia, IdFichaTecnicaEvento)
-
-        var ApiUrl = config.apiUrl + '/ConsultarEventoParticipantes';
-      
-        axios.get(ApiUrl,{params: {pnIdAlcaldia: idAlcaldia, pnIdFichaTecnicaEvento: IdFichaTecnicaEvento, pnIdTipoParticipanteEvento: 1 }})
-        .then (response => {
-            setDatosInvitados(response.data)
-            // copio la lista con [...list] y la ordeno con sort()
-            const sortedList = [...datosInvitados].sort((a, b) => (a.IdParticipante > b.IdParticipante ? 1 : a.IdParticipante < b.IdParticipante ? -1 : 0))
-            // actualizo el estado con la nueva lista ya ordenada
-            setDatosInvitados(sortedList)
-        })
-        .catch (error => {console.error('Error al obtener los invitados', error)})
-
-        console.log('CARGANDO GRIDS invitados', datosInvitados)
-
-        ApiUrl = config.apiUrl + '/ConsultarEventoParticipantes';
-        axios.get(ApiUrl, {params: {pnIdAlcaldia: idAlcaldia, pnIdFichaTecnicaEvento: IdFichaTecnicaEvento, pnIdTipoParticipanteEvento: 2 }})
-        .then (response => {
-            setDatosPresidium(response.data)
-            // copio la lista con [...list] y la ordeno con sort()
-            const sortedList = [...datosPresidium].sort((a, b) => (a.IdParticipante > b.IdParticipante ? 1 : a.IdParticipante < b.IdParticipante ? -1 : 0))
-            // actualizo el estado con la nueva lista ya ordenada
-            setDatosPresidium(sortedList)
-        })
-        .catch (error => {console.error('Error al obtener el Presidium',error)})
-
-        console.log('CARGANDO GRIDS invitados', datosPresidium)
-
-*/
-
-        ApiUrl = config.apiUrl + '/ConsultarEventoProgramas';
-        axios.get(ApiUrl, { params: { pnIdAlcaldia: idAlcaldia, pnIdFichaTecnicaEvento: dataParams.IdFichaTecEvento }})
-        .then ( response => { 
-            setDatosProgramas(response.data);
-            
-            // copio la lista con [...list] y la ordeno con sort()
-            //const sortedList = [...datosProgramas].sort((a, b) => (a.IdPrograma > b.IdPrograma ? 1 : a.IdPrograma < b.IdPrograma ? -1 : 0))
-            // actualizo el estado con la nueva lista ya ordenada
-            //setDatosProgramas(sortedList)
-            console.log('CARGANDO GRIDS programas', response.data, 'lista de progs: 2' + datosProgramas)
-        })
-        .catch (error => { console.error('Error al obtener los programas', error)})
-
-        //setEsEditar(false); // para que solo se ejecute al cargar la pantalla
-
-    }, [esEditar]); // Se EJECUTA CUANDO CAMBIA la bandera esEditar // se ejecuta 1 vez al inicio solamente
-
+   
     const enumTipoDeParticipante = {
         INVITADO: '1',
         PRESIDIUM: '2',
@@ -398,22 +371,22 @@ export const FrmFichaTecnicaEvento = () => {
     
     const handleEditParticipantes = (rowData, cellId) => {
 
-        console.log(rowData.original.IdTipoParticipanteEvento + ' ' + rowData.original.NombreParticipante + ' ' + rowData.original.TituloCargo)
+        console.log(rowData.original.IdTipoParticipanteEvento + ' ' + rowData.original.Nombre + ' ' + rowData.original.TituloCargo)
 
         if (ParticipanteEs(rowData.original.IdTipoParticipanteEvento) == enumTipoDeParticipante.INVITADO) { 
             console.log('INVITADO')
-            setInvitadoIdFichaTecnicaEvento(rowData.original.IdFichaTecnicaEvento)
+            setInvitadoIdSolicitudAgenda(rowData.original.IdSolicitudAgenda)
             setInvitadoIdParticipante(rowData.original.IdParticipante)
             setInvitadoIdTipoParticipanteEvento(rowData.original.IdTipoParticipanteEvento)
-            setInvitadoNombreParticipante(rowData.original.NombreParticipante)
+            setInvitadoNombreParticipante(rowData.original.Nombre)
             setInvitadoTituloCargo(rowData.original.TituloCargo)
 
         } else if (ParticipanteEs(rowData.original.IdTipoParticipanteEvento) == enumTipoDeParticipante.PRESIDIUM) { 
             console.log('PRESIDIUM')
-            setPresidiumIdFichaTecnicaEvento(rowData.original.IdFichaTecnicaEvento)
+            setPresidiumIdSolicitudAgenda(rowData.original.IdSolicitudAgenda)
             setPresidiumIdParticipante(rowData.original.IdParticipante)
             setPresidiumIdTipoParticipanteEvento(rowData.original.IdTipoParticipanteEvento)
-            setPresidiumNombreParticipante(rowData.original.NombreParticipante)
+            setPresidiumNombreParticipante(rowData.original.Nombre)
             setPresidiumTituloCargo(rowData.original.TituloCargo)
         }  
         console.log(InvitadoNombreParticipante + ' ' + PresidiumNombreParticipante)
@@ -421,18 +394,19 @@ export const FrmFichaTecnicaEvento = () => {
 
     const handleEditProgramas = (rowData, cellId) => {
 
-        setProgramaIdFichaTecnicaEvento(rowData.original.IdFichaTecnicaEvento)
+        setProgramaIdSolicitudAgenda(rowData.original.IdSolicitudAgenda)
         setProgramaIdPrograma(rowData.original.IdPrograma)
         setProgramaNum(rowData.original.Link)  
         setProgramaTema(rowData.original.Programa)
 
+        console.log(rowData.original.IdPrograma + ' ' + rowData.original.Programa)
     }
 
     // falta validar bien los campos del grid para que agrege los valores al grid
     
     const handleSave = (tipo) => {
 
-        console.log(tipo + ' ' + InvitadoIdParticipante)
+        console.log('Save: ' + tipo + ' ' + InvitadoIdParticipante)
 
         if (tipo == 1) { // Guardar Invitados
             console.log(InvitadoNombreParticipante + '-' + InvitadoTituloCargo + '-' + InvitadoIdParticipante)
@@ -441,7 +415,7 @@ export const FrmFichaTecnicaEvento = () => {
             if (InvitadoIdParticipante == 0) {
                
                 const UltimoIdParticipante = datosInvitados.length > 0 && datosInvitados[datosInvitados.length-1].IdParticipante > 0 ? (datosInvitados[datosInvitados.length-1].IdParticipante + 1) : (datosInvitados.length + 1)
-                agregarInvitado({ IdFichaTecnicaEvento: InvitadoIdFichaTecnicaEvento, IdParticipante: UltimoIdParticipante, IdTipoParticipanteEvento: 1, NombreParticipante: InvitadoNombreParticipante, TituloCargo: InvitadoTituloCargo })
+                agregarInvitado({ IdAlcaldia: idAlcaldia, IdSolicitudAgenda: InvitadoIdSolicitudAgenda, IdParticipante: UltimoIdParticipante, IdTipoParticipanteEvento: 1, Nombre: InvitadoNombreParticipante, TituloCargo: InvitadoTituloCargo })
                       
             } else {
                 editInvitado()
@@ -457,7 +431,7 @@ export const FrmFichaTecnicaEvento = () => {
 
                 const UltimoIdParticipante = datosPresidium.length > 0 && datosPresidium[datosPresidium.length-1].IdParticipante > 0 ? (datosPresidium[datosPresidium.length-1].IdParticipante + 1) : (datosPresidium.length + 1)
                 
-                agregarPresidium({ IdFichaTecnicaEvento: PresidiumIdFichaTecnicaEvento, IdParticipante: UltimoIdParticipante, IdTipoParticipanteEvento: 2, NombreParticipante: PresidiumNombreParticipante, TituloCargo: PresidiumTituloCargo })
+                agregarPresidium({ IdAlcaldia: idAlcaldia, IdSolicitudAgenda: PresidiumIdSolicitudAgenda, IdParticipante: UltimoIdParticipante, IdTipoParticipanteEvento: 2, Nombre: PresidiumNombreParticipante, TituloCargo: PresidiumTituloCargo })
                        
             } else {
                 editarPresidium()
@@ -466,13 +440,13 @@ export const FrmFichaTecnicaEvento = () => {
         if (tipo == 3) { // Guardar Programas
             console.log(ProgramaTema + '-' + ProgramaNum + '-' + ProgramaIdPrograma)
            
-            if (ProgramaNum.trim() === '' || ProgramaTema.trim() === '') { setEsMuestraCamposReq(true); return }
+            if (ProgramaNum.toString().trim() === '' || ProgramaTema.trim() === '') { setEsMuestraCamposReq(true); return }
            
             if (ProgramaIdPrograma == 0) {  
 
                 const UltimoIdPrograma = datosProgramas.length > 0 && datosProgramas[datosProgramas.length-1].IdPrograma > 0 ? (datosProgramas[datosProgramas.length-1].IdPrograma + 1) : (datosProgramas.length + 1)
                 
-                agregarProgramas( {IdFichaTecnicaEvento: ProgramaIdFichaTecnicaEvento, IdPrograma: UltimoIdPrograma, Link: ProgramaNum, Programa: ProgramaTema })
+                agregarProgramas( { IdAlcaldia: idAlcaldia, IdSolicitudAgenda: ProgramaIdSolicitudAgenda, IdPrograma: UltimoIdPrograma, Link: ProgramaNum, Programa: ProgramaTema })
            
             } else {
                 editarPrograma()
@@ -495,32 +469,32 @@ export const FrmFichaTecnicaEvento = () => {
 
     const agregarProgramas = (nuevo) => {
         console.log('agregarProgramas')
-        //setDatosProgramas(prevDatos => [...prevDatos, nuevo]);
+        setDatosProgramas(prevDatos => [...prevDatos, nuevo]);
         inicializaProgramas()
     };
 
     const handleDeleteInvitado = (row, cellId) => {
-        const nuevosDatos = datosInvitados.filter(dato => dato.IdFichaTecnicaEvento == row.original.IdFichaTecnicaEvento && dato.IdParticipante !== row.original.IdParticipante);
+        const nuevosDatos = datosInvitados.filter(dato => dato.IdSolicitudAgenda == row.original.IdSolicitudAgenda && dato.IdParticipante !== row.original.IdParticipante);
         setDatosInvitados(nuevosDatos);
     };
 
     const handleDeletePresidium = (row, cellId) => {
-        const nuevosDatos = datosPresidium.filter(dato => dato.IdFichaTecnicaEvento == row.original.IdFichaTecnicaEvento && dato.IdParticipante !== row.original.IdParticipante);
+        const nuevosDatos = datosPresidium.filter(dato => dato.IdSolicitudAgenda == row.original.IdSolicitudAgenda && dato.IdParticipante !== row.original.IdParticipante);
         setDatosPresidium(nuevosDatos);
     };
 
     const handleDeletePrograma = (row, cellId) => {
-        const nuevosDatos = datosProgramas.filter(dato => dato.IdFichaTecnicaEvento == row.original.IdFichaTecnicaEvento && dato.IdPrograma !== row.original.IdPrograma);
-        //setDatosProgramas(nuevosDatos);
+        const nuevosDatos = datosProgramas.filter(dato => dato.IdSolicitudAgenda == row.original.IdSolicitudAgenda && dato.IdPrograma !== row.original.IdPrograma);
+        setDatosProgramas(nuevosDatos);
     };
 
     const editInvitado = () => {
         console.log('editInvitado ')
         const nuevosParticipantes = datosInvitados.map((participante) => {
-            if (participante.IdFichaTecnicaEvento == InvitadoIdFichaTecnicaEvento && participante.IdParticipante === InvitadoIdParticipante) {
+            if (participante.IdSolicitudAgenda == InvitadoIdSolicitudAgenda && participante.IdParticipante === InvitadoIdParticipante) {
                 return {
                     ...participante, // Mantiene los datos existentes
-                    NombreParticipante: InvitadoNombreParticipante, // Sobrescribe el campo de nombre
+                    Nombre: InvitadoNombreParticipante, // Sobrescribe el campo de nombre
                     TituloCargo: InvitadoTituloCargo, // Sobrescribe el campo de puesto
                 };
             }
@@ -533,10 +507,10 @@ export const FrmFichaTecnicaEvento = () => {
     const editarPresidium = () => {
         console.log('editarPresidium')
         const nuevosPresidium = datosPresidium.map((Presidium) => {
-            if (Presidium.IdFichaTecnicaEvento == PresidiumIdFichaTecnicaEvento && Presidium.IdParticipante === PresidiumIdParticipante) {
+            if (Presidium.IdSolicitudAgenda == PresidiumIdSolicitudAgenda && Presidium.IdParticipante === PresidiumIdParticipante) {
                 return {
                     ...Presidium, // Mantiene los datos existentes
-                    NombreParticipante: PresidiumNombreParticipante, // Sobrescribe el campo de nombre
+                    Nombre: PresidiumNombreParticipante, // Sobrescribe el campo de nombre
                     TituloCargo: PresidiumTituloCargo, // Sobrescribe el campo de puesto
                 };
             }
@@ -547,9 +521,9 @@ export const FrmFichaTecnicaEvento = () => {
     };
 
     const editarPrograma = () => {
-        console.log('editarPrograma')
         const nuevosProgramas = datosProgramas.map((programa) => {
-            if (programa.IdFichaTecnicaEvento == ProgramaIdFichaTecnicaEvento && programa.IdPrograma === ProgramaIdPrograma) {
+            console.log('editarPrograma idftec: ' + programa.IdSolicitudAgenda, ', idprog ' + programa.IdPrograma)
+            if (programa.IdSolicitudAgenda == ProgramaIdSolicitudAgenda && programa.IdPrograma === ProgramaIdPrograma) {
                 return {
                     ...programa,
                     Link: ProgramaNum,
@@ -558,7 +532,7 @@ export const FrmFichaTecnicaEvento = () => {
             }
             return programa; // Devolver el participante sin cambios si no coincide el ID
         });
-        //setDatosProgramas(nuevosProgramas);
+        setDatosProgramas(nuevosProgramas);
         inicializaProgramas()
     };
 
@@ -580,28 +554,32 @@ export const FrmFichaTecnicaEvento = () => {
         setProgramaIdPrograma(0)
     }
 
-    useEffect(() => {
-        setEsNuevo(1)
-    }, []);
+    const handleKeyPressInvitado = (event) => {
+        if(event.key === 'Enter'){
+          console.log('enter press here! ')
+          //handleSave(1)
+        }
+    }
 
+    const handleKeyPressPresidium = (event) => {
+        if(event.key === 'Enter'){
+          console.log('enter press here! ')
+          //handleSave(2)
+        }
+    }
+
+    const handleKeyPressPrograma = (event) => {
+        if(event.key === 'Enter'){
+          console.log('enter press here! ')
+          //handleSave(3)
+        }
+    }
 
     const guardarFichaTecnicaEvento = async (e) => {
         e.preventDefault();
 
         //convierte arreglo a xml para parametro sql
         var xmlString1 = '';
-/*
-        const tIni = new Date();
-
-        const pInicio = vInicio.split(":");
-
-        tIni.setHours(pInicio[0], pInicio[1]);
-
-        const tFin = new Date();
-
-        const pFin = vFinal.split(":");
-
-        tFin.setHours(pFin[0], pFin[1]);*/
 
         if (hora == null || horaFin == null) { setEsMuestraCamposReq(true); return }
 
@@ -626,63 +604,11 @@ export const FrmFichaTecnicaEvento = () => {
 
          // todo validar requeridas las horas    
          console.log('3 '+ idAlcaldia, titulo, FechaHoraInicioEvento, FechaHoraFinalEvento, hora, horaFin, lugar, Logistica, IdOrigenAgenda)
-
-        const data = {
-    
-          pnIdAlcaldia: idAlcaldia,
-          pnIdFichaTecnicaEvento: IdFichaTecnicaEvento,
-          psTituloEvento: titulo,
-          pdFechaHoraInicioEvento: format(FechaHoraInicioEvento,'yyyy-MM-dd HH:mm:ss'),
-          pdFechaHoraFinalEvento: format(FechaHoraFinalEvento,'yyyy-MM-dd HH:mm:ss'),
-          pnIdOrigenAgenda : IdOrigenAgenda,
-          psLugarEvento: lugar,
-          psLogistica : Logistica,
-          pnClaUsuarioMod: 0
-        };
-    
-        const apiReq = config.apiUrl + '/GuardarFichaTecnicaEvento';
-        
-        console.log('4 Guardando los datos.', data);
     
         try {
-    
-            const response = await axios.post(apiReq, { data }, { 'Access-Control-Allow-Origin': '*' })
-            console.log("Response Data:", response.data);
-    
-            const IdFicha = response.data[0].IdFichaTecnicaEvento; //se debe especificar el registro 0 ya que el response es un arreglo
-            console.log('IdFichaTecnicaEvento Generado:', IdFicha);
-
-            if (IdFicha > 0) {
-
-                // Actualizar idfichatecnicaevento insertado a toda la lista
-                const datosInvitados2 = datosInvitados.map((invitado) => {
-                    if (invitado.IdFichaTecnicaEvento == 0) {
-                        return {
-                            ...invitado,
-                            IdFichaTecnicaEvento: IdFicha,
-                        };
-                    }
-                    return invitado; // Devolver el participante sin cambios si no coincide el ID
-                });
-               
-                 //const datosInvitadosTmp = datosEquipo1.filter((equipo1) => {return equipo1.ActivoChk;});
-                const datosInvitadosTmp = datosInvitados2.map(({ idAlcaldia, 
-                                                                IdFichaTecnicaEvento, 
-                                                                IdParticipante, 
-                                                                IdTipoParticipanteEvento, 
-                                                                NombreParticipante, 
-                                                                TituloCargo, 
-                                                                ClaUsuarioMod }) => ({ idAlcaldia, 
-                                                                                       IdFichaTecnicaEvento, 
-                                                                                       IdParticipante, 
-                                                                                       IdTipoParticipanteEvento, 
-                                                                                       NombreParticipante, 
-                                                                                       TituloCargo, 
-                                                                                       ClaUsuarioMod }));
-
                 let xmlDoc = document.implementation.createDocument(null, "data");
                 let rootElement = xmlDoc.documentElement;
-                datosInvitadosTmp.forEach(item => {
+                datosInvitados.forEach(item => {
                     const itemElement = xmlDoc.createElement("item");
                     for (const key in item) {
                         if (item.hasOwnProperty(key)) {
@@ -702,34 +628,9 @@ export const FrmFichaTecnicaEvento = () => {
                 var xmlString2
                 xmlString2 = ''
 
-                // Actualizar idfichatecnicaevento insertado a toda la lista
-                const datosPresidium2 = datosPresidium.map((item) => {
-                    if (item.IdFichaTecnicaEvento == 0) {
-                        return {
-                            ...item,
-                            IdFichaTecnicaEvento: IdFicha,
-                        };
-                    }
-                    return item; // Devolver el participante sin cambios si no coincide el ID
-                });
-
-                //const datosInvitadosTmp = datosEquipo1.filter((equipo1) => {return equipo1.ActivoChk;});
-                const datosPresidiumTmp = datosPresidium2.map(({ idAlcaldia, 
-                                                                 IdFichaTecnicaEvento, 
-                                                                 IdParticipante, 
-                                                                 IdTipoParticipanteEvento, 
-                                                                 NombreParticipante, 
-                                                                 TituloCargo, 
-                                                                 ClaUsuarioMod }) => ({ idAlcaldia, 
-                                                                                       IdFichaTecnicaEvento, 
-                                                                                       IdParticipante, 
-                                                                                       IdTipoParticipanteEvento, 
-                                                                                       NombreParticipante, 
-                                                                                       TituloCargo, 
-                                                                                       ClaUsuarioMod }));
                 xmlDoc = document.implementation.createDocument(null, "data");
                 rootElement = xmlDoc.documentElement;
-                datosPresidiumTmp.forEach(item => {
+                datosPresidium.forEach(item => {
                     const itemElement = xmlDoc.createElement("item");
                     for (const key in item) {
                         if (item.hasOwnProperty(key)) {
@@ -749,32 +650,9 @@ export const FrmFichaTecnicaEvento = () => {
                 var xmlString3
                 xmlString3 = ''
 
-                // Actualizar idfichatecnicaevento insertado a toda la lista
-                const datosProgramas2 = datosProgramas.map((item) => {
-                    if (item.IdFichaTecnicaEvento == 0) {
-                        return {
-                            ...item,
-                            IdFichaTecnicaEvento: IdFicha,
-                        };
-                    }
-                    return item; // Devolver el participante sin cambios si no coincide el ID
-                });
-
-                //const datosInvitadosTmp = datosEquipo1.filter((equipo1) => {return equipo1.ActivoChk;});
-                const datosProgramasTmp = datosProgramas2.map(({ idAlcaldia, 
-                                                                IdFichaTecnicaEvento, 
-                                                                IdPrograma, 
-                                                                Link, 
-                                                                Programa, 
-                                                                ClaUsuarioMod }) => ({ idAlcaldia, 
-                                                                                       IdFichaTecnicaEvento, 
-                                                                                       IdPrograma, 
-                                                                                       Link, 
-                                                                                       Programa, 
-                                                                                       ClaUsuarioMod }));
                 xmlDoc = document.implementation.createDocument(null, "data");
                 rootElement = xmlDoc.documentElement;
-                datosProgramasTmp.forEach(item => {
+                datosProgramas.forEach(item => {
                     const itemElement = xmlDoc.createElement("item");
                     for (const key in item) {
                         if (item.hasOwnProperty(key)) {
@@ -792,56 +670,70 @@ export const FrmFichaTecnicaEvento = () => {
 
                 const data = {
                     pnIdAlcaldia: idAlcaldia,
-                    pnIdFichaTecnicaEvento: IdFicha,
+                    pnIdSolicitudAgenda: IdSolicitudAgenda,
+                    psTituloEvento: titulo,
+                    pdFechaHoraInicioEvento: format(FechaHoraInicioEvento,'yyyy-MM-dd HH:mm:ss'),
+                    pdFechaHoraFinalEvento: format(FechaHoraFinalEvento,'yyyy-MM-dd HH:mm:ss'),
+                    pnIdOrigenAgenda : IdOrigenAgenda,
+                    psLugarEvento: lugar,
+                    psLogistica : Logistica,
                     pnClaUsuarioMod: 0,
                     psXmlResultados1: xmlString1,
                     psXmlResultados2: xmlString2,
-                    psXmlResultados3: xmlString3,
+                    psXmlResultados3: xmlString3
                 };
+
+                console.log('8 Guardando los sig. datos: ', data);
 
                 const apiReq = config.apiUrl + '/GuardaFichaTecnicaEventoGrids';
 
                 try {
                     
-                    await axios.post(apiReq, { data })
-                    .then(response => {    
-                        if (!response.data == '') {
+                    await axios.post(apiReq, { data }, { 'Access-Control-Allow-Origin': '*' })
+                    .then(response2 => {    
+                        if (!response2.data == '') {
                             console.log('REGRESA ERROR:')
-                            if (response.data.originalError === undefined) {
-                                console.log('response.data: ' + response.data)
-                                setAlertaMensaje(response.data)
+                            if (response2.data.originalError === undefined) {
+                                console.log('response.data: ' + response2.data)
+                                SetEsError(true)
+                                setAlertaMensaje(response2.data)
                             }
                             else {
-                                console.log('response.data.originalError.info.message: ' + response.data.originalError.info.message)
-                                setAlertaMensaje(response.data.originalError.info.message)
+                                console.log('response2.data.originalError.info.message: ' + response2.data.originalError.info.message)
+                                SetEsError(true)
+                                setAlertaMensaje(response2.data.originalError.info.message)
                             }
                         } else {
                             console.log('guardo correctamente')  
+                            SetEsError(false)
+                            setEsFin(true);
                             //setEsRegresaDeEditar(true)
                             //inicializaCampos()
                             setEsEditar(false)//regresa al grid
                             setEsNuevo(false)
 
-                            const data = {
+                            const data3 = {
                                 esNuevo: true      
                             };
                           
-                            navigate("/ConsultarEventos", { state: data });
+                            navigate("/ConsultarEventos", { state: data3 });
                         }
                     })    
                 
                 } catch (error) {
                      console.error('Error al guardar la captura de resultados', error);
+                     SetEsError(true)
+                     setAlertaMensaje(error)
                 }
 
-            }
+            //}
                         
-            setEsFin(true);
-
+        //}
         } catch (error) {
 
             console.error('Error al guardar el evento.', error);
-
+            SetEsError(true)
+            setAlertaMensaje(error)//(response.data)
         }
 
     }
@@ -872,37 +764,85 @@ export const FrmFichaTecnicaEvento = () => {
 
                     <span style={{ flexBasis: '99%', flexGrow: 0 }}>
                 
+                        <Frame title="Datos de la Solicitud">
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+                                <span style={{ flexBasis: '65%', flexShrink: 1, marginTop: '0px' }}>
+                                    <ElementoCampo type='date' lblCampo="Fecha evento*:" claCampo="fecha" nomCampo={fecha} onInputChange={setFecha} onClick={setFecha} editable={false} />
+                                </span>
+                                <span style={{ flexBasis: '15%', flexShrink: 1, marginTop: '0px' }}>
+                                    <ElementoCampo type='time' lblCampo="Hora Inicio*:" claCampo="hora" nomCampo={hora} onInputChange={setHora} onClick={setHora} editable={false} />
+                                </span>
+                                <span style={{ flexBasis: '15%', flexShrink: 1, marginTop: '0px' }}>
+                                    <ElementoCampo type='time' lblCampo="Hora Fin*:" claCampo="horaFin" nomCampo={horaFin} onInputChange={setHoraFin} onClick={setHoraFin} editable={false} />
+                                </span>
+
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+                                <span style={{ flexBasis: '45%', flexShrink: 1, marginTop: '0px' }}>
+                                    <ElementoCampo type='select' lblCampo="Origen*:" claCampo="Origen" nomCampo={IdOrigenAgenda} options={datosOrigen} onInputChange={setIdOrigenAgenda} editable={false} />
+                                </span>
+
+                                <span style={{ flexBasis: '50%', flexShrink: 1, marginTop: '0px' }}>
+                                    <ElementoCampo type='text' lblCampo="Asunto*:" claCampo="Asunto" nomCampo={Asunto} onInputChange={SetAsunto} editable={false} />
+                                </span>
+
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+                                <span style={{ flexBasis: '45%', flexShrink: 1, marginTop: '0px' }}>
+                                    <ElementoCampo type='text' lblCampo="Nombre del Solicitante*:" claCampo="Nombre" nomCampo={Nombre} onInputChange={SetNombre} editable={false} />
+                                </span>
+
+                                <span style={{ flexBasis: '50%', flexShrink: 1, marginTop: '0px' }}>
+                                    <ElementoCampo type='text' lblCampo="Cargo*:" claCampo="Cargo" nomCampo={Cargo} onInputChange={SetCargo} editable={false} />
+                                </span>
+
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+                                <span style={{ flexBasis: '30%', flexShrink: 1, marginTop: '0px' }}>
+                                    <ElementoCampo type='text' lblCampo="Clasificación*:" claCampo="Clasificacion" nomCampo={Clasificacion} onInputChange={SetClasificacion} editable={false} />
+                                </span>
+
+                                <span style={{ flexBasis: '30%', flexShrink: 1, marginTop: '0px' }}>
+                                    <ElementoCampo type='text' lblCampo="Tipo*:" claCampo="Tipo" nomCampo={Tipo} onInputChange={SetTipo} editable={false} />
+                                </span>
+
+                                <span style={{ flexBasis: '35%', flexShrink: 1, marginTop: '0px' }}>
+                                    <ElementoCampo type='text' lblCampo="Estatus*:" claCampo="Estatus" nomCampo={Estatus} onInputChange={SetEstatus} editable={false} />
+                                </span>
+
+                            </div>
+
+                        </Frame>
+
+                    </span>
+
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+                    <span style={{ flexBasis: '99%', flexGrow: 0 }}>
+                
                         <Frame title="Datos del evento">
 
                             <span style={{ flexBasis: '95%', flexGrow: 0 }}>
                                 <ElementoCampo type='text' lblCampo="Título* :" claCampo="Nombre" nomCampo={titulo} onInputChange={setTitulo} tamanioString={100} />
                             </span>
-
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-
-                                <span style={{ flexBasis: '65%', flexShrink: 1, marginTop: '0px' }}>
-                                    <ElementoCampo type='date' lblCampo="Fecha evento*:" claCampo="fecha" nomCampo={fecha} onInputChange={setFecha} onClick={setFecha} />
-                                </span>
-                                <span style={{ flexBasis: '15%', flexShrink: 1, marginTop: '0px' }}>
-                                    <ElementoCampo type='time' lblCampo="Hora Inicio*:" claCampo="hora" nomCampo={hora} onInputChange={setHora} onClick={setHora} />
-                                </span>
-                                <span style={{ flexBasis: '15%', flexShrink: 1, marginTop: '0px' }}>
-                                    <ElementoCampo type='time' lblCampo="Hora Fin*:" claCampo="horaFin" nomCampo={horaFin} onInputChange={setHoraFin} onClick={setHoraFin} />
-                                </span>
-
-                            </div>
-
-                                <span style={{ flexBasis: '95%', flexShrink: 1, marginTop: '0px' }}>
-                                    <ElementoCampo type='select' lblCampo="Origen*:" claCampo="Origen" nomCampo={IdOrigenAgenda} options={datosOrigen} onInputChange={setIdOrigenAgenda} />
-                                </span>
                                     
-                                <span style={{ flexBasis: '95%', flexShrink: 1, marginTop: '0px' }}>
-                                    <ElementoCampo type='text' lblCampo="Lugar*:" claCampo="Lugar" nomCampo={lugar} onInputChange={setLugar} />
-                                </span>
+                            <span style={{ flexBasis: '95%', flexShrink: 1, marginTop: '0px' }}>
+                                <ElementoCampo type='text' lblCampo="Lugar*:" claCampo="Lugar" nomCampo={lugar} onInputChange={setLugar} />
+                            </span>
 
-                                <span style={{ flexBasis: '95%', flexGrow: 1 }}>
-                                    <ElementoCampo type='text' lblCampo="Logística*:" claCampo="Logistica" nomCampo={Logistica} onInputChange={setLogistica} />
-                                </span>
+                            <span style={{ flexBasis: '95%', flexGrow: 1 }}>
+                                <ElementoCampo type='text' lblCampo="Logística*:" claCampo="Logistica" nomCampo={Logistica} onInputChange={setLogistica} />
+                            </span>
                         
                         </Frame>
 
@@ -929,7 +869,7 @@ export const FrmFichaTecnicaEvento = () => {
                                             </span>
 
                                             <span style={{ flexBasis: '25%', flexShrink: 1, marginTop: '0px' }}>
-                                                <ElementoCampo type='text' lblCampo="Título/Cargo*:" claCampo="" nomCampo={PresidiumTituloCargo} onInputChange={setPresidiumTituloCargo} />
+                                                <ElementoCampo type='text' lblCampo="Título/Cargo*:" claCampo="" nomCampo={PresidiumTituloCargo} onInputChange={setPresidiumTituloCargo} onKeyPress={handleKeyPressPresidium}/>
                                             </span>
 
                                             <span style={{ flexBasis: '5%', flexShrink: 1, marginTop: '0px' }}>
@@ -956,7 +896,7 @@ export const FrmFichaTecnicaEvento = () => {
                                         <ElementoCampo type='text' lblCampo="Nombre *:" claCampo="" nomCampo={InvitadoNombreParticipante} onInputChange={setInvitadoNombreParticipante} />
                                     </span>
                                     <span style={{ flexBasis: '25%', flexShrink: 1, marginTop: '0px' }}>
-                                        <ElementoCampo type='text' lblCampo="Título/Cargo*:" claCampo="" nomCampo={InvitadoTituloCargo} onInputChange={setInvitadoTituloCargo} />
+                                        <ElementoCampo type='text' lblCampo="Título/Cargo*:" claCampo="" nomCampo={InvitadoTituloCargo} onInputChange={setInvitadoTituloCargo} onKeyPress={handleKeyPressInvitado}/>
                                     </span>
                                     <span style={{ flexBasis: '5%', flexShrink: 1, marginTop: '0px' }}>
                                         {/* <button type="button" className="btn btn-primary" onClick={() => handleSave(1)} ><Pagenew /></button> */}
@@ -979,7 +919,7 @@ export const FrmFichaTecnicaEvento = () => {
                                         <ElementoCampo type='text' lblCampo="Num.*:" claCampo="" nomCampo={ProgramaNum} onInputChange={setProgramaNum} />
                                     </span>
                                     <span style={{ flexBasis: '75%', flexShrink: 1, marginTop: '0px' }}>
-                                        <ElementoCampo type='text' lblCampo="Tema*:" claCampo="" nomCampo={ProgramaTema} onInputChange={setProgramaTema} />
+                                        <ElementoCampo type='text' lblCampo="Tema*:" claCampo="" nomCampo={ProgramaTema} onInputChange={setProgramaTema} onKeyPress={handleKeyPressPrograma}/>
                                     </span>
                                     <span style={{ flexBasis: '5%', flexShrink: 1, marginTop: '0px' }}>
                                         {/* <button type="button" className="btn btn-primary" onClick={() => handleSave(1)} ><Pagenew /></button> */}
@@ -998,23 +938,7 @@ export const FrmFichaTecnicaEvento = () => {
                                     esOcultaBotonArriba={true}
                                     // handleDelete={() => handleDelete(1,datosInvitados,'idParticipante')} />
                                     handleDelete={handleDeletePrograma} 
-                                    setData={setDatosProgramas}/>
-{/*
-                    <SimpleTable
-                    // data={datosActividadLocal} 
-                    data={datosActividad.filter(item => item.IdAcuerdo == acuerdoIdAct)}
-                    columns={columnsActividad} 
-                    handleEdit={handleEditActividad}
-                    esOcultaFooter={true} 
-                    esOcultaBotonNuevo={true} 
-                    esOcultaFiltro={true}
-                    handleDelete={handleDeleteActividad} 
-                    esOcultaBotonArriba={true}
-                    handleDet={handleDet}
-                    handleDownload={handleDownload}
-                    setData={setDatosActividad}
-                />*/}
-                                                   
+                                    setData={setDatosProgramas}/>                                                   
                             </Frame >
 
                         </Frame>
@@ -1023,6 +947,12 @@ export const FrmFichaTecnicaEvento = () => {
 
                 </div> 
             </form>
+            {esError && 
+                <ElementoToastNotification
+                    mensaje={alertaMensaje}
+                    onAceptar={onAceptarB}
+                ></ElementoToastNotification>
+                }
             {esMuestraCamposReq &&
                 <ElementoToastNotification
                     mensaje={'Los datos con * son requeridos, favor de validar.'}
