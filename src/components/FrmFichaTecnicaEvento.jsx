@@ -195,7 +195,12 @@ export const FrmFichaTecnicaEvento = () => {
             header: 'Tema',
             accessorKey: 'Programa',
             visible: true,
-        }
+        },
+        {
+            header: (''),
+            accessorKey: 'handleDelete',
+            visible: true,
+        },
     ];
 
   
@@ -296,7 +301,6 @@ export const FrmFichaTecnicaEvento = () => {
             })
             .catch (error => { console.error('Error al obtener los programas', error)})
            
-  cambios Artur - 03/11/2024
             console.log('ACTUALIZANDO VALORES')
 
             console.log('1 ' + dataParams, dataParams.esNuevo, esNuevo, dataParams.IdSolicitudAgenda, dataParams.FechaHoraInicioEvento, dataParams.FechaHoraFinalEvento)
@@ -951,7 +955,9 @@ export const FrmFichaTecnicaEvento = () => {
                                     esOcultaBotonArriba={true}
                                     // handleDelete={() => handleDelete(1,datosInvitados,'idParticipante')} />
                                     handleDelete={handleDeletePrograma} 
-                                    setData={setDatosProgramas}/>                                                   
+                                    setData={setDatosProgramas}
+                                />       
+
                             </Frame >
 
                         </Frame>

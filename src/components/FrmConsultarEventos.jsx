@@ -89,6 +89,7 @@ export const FrmConsultarEventos = () => {
       .catch(error => console.error('Error al obtener datos:', error))
       .finally(() => {
         inicializaCampos()
+        filtraLocal()
         //console.log('Datos Incidencia:', datosEventos)
       });
 
