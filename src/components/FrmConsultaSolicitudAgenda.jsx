@@ -148,6 +148,12 @@ export const FrmConsultaSolicitudAgenda = () => {
       , visible: true
     },
     {
+      header: 'FichaTecnica',
+      accessorKey: 'IdSolicitudAgendaFichaTecnica',
+      footer: 'FichaTecnica'
+      , visible: false
+    },
+    {
       header: 'Origen',
       accessorKey: 'IdOrigenAgenda',
       footer: 'Origen'
@@ -281,6 +287,7 @@ export const FrmConsultaSolicitudAgenda = () => {
       esNuevo: false,
       idAlcaldia: rowData.original.IdAlcaldia,
       idSolicitudAgenda: rowData.original.IdSolicitudAgenda,
+      idSolicitudAgendaFichaTecnica: rowData.original.IdSolicitudAgendaFichaTecnica,
 
       descripcion: rowData.original.Descripcion,
       idTipoAgenda: rowData.original.IdTipoAgenda,

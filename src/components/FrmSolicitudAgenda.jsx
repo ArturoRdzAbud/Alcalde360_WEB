@@ -30,6 +30,7 @@ export const FrmSolicitudAgenda = () => {
   //datos de registro
   const { idAlcaldia } = useContext(PerfilContext); // variable global
   const [idSolicitudAgenda, setIdSolicitudAgenda] = useState(data.idSolicitudAgenda);
+  const [idSolicitudAgendaFichaTecnica, setIdSolicitudAgendaFichaTecnica] = useState(data.idSolicitudAgendaFichaTecnica);
 
   const [descripcion, setDescripcion] = useState(''); //asunto
   const [idTipoAgenda, setIdTipoAgenda] = useState(0);
@@ -185,6 +186,14 @@ export const FrmSolicitudAgenda = () => {
     setEsNuevo(true)
     setAccion(1)
   };
+  const fichaTecnica = (event) => {
+    event.preventDefault(); // Cancela el envío del formulario
+    if (idSolicitudAgendaFichaTecnica>0){
+      navigate(`/FichaTecnicaReunion?solicitud=${idSolicitudAgenda}&ficha=${idSolicitudAgendaFichaTecnica}`, { state: data });
+    }else{
+      navigate(`/FichaTecnicaReunion?solicitud=${idSolicitudAgenda}`, { state: data });
+    }
+  };
 
   useEffect(() => {
     var apiUrl = 'http://localhost:3000/ConsultarCombo?psSpSel=%22ConsultarTipoAgendaCmb%22';
@@ -267,6 +276,7 @@ export const FrmSolicitudAgenda = () => {
       <form onSubmit={guardarSolicitudAgenda}>
         <br />
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <button className="btn btn-secondary" onClick={fichaTecnica} >Registro Ficha Técnica</button>          
           <ElementoBotones cancelar={cancelar}></ElementoBotones>
         </div>
 

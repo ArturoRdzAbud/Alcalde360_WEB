@@ -517,6 +517,7 @@ export const FrmFichaTecnica = () => {
 
     const guardaIU = (async () => {
         // console.log('ini guardado ')
+        // console.log(ficha)
         // setAlertaMensaje('Al')
         // return
         const xmlParticipante = convertirAxml(datosParticipantes, "data");
