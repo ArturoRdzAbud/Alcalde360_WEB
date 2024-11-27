@@ -13,47 +13,34 @@ import { alignPropType } from 'react-bootstrap/esm/types';
 import { ElementoToastNotification } from './ElementoToastNotification';
 import { PerfilContext } from './PerfilContext'; // Importa el contexto
 
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const FrmGuardarEstatusIncidencia = () => {
 
     //Parametros recibidos desde form Consultar Incidencia
     const location = useLocation();
     const dataParams = location.state;
+    const navigate = useNavigate();
     //---------------------------------------------------
 
     const { perfil, esConLicencia } = useContext(PerfilContext);
 
     //combo
     const [datosEstatus, setDatosEstatus] = useState([]);
-
-    const [esNuevo, setEsNuevo] = useState(false);
-    const [esEditar, setEsEditar] = useState(false);
     const [esFin, setEsFin] = useState(false);
 
     //asignación de valores enviados desde la consulta de incidencia para los datos de registro
-    const [IdAlcaldia, setIdAlcaldia] =  useState(1);
+    const [IdAlcaldia, setIdAlcaldia] = useState(1);
     const [IdIncidencia, setIdIncidencia] = useState(1);
-    const [IdEstatus, setIdEstatus] =  useState(0);
-    const [FechaEstimada, setFechaEstimada] =  useState(new Date());
-    const [Comentarios, setComentarios] =  useState('');
-    const [FechaReporte, setFechaReporte] =  useState(new Date());
+    const [IdEstatus, setIdEstatus] = useState(0);
+    const [FechaEstimada, setFechaEstimada] = useState(format(new Date(), 'yyyy-MM-dd'));
+    const [Comentarios, setComentarios] = useState('');
+    const [FechaReporte, setFechaReporte] = useState(new Date().toISOString().split('T')[0]);
     const [idUsuario, setIdUsuario] = useState(0);
+    const [Descripcion, setDescripcion] = useState('');
 
-    //parametros enviados desde frmconsultaincidencia
-    if (dataParams != null) {
-        if (dataParams.idAlcaldia != null) {setIdAlcaldia(dataParams.idAlcaldia); }
-        if (dataParams.idIncidencia != null) {setIdIncidencia(dataParams.idIncidencia); }
-        if (dataParams.IdEstatus != null) {setIdEstatus(dataParams.IdEstatus); }
-        if (dataParams.FechaEstimada != null) {setFechaEstimada(dataParams.FechaEstimada); }
-        if (dataParams.Comentarios != null) {setComentarios(dataParams.Comentarios); }
-        if (dataParams.FechaReporte != null) {setFechaReporte(dataParams.FechaReporte); }
-        if (dataParams.idUsuario != null) {setIdUsuario(dataParams.idUsuario); }
-
-        console.log(dataParams.FechaReporte);
-    }
 
     const [activo, setActivo] = useState(false);
     const [accion, setAccion] = useState(0);
@@ -69,104 +56,75 @@ const FrmGuardarEstatusIncidencia = () => {
         setAlertaMensaje('')
     };
 
-    
+
     useEffect(() => {
         var apiUrl = config.apiUrl + '/ConsultarCombo?psSpSel=%22ConsultarEstatusIncidenciaCmb%22';
         axios.get(apiUrl)
             .then(response => {
                 setDatosEstatus(response.data)
             }
-        )
-      .catch(error => console.error('Error al obtener estatus', error));
+            )
+            .catch(error => console.error('Error al obtener estatus', error));
+
+        setIdAlcaldia(dataParams.idAlcaldia);
+        setIdIncidencia(dataParams.idIncidencia);
+        setIdEstatus(dataParams.idEstatusIncidencia);
+        setDescripcion(dataParams.descripcion);
+        setFechaEstimada(dataParams.fechaEstimada);
+        setFechaReporte(dataParams.fechaReporte);
 
     }, []);
 
-    const nuevo = () => {
-        inicializaCampos()
-        setEsNuevo(true)
-        setEsEditar(true)
-        setAccion(1)
-
-    }
 
     const cancelar = () => {
-        inicializaCampos()
-        setEsEditar(false)
-        setEsNuevo(false)
-        //console.log("foto:" + foto)
+        //inicializaCampos()
+        navigate(-2)
     }
 
-    const inicializaCampos = () => {
 
-        setActivo(true)
-
-        //Campos 
-        setIdAlcaldia(IdAlcaldia); //temporalmente se asignan valores para probar el guardado
-        setIdIncidencia(IdIncidencia); //temporalmente se asignan valores para probar el guardado
-        setIdEstatus(0);
-        setFechaEstimada(new Date());
-        
-        //para que no la fecha no le reste un dia por problemas de zona horaria
-        if (!FechaEstimada==null) {
-             FechaEstimada.setMinutes(FechaEstimada.getMinutes() + FechaEstimada.getTimezoneOffset())
-        }
-
-        setComentarios('');
-        setIdUsuario(idUsuario)//asigna temporalmente 1 hasta que tengamos una variable global de usuario para pasar este dato al SP
-
-        // setIdPerfil(-1)
-        setAccion(0)
-        setEsFin(false)
-    }
- 
     const diasAAgregar = 30; // Número de días a agregar
 
     const agregarDias = (Fecha) => {
-          
-        let fechaActual = new Date();                 
-        fechaActual.setDate(Fecha.getDate() + diasAAgregar);
-          
-        return (fechaActual);
-    }   
+
+        let fechaNueva = new Date(Fecha);
+        fechaNueva.setDate(fechaNueva.getUTCDate() + diasAAgregar);
+
+        return (fechaNueva);
+    }
 
     const guardarEstatusIncidencia = async (e) => {
         e.preventDefault();
 
         const data = {
-            pnIdAlcaldia : IdAlcaldia,
-            pnIdIncidencia : IdIncidencia,
-            pnIdEstatus : IdEstatus,
-            pdFechaEstimada : FechaEstimada,
-            psComentarios : Comentarios,
-            pnIdUsuario: idUsuario,            
+            pnIdAlcaldia: IdAlcaldia,
+            pnIdIncidencia: IdIncidencia,
+            pnIdEstatus: IdEstatus,
+            pdFechaEstimada: FechaEstimada,
+            psComentarios: Comentarios,
+            pnIdUsuario: idUsuario,
         };
 
         const apiReq = config.apiUrl + '/GuardarEstatusIncidencia';
 
         try {
 
-            if (IdAlcaldia == 0) {setEsMuestraCamposReq(true); return}
-            if (IdIncidencia == 0) {setEsMuestraCamposReq(true); return}
-            if (IdEstatus == 0) {setEsMuestraCamposReq(true); return}
+            if (IdAlcaldia == 0) { setEsMuestraCamposReq(true); return }
+            if (IdIncidencia == 0) { setEsMuestraCamposReq(true); return }
+            if (IdEstatus == 0) { setEsMuestraCamposReq(true); return }
             if (Comentarios === null || Comentarios.trim() == '') { setEsMuestraCamposReq(true); return }
-            
-            const fechaMensual = agregarDias(FechaReporte); 
 
-            //console.log(IdAlcaldia);
-            //console.log(IdIncidencia);
-            //console.log(IdEstatus);
-            //console.log(Comentarios);
-            console.log('fecha reporte : ' + format(FechaReporte,'yyyy-MM-dd'));
+            const fechaMensual = format(agregarDias(FechaReporte), 'yyyy-MM-dd');
+
+            console.log('fecha reporte : ' + FechaReporte);
             console.log('fecha estimada : ' + FechaEstimada);
-            console.log('fecha mensual : ' + format(fechaMensual, 'yyyy-MM-dd'));
+            console.log('fecha mensual : ' + fechaMensual);
 
-            if (FechaEstimada <= format(FechaReporte,'yyyy-MM-dd'))
-            {
-                setAlertaMensaje('La fecha estimada deber ser mayor a la fecha del reporte : ' + format(FechaReporte,'dd/MM/yyyy'));
+            if (FechaEstimada <= FechaReporte) {
+                setAlertaMensaje('La fecha estimada deber ser mayor a la fecha del reporte : ' + format(parseISO(FechaReporte), 'dd/MM/yyyy'));
                 return
-            } else if (FechaEstimada > format(fechaMensual, 'yyyy-MM-dd')) //<== probar validacion
+            } else if (FechaEstimada > fechaMensual) //<== probar validacion
             {
-                setAlertaMensaje('La fecha estimada deber ser menor a un mes (' + format(fechaMensual, 'dd/MM/yyyy') + '), después de la fecha del reporte');
+                setAlertaMensaje('La fecha estimada deber ser menor a un mes (' + format(parseISO(fechaMensual), 'dd/MM/yyyy') + '), después de la fecha del reporte');
                 return
             }
 
@@ -178,16 +136,9 @@ const FrmGuardarEstatusIncidencia = () => {
                         // Asegúrate de que response.data sea una cadena antes de asignarla
                         setAlertaMensaje(JSON.stringify(response.data));
                     } else {
-                        console.log(IdAlcaldia , IdIncidencia, 'guardo correctamente');
+                        console.log(IdAlcaldia, IdIncidencia, 'Guardo Correctamente Estatus');
 
-                        inicializaCampos();
-
-                        setIdEstatus(IdEstatus);
-                        setFechaEstimada(FechaEstimada);
-                        setComentarios(Comentarios);
-
-                        setEsEditar(false); // regresa al grid
-                        setEsNuevo(false);
+                        setComentarios('');
                         setEsFin(true);
                     }
                 })
@@ -208,53 +159,37 @@ const FrmGuardarEstatusIncidencia = () => {
             <SideBarHeader titulo='Actualizar Estatus de Incidencia'></SideBarHeader>
             <br /><br /><br /><br />
 
-                <>
-                    <form onSubmit={guardarEstatusIncidencia} autoComplete="off">
-                        <br />
-                        <ElementoBotones cancelar={cancelar}></ElementoBotones>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ flexGrow: 1 }}>
-                                <ElementoCampo type='select' lblCampo="Estatus* :" claCampo="campo" nomCampo={IdEstatus} options={datosEstatus} onInputChange={setIdEstatus} />
-                                <ElementoCampo type='date' lblCampo="Fecha Estimada* :" claCampo="campo" nomCampo={FechaEstimada} onInputChange={setFechaEstimada} />
-                                <ElementoCampo type='text' lblCampo="Comentarios* :" claCampo="campo" nomCampo={Comentarios} onInputChange={setComentarios} tamanioString={250} />
-                                
-                            </span>
-                            <span style={{ flexGrow: 0.5 }}>
-                                <h2></h2>
-                            </span>
-                        </div>
+            <>
+                {/*<p>Folio Incidencia : {IdIncidencia}</p><br />
+                <p>Descripción : {Descripcion}</p>
+                <p>Fecha Reporte : {format(parseISO(FechaReporte), 'dd/MM/yyyy')}</p>
+                <p>Fecha Reporte : {JSON.stringify(format(FechaReporte, 'dd/MM/yyyy'))}</p>
+                <p>Fecha Reporte : {FechaReporte}</p>*/}
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ flexGrow: 1 }}>
+                <form onSubmit={guardarEstatusIncidencia} autoComplete="off">
+                    <br />
+                    <ElementoBotones cancelar={cancelar}></ElementoBotones>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ flexGrow: 1 }}>
+                            {<ElementoCampo type="text" lblCampo="Folio*: " claCampo="campo" nomCampo={IdIncidencia} onInputChange={setIdIncidencia} editable={false} />}
+                            {<ElementoCampo type="text" lblCampo="Descripción*: " claCampo="campo" nomCampo={Descripcion} onInputChange={setDescripcion} editable={false} />}
+                            <ElementoCampo type='select' lblCampo="Estatus* :" claCampo="campo" nomCampo={IdEstatus} options={datosEstatus} onInputChange={setIdEstatus} />
+                            <ElementoCampo type='date' lblCampo="Fecha Reporte :" claCampo="campo" nomCampo={FechaReporte} editable={false} />
+                            <ElementoCampo type='date' lblCampo="Fecha Estimada* :" claCampo="campo" nomCampo={FechaEstimada} onInputChange={setFechaEstimada} />
+                            <ElementoCampo type='text' lblCampo="Comentarios* :" claCampo="campo" nomCampo={Comentarios} onInputChange={setComentarios} tamanioString={200} />
 
-                            </span>
-                            <span style={{ flexGrow: 1 }}>
-                                <h2></h2>
-                            </span>
-                            <span style={{ flexGrow: 1 }}>
+                        </span>
+                        <span style={{ flexGrow: 0.5 }}>
+                            <h2></h2>
+                        </span>
+                    </div>
 
-                            </span>
-                        </div>
+                    {/*<p>Parrafo temporal para ver parametros del SP a Base de datos|@IdLiga={idLiga}|@idUsuario={idUsuario}|@fN={fechaNacimiento}|@idPerfil={idPerfil}|@Activo={activo.toString()}|</p>*/}
+                    {/*<button type="submit" className="btn btn-primary" title="Guardar">Guardar</button>*/}
+                    {/*<button type="button" className="btn btn-primary" onClick={cancelar} title="Cancelar">Cancelar</button>*/}
 
-                        {/*<p>Parrafo temporal para ver parametros del SP a Base de datos|@IdLiga={idLiga}|@idUsuario={idUsuario}|@fN={fechaNacimiento}|@idPerfil={idPerfil}|@Activo={activo.toString()}|</p>*/}
-                        {/*<button type="submit" className="btn btn-primary" title="Guardar">Guardar</button>*/}
-                        {/*<button type="button" className="btn btn-primary" onClick={cancelar} title="Cancelar">Cancelar</button>*/}
-
-
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ flexGrow: 1 }}>
-
-                            </span>
-                            <span style={{ flexGrow: 1 }}>
-                                <h2></h2>
-                            </span>
-                            <span style={{ flexGrow: 1 }}>
-
-                            </span>
-                        </div>
-
-                    </form>
-                </>
+                </form>
+            </>
             {
                 esMuestraCamposReq &&
                 <AlertaEmergente

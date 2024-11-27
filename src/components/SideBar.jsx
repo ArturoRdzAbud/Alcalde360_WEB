@@ -19,13 +19,19 @@ import FrmReporteIncidencia from './FrmReporteIncidencia';
 import FrmPrueba from './FrmPrueba';
 import FrmEncuesta from './FrmEncuesta';
 import FrmEncuestaIntermedia from './FrmEncuestaIntermedia';
+import FrmFichaTecnica from './FrmFichaTecnica';
+import FrmConsultaSolicitudAgenda from './FrmConsultaSolicitudAgenda';
+import FrmSolicitudAgenda from './FrmSolicitudAgenda';
 
 import ProtectedRoute from './ProtectedRoute';
 import AccessDeniedPage from './AccessDeniedPage';
 
 //llamada temporal a pantalla asignar área y prioridad de incidencia (eliminar cuando se vaya a integrar)
 import FrmAsignarAreayPrioridadIncidencia from './FrmAsignarAreayPrioridadIncidencia';
+import FrmGuardarEstatusIncidencia from './FrmGuardarEstatusIncidencia';
 
+import FrmConsultarEventos from './FrmConsultarEventos';
+import FrmFichaTecnicaEvento from './FrmFichaTecnicaEvento';
 
 //Iconos
 import HomeSvg from '../svg/icon-home.svg?react'
@@ -33,7 +39,6 @@ import Arbitrosvg from '../svg/arbitro.svg?react'
 import Arbitros2vg from '../svg/arbitro.svg?react'
 import UsuarioSvg from '../svg/usuario.svg?react'
 import IconFlagvg from '../svg/icon-flag.svg?react'
-
 
 
 // export default props => {
@@ -63,11 +68,15 @@ export const SideBar = () => {
     const [isAccesosOpen, setIsAccesosOpen] = useState(false);
     const [isEncuestaOpen, setIsEncuestaOpen] = useState(false);
     const [isEncuestaIntermediaOpen, setIsEncuestaIntermediaOpen] = useState(false);
+    const [isIncidenciasOpen, setIsIncidenciasOpen] = useState(false);
     const toggleAccesos = () => {
         setIsAccesosOpen(!isAccesosOpen);
     };
     const toggleEncuesta = () => {
         setIsEncuestaOpen(!isEncuestaOpen);
+    };
+    const toggleIncidencias = () => {
+        setIsIncidenciasOpen(!isIncidenciasOpen);
     };
 
     // const toggleMenu = (setState,stateValue) => {
@@ -106,6 +115,12 @@ export const SideBar = () => {
             //para que funcione en desarrollo comentar el strictmode en el archivo main.jsx
         //20240408 npm install react-bootstrap bootstrap
             // para que funcionene los modales bootstrap en react
+        //202410 npm i bootstrap-icons 
+                //para iconos bootstrap
+        //20241014 npm install date-fns
+                //se usa en frmguardarestatusincidencia
+        //202410 npm install react-select
+                para que los combos puedan tener busqueda integrada
 
         https://app.netlify.com/
         https://www.digitalocean.com/community/tutorials/react-react-burger-menu-sidebar  
@@ -160,11 +175,11 @@ export const SideBar = () => {
                                     {isAdminOpen ? '▾' : '▸'} Configuración</div><div style={separatorStyles}></div></>)}
                                 {isAdminOpen && (
                                     <div style={fontsize}>
-                                        {perfil >= 4 && <NavLink onClick={closeMenu} to='/Arbitros' className='nav-link' > <Arbitros2vg />{'Catálogo de Árbitros'} </NavLink>}
-                                        {perfil >= 4 && <NavLink onClick={closeMenu} to='/ConsultarIncidencia' className='nav-link' > <IconFlagvg />{'Consulta de Incidencias'} </NavLink>}
+                                        {/*perfil >= 4 && <NavLink onClick={closeMenu} to='/Arbitros' className='nav-link' > <Arbitros2vg />{'Catálogo de Árbitros'} </NavLink>*/}
+                                        {/*perfil >= 4 && <NavLink onClick={closeMenu} to='/ConsultarIncidencia' className='nav-link' > <IconFlagvg />{'Consulta de Incidencias'} </NavLink>*/}
                                         {/*perfil >= 4 && <NavLink onClick={closeMenu} to='/Prueba' className='nav-link' > <IconFlagvg />{'Prueba'} </NavLink>*/}
                                         {/*llamada temporal a pantalla asignar área y prioridad de incidencia (eliminar cuando se vaya a integrar)*/}
-                                        {perfil >= 4 && <NavLink onClick={closeMenu} to='/AsignarAreayPrioridadIncidencia' className='nav-link' > <IconFlagvg />{'Asignar Área y Prioridad de la Incidencia'} </NavLink>}
+                                        {/*perfil >= 4 && <NavLink onClick={closeMenu} to='/AsignarAreayPrioridadIncidencia' className='nav-link' > <IconFlagvg />{'Asignar Área y Prioridad de la Incidencia'} </NavLink>*/}
 
                                     </div>
                                 )}
@@ -174,6 +189,7 @@ export const SideBar = () => {
                             {esConLicencia == -1 &&
                                 <>
                                     <NavLink onClick={closeMenu} to='/CatUsuario' className='nav-link' > <JugadoresSvg />{' Usuarios'} </NavLink>
+
                                 </>
                             }
 
@@ -187,16 +203,43 @@ export const SideBar = () => {
                                         {isAccesosOpen && (
                                             <div style={fontsize}>
                                                 <NavLink onClick={closeMenu} to='/FrmUsuario' className='nav-link' >{' Registro de Usuarios'} </NavLink>
+
                                             </div>
                                         )}
                                     </div>
+
+                                    <div className="menu-section" >
+                                        <div className="menu-section-title" onClick={toggleIncidencias} style={fontsizeH}>
+                                            {isIncidenciasOpen ? '▾' : '▸'} Consultar</div><div style={separatorStyles}></div>
+                                        {isIncidenciasOpen && (
+                                            <div style={fontsize}>
+                                                <NavLink onClick={closeMenu} to='/ConsultarIncidencia' className='nav-link' > {'Consulta de Incidencias'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/ConsultarSolicitudAgenda' className='nav-link' > {'Consulta de Solicitud de Agenda'} </NavLink>
+                                            </div>
+                                        )}
+                                    </div>
+
                                     <div className="menu-section" >
                                         <div className="menu-section-title" onClick={toggleEncuesta} style={fontsizeH}>
                                             {isEncuestaOpen ? '▾' : '▸'} Encuestas</div><div style={separatorStyles}></div>
                                         {isEncuestaOpen && (
                                             <div style={fontsize}>
-                                                <NavLink onClick={closeMenu} to='/FrmEncuestaIntermedia' className='nav-link' >{' Intermedia'} </NavLink>
-                                                <NavLink onClick={closeMenu} to='/FrmEncuesta' className='nav-link' >{' Clausura'} </NavLink>
+                                                {/* <NavLink onClick={closeMenu} to='/FrmEncuestaIntermedia' className='nav-link' >{' Intermedia'} </NavLink> */}
+                                                <NavLink onClick={closeMenu} to='/EncuestaProcesoAtencion' className='nav-link' >{' Intermedia'} </NavLink>
+                                                {/* <NavLink onClick={closeMenu} to='/FrmEncuesta' className='nav-link' >{' Clausura'} </NavLink> */}
+                                                <NavLink onClick={closeMenu} to='/EncuestaSatisfaccionCiudadana' className='nav-link' >{' Clausura'} </NavLink>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="menu-section" >
+                                        <div className="menu-section-title" onClick={toggleEncuesta} style={fontsizeH}>
+                                            {isEncuestaOpen ? '▾' : '▸'} Ficha Técnica</div><div style={separatorStyles}></div>
+                                        {true && (
+                                            <div style={fontsize}>
+                                                <NavLink onClick={closeMenu} to='/FichaTecnicaReunion' className='nav-link' > {' Reunión'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/ConsultarEventos' className='nav-link' > {' Eventos'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/Arbitros' className='nav-link' > {' Arbitros'} </NavLink>
                                             </div>
                                         )}
                                     </div>
@@ -222,10 +265,20 @@ export const SideBar = () => {
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/Prueba' element={<FrmPrueba />} /></Route>
                         {/*llamada temporal a pantalla asignar área y prioridad de incidencia (eliminar cuando se vaya a integrar)*/}
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/AsignarAreayPrioridadIncidencia' element={<FrmAsignarAreayPrioridadIncidencia />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/GuardarEstatusIncidencia' element={<FrmGuardarEstatusIncidencia />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/ConsultarSolicitudAgenda' element={<FrmConsultaSolicitudAgenda />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/SolicitudAgenda' element={<FrmSolicitudAgenda />} /></Route>
 
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmUsuario' element={<FrmUsuario />} /></Route>
-                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuesta' element={<FrmEncuesta />} /></Route>
-                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuestaIntermedia' element={<FrmEncuestaIntermedia />} /></Route>
+                        {/* <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuesta' element={<FrmEncuesta />} /></Route> */}
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/EncuestaSatisfaccionCiudadana' element={<FrmEncuesta />} /></Route>
+                        {/* <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FrmEncuestaIntermedia' element={<FrmEncuestaIntermedia />} /></Route> */}
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/EncuestaProcesoAtencion' element={<FrmEncuestaIntermedia />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FichaTecnicaReunion' element={<FrmFichaTecnica />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/ConsultarEventos' element={<FrmConsultarEventos />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/FichaTecnicaEvento' element={<FrmFichaTecnicaEvento />} /></Route>
+                        
+                        
                         {/* <ProtectedRoute path="/Liga" element={<CatLiga />} profile={perfil} requiredProfile={2}/> */}
                         {/* <Route path="/Liga" element={<ProtectedRoute profile={perfil} requiredProfile={2} />}/> */}
 

@@ -1,0 +1,20 @@
+.mi-frame {
+  border: 2px solid #ccc;       /* Borde del frame */
+  padding: 20px;                /* Espaciado interno */
+  border-radius: 10px;          /* Bordes redondeados */
+  background-color: #f9f9f9;    /* Color de fondo */
+  /* width: 300px;                 Ancho del frame */
+  margin: 20px auto;            /* Centrar el frame */
+  position: relative;           /* Necesario para posicionar el título */
+}
+
+.frame-title {
+  position: absolute;
+  top: -12px;                   /* Ajusta la posición vertical del título */
+  /* left: 50%; */
+  left:20%;
+  transform: translateX(-50%);  /* Centrar el título horizontalmente */
+  background-color: #f9f9f9;    /* Color de fondo para cubrir el borde */
+  padding: 0 10px;              /* Espaciado alrededor del texto */
+  font-weight: bold;            /* Texto en negrita */
+}

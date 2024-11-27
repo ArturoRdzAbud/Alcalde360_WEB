@@ -4,6 +4,8 @@ import './App.css'
 import { BrowserRouter, Link, NavLink, Route, Routes, useNavigate } from 'react-router-dom'
 
 import { SideBar } from './components/SideBar';
+import 'bootstrap-icons/font/bootstrap-icons.css';  // Asegúrate de importar el CSS
+
 // import CatTiposDeSancion from './components/CatTiposDeSancion';
 
 function App() {

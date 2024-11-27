@@ -6,7 +6,7 @@ import { ElementoCampo } from './ElementoCampo';
 import { ElementoBotones } from './ElementoBotones';
 import { SideBarHeader } from './SideBarHeader';
 import config from '../config'; // archivo configs globales del proy
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ElementoToastNotification } from './ElementoToastNotification';
 import { PerfilContext } from './PerfilContext'; // Importa el contexto
 
@@ -32,6 +32,15 @@ const FrmEncuestaIntermedia = () => {
   // const [datosEstadoBD, setDatosEstadoBD] = useState([]);//se guarda en otro arreglo para filtrarlo localmente
   // const [datosMunicipio, setDatosMunicipio] = useState([]);
   // const [datosMunicipioBD, setDatosMunicipioBD] = useState([]);//se guarda en otro arreglo para filtrarlo localmente
+  //>
+  //param
+  const [searchParams] = useSearchParams();
+  const idincidencia = searchParams.get('idincidencia');
+  const eseditar = searchParams.get('eseditar') === 'true';
+
+  const [datosCargados, setDatosCargados] = useState(false); // Para saber si los datos están cargados
+  const [combosRenderizados, setCombosRenderizados] = useState(false); // Para saber si los combos están listos en pantalla
+  const [isLoading, setIsLoading] = useState(true); // Estado para controlar el renderizado
   //>
   const [esEditar, setEsEditar] = useState(false);
   const [esNuevo, setEsNuevo] = useState(false);
@@ -74,8 +83,8 @@ const FrmEncuestaIntermedia = () => {
     setEsFin(false)
 
     inicializaCampos()
-    setEsEditar(false)
-    setEsNuevo(false)
+    // setEsEditar(false)
+    // setEsNuevo(false)
 
   };
   const onAceptarB = () => {
@@ -95,6 +104,8 @@ const FrmEncuestaIntermedia = () => {
     // console.log('guarda')
     // return
 
+
+
     const data = {
       pnIdAlcaldia: idAlcaldia,
       pnIdIncidencia: idIncidencia,
@@ -108,15 +119,15 @@ const FrmEncuestaIntermedia = () => {
       pnAccion: accion,
     };
     const apiReq = config.apiUrl + '/GuardarEncuesta';
+    console.log(apiReq)
     try {
-
       // if (ligaNombre.trim() === '') { setEsMuestraCamposReq(true); return }
-      if (v1 <= 0) { setEsMuestraCamposReq(true); return }
-      if (v2 <= 0 && v1 == 1) { setEsMuestraCamposReq(true); return }
-      if (v3 <= 0) { setEsMuestraCamposReq(true); return }
-      if (v4 <= 0 && v5 == 1) { setEsMuestraCamposReq(true); return }
-
       console.log('Guardando Encuesta', data);
+      if (v1 <= 0)            { console.log(1);setEsMuestraCamposReq(true); return }
+      if (v2 <= 0 && v1 == 1) { console.log(2);setEsMuestraCamposReq(true); return }
+      if (v3 <= 0)            { console.log(3);setEsMuestraCamposReq(true); return }
+      if (v4 <= 0 && v5 == 1) { console.log(4);setEsMuestraCamposReq(true); return }
+
       // return
       await axios.post(apiReq, { data }, { 'Access-Control-Allow-Origin': '*' })
         .then(response => {
@@ -157,7 +168,9 @@ const FrmEncuestaIntermedia = () => {
     setV4(-1)
     setV5(1)
     //DatosPantalla
-    setIdIncidencia(1)
+    // setIdIncidencia(1)
+    setIdIncidencia(idincidencia)//param
+
 
     setActivo(true)
     setAccion(0)
@@ -223,6 +236,7 @@ const FrmEncuestaIntermedia = () => {
     datosFiltrados = claTipoEncuesta > 0 ? datosEncuestaPreguntaBD.filter(item => item.ClaTipoEncuesta == claTipoEncuesta) : datosFiltrados;
     setDatosEncuestaPregunta(datosFiltrados);
     // console.log(datosEncuestaPregunta)
+    setCombosRenderizados(true);
   };
 
   //-------------------------------------------------------------------SECCION USE EFFFECT
@@ -283,6 +297,7 @@ const FrmEncuestaIntermedia = () => {
         setDatosEncuestaPreguntaBD(responsePregunta.data);
         // console.log(datosEncuestaPreguntaBD)
         inicializaCampos();
+        setDatosCargados(true);
       } catch (error) {
         console.error('Error al obtener datos:', error);
       }
@@ -301,10 +316,20 @@ const FrmEncuestaIntermedia = () => {
     console.log('es:' + v1)
     setV2(-1)
   }, [v1]);
-    useEffect(() => {
+  useEffect(() => {
     console.log('es:' + v1)
     setV4(-1)
   }, [v5]);
+
+  //param
+  useEffect(() => {
+    if (datosCargados && combosRenderizados) {
+      // buttonRefNuevo.current.click();
+      setEsEditar(eseditar)
+      setEsNuevo(eseditar)
+      setIsLoading(false)
+    }
+  }, [datosCargados, combosRenderizados]);
 
   const columns = [
     {
@@ -419,16 +444,17 @@ const FrmEncuestaIntermedia = () => {
 
   return (
     <>
-      <SideBarHeader titulo={esNuevo ? ('Encuesta de Proceso de Atención') : esEditar ? 'Edita Encuesta' : 'Encuesta de Satisfacción Ciudadana ' + ((claTipoEncuesta == 1) ? 'Clausura' : 'Intermedia')}></SideBarHeader>
-      <br /><br /><br /><br />
+      {isLoading ? (<p>Cargando...</p>) : (<>
+        <SideBarHeader titulo={esNuevo ? ('Encuesta de Proceso de Atención') : esEditar ? 'Edita Encuesta' : 'Encuestas Contestadas ' + ((claTipoEncuesta == 1) ? 'Clausura' : 'Intermedia')}></SideBarHeader>
+        <br /><br /><br /><br />
 
-      <div>
-        {!esEditar ?//----------------------------MODO GRID pinta filtros al inicio
-          <>
-            <ElementoCampo type='checkbox' lblCampo="Ver filtros en Tabla:" claCampo="activo" nomCampo={esVerCamposFiltro} onInputChange={setEsVerCamposFiltro} />
-            <ElementoCampo type='checkbox' lblCampo="Ver Inactivos :" claCampo="activo" nomCampo={esVerBaja} onInputChange={setEsVerBaja} />
+        <div>
+          {!esEditar ?//----------------------------MODO GRID pinta filtros al inicio
+            <>
+              {/* <ElementoCampo type='checkbox' lblCampo="Ver filtros en Tabla:" claCampo="activo" nomCampo={esVerCamposFiltro} onInputChange={setEsVerCamposFiltro} />
+              <ElementoCampo type='checkbox' lblCampo="Ver Inactivos :" claCampo="activo" nomCampo={esVerBaja} onInputChange={setEsVerBaja} /> */}
 
-            {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ flexGrow: 1 }}>
                 <ElementoCampo type="select" lblCampo="País: " claCampo="campo" nomCampo={ligaPaisF} options={datosPais} onInputChange={(value) => handlePais(value, ligaPaisF)} />
               </span>
@@ -441,18 +467,18 @@ const FrmEncuestaIntermedia = () => {
             </div> 
             <ElementoCampo type="select" lblCampo="Municipio: " claCampo="campo" nomCampo={ligaMunicipioF} options={datosMunicipio} onInputChange={(value) => handleMunicipio(value, ligaMunicipioF)} />
             */}
-            <SimpleTable data={datosEncuesta} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} esOcultaFooter={true} />
-          </>
-          ://----------------------------MODO EDICION/NUEVO REGISTRO
-          <div>
-            <form onSubmit={guardarEncuesta}>
-              <br />
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <ElementoBotones cancelar={cancelar}></ElementoBotones>
-              </div>
-              <>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  {/* <span style={{ flexGrow: 1 }}>
+              <SimpleTable data={datosEncuesta} columns={columns} handleEdit={handleEdit} handleNuevo={nuevo} esOcultaFooter={true} esOcultaBotonNuevo={true}/>
+            </>
+            ://----------------------------MODO EDICION/NUEVO REGISTRO
+            <div>
+              <form onSubmit={guardarEncuesta}>
+                <br />
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <ElementoBotones cancelar={cancelar} esOcultaCancelar={true}></ElementoBotones>
+                </div>
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {/* <span style={{ flexGrow: 1 }}>
                     <ElementoCampo type='text' lblCampo="Nombre* :" claCampo="nombre" onInputChange={setLigaNombre} nomCampo={ligaNombre} tamanioString="100" />
                     <ElementoCampo type='text' lblCampo="Representante :" claCampo="nombre" onInputChange={setLigaRepresentante} nomCampo={ligaRepresentante} tamanioString="100" />
                     <ElementoCampo type='tel' lblCampo="Telefono :" claCampo="nombre" onInputChange={setLigaTelefono} nomCampo={ligaTelefono} tamanioString="100" />
@@ -467,84 +493,87 @@ const FrmEncuestaIntermedia = () => {
                     <ElementoCampo type="select" lblCampo="Municipio*: " claCampo="campo" nomCampo={ligaMunicipio} options={datosMunicipio} onInputChange={setLigaMunicipio} />
                   </span> */}
 
-                  {/* <ElementoCampo type="select" lblCampo={""+datosEncuestaPreguntaBD[0].NomPregunta+"*:"} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} /> */}
+                    {/* <ElementoCampo type="select" lblCampo={""+datosEncuestaPreguntaBD[0].NomPregunta+"*:"} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} /> */}
 
-                </div>
-
-
-
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <span style={{ flexBasis: '60%', marginRight: '10px', flexShrink: 0 }}>
-                    <ElementoCampo type="radio" lblCampo={`${datosEncuestaPregunta[0].NomPregunta} *:`} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} />
-                  </span>
-                  <span style={{ flexGrow: 0.1 }}>
-                    <h2></h2>
-                  </span>
-                  {v1 == 1 &&
-                    <span style={{ flexBasis: '40%', flexShrink: 1 , marginTop: '40px'}}>
-                      <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[1].NomPregunta} *:`} claCampo="campo" nomCampo={v2} options={datosP2} onInputChange={setV2} />
-                    </span>}
-                </div>
-
-
-                <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[2].NomPregunta} *:`} claCampo="campo" nomCampo={v3} options={datosP3} onInputChange={setV3} />
+                  </div>
 
 
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ flexGrow: 0 }}>
-                    <ElementoCampo type="radio" lblCampo={`${datosEncuestaPregunta[3].NomPregunta} *:`} claCampo="campo2" nomCampo={v5} options={datosP1} onInputChange={setV5} />
-                  </span>
-                  <span style={{ flexGrow: 0.1 }}>
-                    <h2></h2>
-                  </span>
-                  {v5 == 1 &&
-                    <span style={{ flexBasis: '40%', flexShrink: 1 , marginTop: '20px'}}>
-                      <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[1].NomPregunta} *:`} claCampo="campo" nomCampo={v4} options={datosP2} onInputChange={setV4} />
-                    </span>}
-                </div>
+
+                  {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}> */}
+                    <span style={{ flexBasis: '60%', marginRight: '10px', flexShrink: 0 }}>
+                      <ElementoCampo type="radio" lblCampo={`${datosEncuestaPregunta[0].NomPregunta} *:`} claCampo="campo" nomCampo={v1} options={datosP1} onInputChange={setV1} />
+                    </span>
+                    {/* <span style={{ flexGrow: 0.1 }}>
+                      <h2></h2>
+                    </span> */}
+                    {v1 == 1 &&
+                      <span style={{ flexBasis: '40%', flexShrink: 1, marginTop: '40px' }}>
+                        <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[1].NomPregunta} *:`} claCampo="campo" nomCampo={v2} options={datosP2} onInputChange={setV2} />
+                      </span>}
+                  {/* </div> */}
+
+
+                  <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[2].NomPregunta} *:`} claCampo="campo" nomCampo={v3} options={datosP3} onInputChange={setV3} />
 
 
 
-                {/* <ElementoCampo type='checkbox' lblCampo="Activo :" claCampo="activo" nomCampo={activo} onInputChange={setActivo} /> */}
-              </>
-
-
-            </form>
-          </div>
-        }
-
-        {esMuestraCamposReq &&
-          // <AlertaEmergente
-          //     titulo={'Alerta'}
-          //     mensaje={'Los datos con * son requeridos, favor de validar.'}
-          //     mostrarBotonAceptar={true}
-          //     mostrarBotonCancelar={false}
-          //     onAceptar={onAceptar}
-          // ></AlertaEmergente>
-          <ElementoToastNotification
-            mensaje={'Los datos con * son requeridos, favor de validar.'}
-            onAceptar={onAceptarB}
-          ></ElementoToastNotification>
-          // : <p></p>
-        }
-        {esFin &&
-          <ElementoToastNotification
-            mensaje={'Los datos fueron guardados correctamente.'}
-            onAceptar={onAceptar}
-          ></ElementoToastNotification>
-        }
-        {alertaMensaje &&
-          <ElementoToastNotification
-            mensaje={alertaMensaje}
-            onAceptar={onAceptarC}
-          ></ElementoToastNotification>
-        }
+                  {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}> */}
+                    <span style={{ flexGrow: 0 }}>
+                      <ElementoCampo type="radio" lblCampo={`${datosEncuestaPregunta[3].NomPregunta} *:`} claCampo="campo2" nomCampo={v5} options={datosP1} onInputChange={setV5} />
+                    </span>
+                    {/* <span style={{ flexGrow: 0.1 }}>
+                      <h2></h2>
+                    </span> */}
+                    {v5 == 1 &&
+                      <span style={{ flexBasis: '40%', flexShrink: 1, marginTop: '20px' }}>
+                        <ElementoCampo type="select" lblCampo={`${datosEncuestaPregunta[1].NomPregunta} *:`} claCampo="campo" nomCampo={v4} options={datosP2} onInputChange={setV4} />
+                      </span>}
+                  {/* </div> */}
 
 
 
-      </div>
+                  {/* <ElementoCampo type='checkbox' lblCampo="Activo :" claCampo="activo" nomCampo={activo} onInputChange={setActivo} /> */}
+                </>
+
+
+              </form>
+            </div>
+          }
+
+          {esMuestraCamposReq &&
+            // <AlertaEmergente
+            //     titulo={'Alerta'}
+            //     mensaje={'Los datos con * son requeridos, favor de validar.'}
+            //     mostrarBotonAceptar={true}
+            //     mostrarBotonCancelar={false}
+            //     onAceptar={onAceptar}
+            // ></AlertaEmergente>
+            <ElementoToastNotification
+              mensaje={'Los datos con * son requeridos, favor de validar.'}
+              onAceptar={onAceptarB}
+            ></ElementoToastNotification>
+            // : <p></p>
+          }
+          {esFin &&
+            <ElementoToastNotification
+              mensaje={'Los datos fueron guardados correctamente.'}
+              onAceptar={onAceptar}
+            ></ElementoToastNotification>
+          }
+          {alertaMensaje &&
+            <ElementoToastNotification
+              mensaje={alertaMensaje}
+              onAceptar={onAceptarC}
+            ></ElementoToastNotification>
+          }
+
+
+
+        </div>
+
+      </>
+      )}
     </>
   );
 };
