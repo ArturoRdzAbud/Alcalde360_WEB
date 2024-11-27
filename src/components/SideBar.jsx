@@ -6,7 +6,7 @@ import { BrowserRouter, Link, NavLink, Route, Routes, useNavigate } from 'react-
 // import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 
-import { PerfilContext } from './PerfilContext'; // Importa el contexto
+import { PerfilContext } from './PerfilContext'; // Importa el contexto.
 
 //pantallas
 import Home from './Home';
