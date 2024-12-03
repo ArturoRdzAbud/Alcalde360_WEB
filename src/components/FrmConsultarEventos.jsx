@@ -30,31 +30,15 @@ export const FrmConsultarEventos = () => {
 
   const [esMuestraCamposReq, setEsMuestraCamposReq] = useState(false);
   const [alertaMensaje, setAlertaMensaje] = useState('');
-  const [porCumplir, setPorCumplir] = useState(false);
-
+  
   // datos del filtro
-  const [FechaEvento, setFechaEvento] = useState(null);
-  const [HoraInicio, setHoraInicio] = useState(null);
-  const [HoraFin, setHoraFin] = useState(null);
+  const [porCumplir, setPorCumplir] = useState(false);
+  const [FechaEventoIni, setFechaEventoIni] = useState(today);
+  const [FechaEventoFin, setFechaEventoFin] = useState(today);
 
   // Para guardar la Fecha inicio y fin
   const [FechaHoraInicioEvento, setFechaHoraInicioEvento] = useState(null)
   const [FechaHoraFinalEvento, setFechaHoraFinalEvento] = useState(null)
-
-  /*
-  //datos de registro
-  const [IdFechaTecEvento, setIdFechaTecEvento] = useState(0);
-  const [TituloEvento, setTituloEvento] = useState(0);
-  const [FechaHoraInicioEvento, setFechaHoraInicioEvento] = useState(null)
-  const [FechaHoraFinalEvento, setFechaHoraFinalEvento] = useState(null)
-  const [ClaOrigen, setClaOrigen] = useState(0)
-  const [LugarEvento, setLugarEvento]=useState('')
-  const [Logistica, setLogistica]=useState('')
-  const [FechaUltimaMod, setFechaUltimaMod]=useState(null)
-  const [NombrePcMod, setNombrePcMod]=useState('')
-  const [ClaUsuarioMod, setClaUsuarioMod]=useState(0)
-  const [FechaEvento, setFechaEvento] = useState(null)
-  */
 
   const onAceptar = () => {
     setEsMuestraCamposReq(false)
@@ -68,33 +52,18 @@ export const FrmConsultarEventos = () => {
 
   const inicializaCampos = () => {
     //TODO LIMPIAR CADA FILTRO A SU VALOR INICIAL
-/*
-    setIdFechaTecEvento(0);
-    setTituloEvento(0);
-    setFechaHoraInicioEvento(null)
-    setFechaHoraFinalEvento(null)
-    setClaOrigen(0)
-    setLugarEvento('')
-    setLogistica('')
-    setFechaUltimaMod(null)
-    setNombrePcMod('')
-    setClaUsuarioMod(0)
-    setFechaEvento(null)
-*/
-    setFechaEvento(null)
-    setHoraInicio(null)
-    setHoraFin(null)
 
+    setFechaEventoIni(today)
+    setFechaEventoFin(today)
+ 
     setFechaHoraInicioEvento(null)
     setFechaHoraFinalEvento(null)
 
   };
 
   useEffect(() => {
-    // Cambia la URL a la de tu API
-    //console.log({ idAlcaldia })
 
-    if (esEditar) return//sale si es modo edicion
+    if (esEditar) return //sale si es modo edicion
 
     const apiUrl = config.apiUrl + '/ConsultarEventos';
 
@@ -106,27 +75,59 @@ export const FrmConsultarEventos = () => {
         //console.log('Datos Incidencia:', datosEventos)
       });
 
+  },[]);  // useEffect se ejecuta cuando se modifica la propiedad esEditar
+
+
+  useEffect(() => {
+
+    if (esEditar) return//sale si es modo edicion
+
+    const apiUrl = config.apiUrl + '/ConsultarEventos';
+
+    axios.get(apiUrl, { params: { pnIdAlcaldia: idAlcaldia } })
+      .then(response => { setDatosEvento(response.data); setDatosEventoBd(response.data) })
+      .catch(error => console.error('Error al obtener datos:', error))
+      .finally(() => {
+        inicializaCampos()
+        filtraLocal()
+        //console.log('Datos Incidencia:', datosEventos)
+      });
+
   }, [esEditar]);  // useEffect se ejecuta cuando se modifica la propiedad esEditar
-
-
 
   const filtraLocal = () => {
 
-    if (datosEventoBd != null  && datosEventoBd.length == 0) {return}
+    if (datosEventoBd == null) return
 
     // TODO IR FILTRANDO LOCALMENTE CAMPO POR CAMPO SIN IR A BASE DE DATOS
     var datosFiltrados = datosEventoBd;
-     
-    datosFiltrados = porCumplir ? datosFiltrados.filter(item => item.FechaHoraInicioEvento >= today) : datosFiltrados;
-    console.log(porCumplir, today, datosFiltrados.length)
     
-    let nuevafecha = new Date(FechaEvento.getFullYears(),FechaEvento.getMonth(), FechaEvento.getDate(), HoraInicio.gethours(), HoraInicio.getMinutes());
-    setFechaHoraInicioEvento(nuevafecha)
-    
-    nuevafecha = new Date(FechaEvento.getFullYears(),FechaEvento.getMonth(), FechaEvento.getDate(), HoraFin.getHours(), HoraFin.getMinutes());
-    setFechaHoraFinalEvento(nuevafecha)
+    console.log('1 ', porCumplir, today, FechaEventoIni, FechaEventoFin, datosFiltrados)
 
-    console.log(FechaHoraInicioEvento, '-', FechaHoraFinalEvento);
+    //Al seleccionar borrar la fecha el valor es de dos espacios
+    if (FechaEventoIni == null || FechaEventoFin == null || FechaEventoIni == '' || FechaEventoFin == '' || FechaEventoIni == '  ' || FechaEventoFin == '  ') {
+        setDatosEvento(datosFiltrados);
+        console.log('1.1 ', porCumplir, today, FechaEventoIni, FechaEventoFin, datosFiltrados)
+        return
+    }
+    console.log('2 ', FechaEventoIni, FechaHoraInicioEvento, '-', FechaEventoFin, FechaHoraFinalEvento);
+    
+    let fechaNueva1 = new Date(FechaEventoIni);
+    fechaNueva1.setDate(fechaNueva1.getUTCDate());
+
+    let fechaNueva2 = new Date(FechaEventoFin);
+    fechaNueva2.setDate(fechaNueva2.getUTCDate());
+
+    //!isNaN(Date.parse("22/05/2001"))  // true
+    console.log('2.1 ', fechaNueva1.getUTCDate(), fechaNueva1.getFullYear(), fechaNueva2.getUTCDate(), fechaNueva2.getFullYear(), FechaEventoIni, FechaEventoFin);
+
+    let nuevafecha = new Date(fechaNueva1.getFullYear(),fechaNueva1.getMonth(), fechaNueva1.getDate());
+    setFechaHoraInicioEvento(nuevafecha);
+    
+    nuevafecha = new Date(fechaNueva2.getFullYear(),fechaNueva2.getMonth(), fechaNueva2.getDate());
+    setFechaHoraFinalEvento(nuevafecha);
+
+    console.log('2.2 ', FechaEventoIni, FechaHoraInicioEvento, '-', FechaEventoFin, FechaHoraFinalEvento);
 
     //Al seleccionar borrar la fecha el valor es de dos espacios
     if (FechaHoraInicioEvento == null || FechaHoraFinalEvento == null || FechaHoraInicioEvento == '' || FechaHoraFinalEvento == '' || FechaHoraInicioEvento == '  ' || FechaHoraFinalEvento == '  ') {
@@ -137,13 +138,21 @@ export const FrmConsultarEventos = () => {
         setDatosEvento(datosFiltrados);
         //setFechaHoraFinalEvento(FechaHoraInicioEvento)
         return 
-    } else if (isNaN(result)) {
+    } 
+    /*else if (isNaN(result)) {
         setDatosEvento(datosFiltrados);
         return
-    }
+    }*/
 
-    datosFiltrados = FechaHoraInicioEvento != null || FechaHoraInicioEvento != '' ? datosFiltrados.filter(item => item.FechaHoraInicioEvento >= today) : datosFiltrados;
-    datosFiltrados = FechaHoraFinalEvento != null || FechaHoraFinalEvento != '' ? datosFiltrados.filter(item => item.FechaHoraFinalEvento < FechaHoraFinalEvento + 1) : datosFiltrados;
+    //console.log('3 fechas filtro: ' + FechaHoraInicioEvento, '-', FechaHoraFinalEvento);
+    console.log('3 fechas filtro: ' + FechaEventoIni, FechaHoraInicioEvento, '-', FechaEventoFin, FechaHoraFinalEvento);
+
+    if (porCumplir) {
+      datosFiltrados = porCumplir ? datosFiltrados.filter(item => item.FechaHoraInicioEvento2 >= today) : datosFiltrados;
+    }else {
+      datosFiltrados = FechaEventoIni != null || FechaEventoIni != '' ? datosFiltrados.filter(item => item.FechaHoraInicioEvento2 >= FechaEventoIni) : datosFiltrados;
+      datosFiltrados = FechaEventoFin != null || FechaEventoFin != '' ? datosFiltrados.filter(item => item.FechaHoraFinalEvento2 < FechaEventoFin + 1) : datosFiltrados;
+    }
 
     setDatosEvento(datosFiltrados);
 
@@ -151,8 +160,9 @@ export const FrmConsultarEventos = () => {
 
   useEffect(() => {
     filtraLocal()
-  }, [idAlcaldia, FechaEvento, HoraInicio, HoraFin, porCumplir]); //Se invoca al interactuar con los filtros arriba del grid
+  }, [idAlcaldia, FechaEventoIni, FechaEventoFin, porCumplir]); //Se invoca al interactuar con los filtros arriba del grid
 
+/*
   // Función para obtener la clase CSS según el valor
   const obtenerClaseColor = (valorColor) => {
     switch (valorColor) {
@@ -167,7 +177,6 @@ export const FrmConsultarEventos = () => {
     }
   };
 
-/* 
     {
       accessorKey: 'Color',
       header: '',
@@ -193,15 +202,15 @@ export const FrmConsultarEventos = () => {
       , visible: false
     },
     {
-      header: 'Id Ficha',
-      accessorKey: 'Id',//'IdFichaTecnicaEvento',
-      footer: 'Id Ficha'
+      header: 'Id Solicitud',
+      accessorKey: 'Id',//'IdSolicitudAgenda',
+      footer: 'Id Solicitud'
       , visible: true
     },
     {
-      header: 'Titulo',
+      header: 'Título',
       accessorKey: 'TituloEvento',
-      footer: 'Titulo'
+      footer: 'Título'
       , visible: true
     },
     {
@@ -247,12 +256,47 @@ export const FrmConsultarEventos = () => {
       , visible: true
     },
     {
-      header: 'Logistica',
+      header: 'Logística',
       accessorKey: 'Logistica',
-      footer: 'Logistica'
+      footer: 'Logística'
       , visible: true
     },
-    
+    {
+      header: 'Asunto',
+      accessorKey: 'Asunto',
+      footer: 'Asunto'
+      , visible: true
+    },
+    {
+      header: 'Nombre del Solicitante',
+      accessorKey: 'NombreSolicitante',
+      footer: 'Nombre del Solicitante'
+      , visible: true
+    },
+    {
+      header: 'Cargo',
+      accessorKey: 'Cargo',
+      footer: 'Cargo'
+      , visible: true
+    },
+    {
+      header: 'Clasificación',
+      accessorKey: 'Clasificacion',
+      footer: 'Clasificación'
+      , visible: true
+    },
+    {
+      header: 'Tipo',
+      accessorKey: 'Tipo',
+      footer: 'Tipo'
+      , visible: true
+    },
+    {
+      header: 'Estatus',
+      accessorKey: 'Estatus',
+      footer: 'Estatus'
+      , visible: true
+    }    
   ];
 
   const nuevoEvento = () => {
@@ -278,53 +322,69 @@ export const FrmConsultarEventos = () => {
       esNuevo: false,
       esEditar: true,
       idAlcaldia: rowData.original.IdAlcaldia,
-      IdFichaTecEvento: rowData.original.Id,
+      IdSolicitudAgenda: rowData.original.Id,
       TituloEvento: rowData.original.TituloEvento,
       FechaHoraInicioEvento : rowData.original.FechaHoraInicioEvento,
       FechaHoraFinalEvento : rowData.original.FechaHoraFinalEvento,
       IdOrigenAgenda: rowData.original.IdOrigenAgenda,
       Lugar: rowData.original.Lugar,
-      Logistica: rowData.original.Logistica
-
+      Logistica: rowData.original.Logistica,
+      Asunto: rowData.original.Asunto,
+      NombreSolicitante: rowData.original.NombreSolicitante,
+      Cargo: rowData.original.Cargo,
+      Clasificacion: rowData.original.Clasificacion,
+      Tipo: rowData.original.Tipo,
+      Estatus: rowData.original.Estatus
     };
 
     navigate("/FichaTecnicaEvento", { state: data });
  
   };
 
+  const handleCheckChange =(event) => {
+    console.log('checked : ', event.target.checked)
+    /*
+    if (event.target.checked == true)
+    {
+      setFechaEventoIni(today);
+      setFechaEventoFin(today);
+      setFechaHoraInicioEvento(today)
+      setFechaHoraFinalEvento(today)
+    } else {
+      setFechaEventoIni(null);
+      setFechaEventoFin(null);
+      setFechaHoraInicioEvento(null)
+      setFechaHoraFinalEvento(null)
+    }
+*/
+  }
+
   return (
     <div>
       <SideBarHeader titulo={esNuevo ? 'Nuevo Evento' : esEditar ? 'Editar Evento' : 'Consulta de Eventos'}></SideBarHeader>
       <br /><br /><br /><br />
-      {/* {!esEditar ? */}
+      {/* {!esEditar ? checked={porCumplir}*/}
       <>
         
         <h2>Alcalde 360 - !Cercanía con la gente a través de un click!</h2>
-        {<ElementoCampo type='checkbox' lblCampo="Por cumplir:" claCampo="porcumplir" nomCampo={porCumplir} onInputChange={setPorCumplir} />}
+        {<ElementoCampo type='checkbox' lblCampo="Por cumplir:" claCampo="porcumplir" nomCampo={porCumplir} onInputChange={setPorCumplir}  onChange={handleCheckChange}  />}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           
-          <span style={{ flexBasis: '15%', flexShrink: 1, marginTop: '0px' }}>
-            <ElementoCampo type='date' lblCampo="Fecha Evento* :" claCampo="FechaEvento" nomCampo={FechaEvento} onInputChange={setFechaEvento} />
-
+          <span style={{ flexBasis: '45%', flexShrink: 1, marginTop: '0px' }}>
+            <ElementoCampo type='date' lblCampo="Fecha Inicio* :" claCampo="FechaEventoIni" nomCampo={FechaEventoIni} onInputChange={setFechaEventoIni} />
           </span>
           <span style={{ flexGrow: 0.5 }}>
             <h2></h2>
           </span>
-          <span style={{ flexBasis: '15%', flexShrink: 1, marginTop: '0px' }}>
-
-            <ElementoCampo type='time' lblCampo="Hora inicio* :" claCampo="HoraInicio" nomCampo={HoraInicio} onInputChange={setHoraInicio} />
-
+          <span style={{ flexBasis: '45%', flexShrink: 1, marginTop: '0px' }}>
+            <ElementoCampo type='date' lblCampo="Fecha fin* :" claCampo="FechaEventoFin" nomCampo={FechaEventoFin} onInputChange={setFechaEventoFin} />
           </span>
-          <span style={{ flexBasis: '15%', flexShrink: 1, marginTop: '0px' }}>
 
-            <ElementoCampo type='time' lblCampo="Hora Fin* :" claCampo="HoraFin" nomCampo={HoraFin} onInputChange={setHoraFin} />
-
-          </span>
         </div>
 
         {/*<p>Parrafo temporal para ver parametros|@Alcaldia={idAlcaldia}|@Incidencia={IdFechaTecEvento}|@Tipo={tipoF}|@Area={areaF}|@Inicio={FechaHoraInicioEvento}|@Fin={FechaHoraFinalEvento}|@Colonia={coloniaF}</p>*/}
-        <SimpleTable data={datosEvento} columns={columns} handleEdit={handleEditEvento} handleNuevo={nuevoEvento} />
+        <SimpleTable data={datosEvento} columns={columns} handleEdit={handleEditEvento} handleNuevo={nuevoEvento} esOcultaBotonNuevo />
 
 
       </>
