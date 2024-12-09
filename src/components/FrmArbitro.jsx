@@ -50,6 +50,7 @@ export const FrmArbitro = () => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [accion, setAccion] = useState(0);
+  const [token, setToken] = useState('');
 
   const [esMuestraCamposReq, setEsMuestraCamposReq] = useState(false);
   const [alertaMensaje, setAlertaMensaje] = useState('');
@@ -424,45 +425,50 @@ export const FrmArbitro = () => {
 
   };
 
-
-
-
-
-  // const powerBiUrl = "https://app.powerbi.com/reportEmbed?reportId=f8227953-2483-436c-b175-8711ff11c769&autoAuth=true&ctid=b15d8fa9-690a-4b8a-9b08-df1642c6c557";
+  
   const reportContainer = useRef(null);
   useEffect(() => {
-    const embedUrl = "https://app.powerbi.com/reportEmbed?reportId=f8227953-2483-436c-b175-8711ff11c769&autoAuth=true&ctid=b15d8fa9-690a-4b8a-9b08-df1642c6c557";
 
-    // Aquí deberías extraer el access_token del JSON que tienes
-    const token = "eyJ0eXAiOiJKV1QiLCJub25jZSI6IkxCNWdMVVZnelBYaVpjQTE2cTFrZU96cl9kQ1NBNlYyS3ZuaVlkaC1WZUUiLCJhbGciOiJSUzI1NiIsIng1dCI6Inp4ZWcyV09OcFRrd041R21lWWN1VGR0QzZKMCIsImtpZCI6Inp4ZWcyV09OcFRrd041R21lWWN1VGR0QzZKMCJ9.eyJhdWQiOiJodHRwczovL2dyYXBoLm1pY3Jvc29mdC5jb20iLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9iMTVkOGZhOS02OTBhLTRiOGEtOWIwOC1kZjE2NDJjNmM1NTcvIiwiaWF0IjoxNzMyNzYxODExLCJuYmYiOjE3MzI3NjE4MTEsImV4cCI6MTczMjc2NjQ3NiwiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IkFWUUFxLzhZQUFBQXZVeXJiN09MRU0rTC95UlJTQS9LL2hlUE5WcHo4Y0tqVTkyZjZuVCtBOTU2bytncTVja3VPb3lkNE1HRlFub3BhWkFxUGhqbUMxWlhqYkNTOWI5eXBvU3BTVVM5WXdYYW50Qys0L3BPSHZvPSIsImFtciI6WyJwd2QiLCJtZmEiXSwiYXBwX2Rpc3BsYXluYW1lIjoiYmk0IiwiYXBwaWQiOiI1ZmFkNWYyMC1hMGUyLTQwZGItOWZiYi1hODVjMDk5MDlhNDQiLCJhcHBpZGFjciI6IjEiLCJmYW1pbHlfbmFtZSI6IlJvZHLDrWd1ZXogQWJ1ZCIsImdpdmVuX25hbWUiOiJBcnR1cm8iLCJpZHR5cCI6InVzZXIiLCJpcGFkZHIiOiIxODkuMjA0LjE5NC4xMTUiLCJuYW1lIjoiQXJ0dXJvIFJvZHLDrWd1ZXogQWJ1ZCIsIm9pZCI6ImI1MDY1MTNkLTY4MTktNDUwZC1iNGIyLWM0ODViNTAxNzg3ZCIsInBsYXRmIjoiMyIsInB1aWQiOiIxMDAzMjAwNDA3RjM5MTFEIiwicmgiOiIxLkFXRUJxWTlkc1FwcGlrdWJDTjhXUXNiRlZ3TUFBQUFBQUFBQXdBQUFBQUFBQUFCaUFVdGhBUS4iLCJzY3AiOiJVc2VyLlJlYWQgcHJvZmlsZSBvcGVuaWQgZW1haWwiLCJzaWduaW5fc3RhdGUiOlsia21zaSJdLCJzdWIiOiJINXZFZWUyOWJOU2lkTUw1eXdmMDh1UFVoaE1pYVNZc1RDWEQ0TDBWSWVjIiwidGVuYW50X3JlZ2lvbl9zY29wZSI6Ik5BIiwidGlkIjoiYjE1ZDhmYTktNjkwYS00YjhhLTliMDgtZGYxNjQyYzZjNTU3IiwidW5pcXVlX25hbWUiOiJBcnR1cm9Sb2RyaWd1ZXpBYnVkQEdydXBvQXJ0cmEub25taWNyb3NvZnQuY29tIiwidXBuIjoiQXJ0dXJvUm9kcmlndWV6QWJ1ZEBHcnVwb0FydHJhLm9ubWljcm9zb2Z0LmNvbSIsInV0aSI6IjF1RzhZRzU4QVV5YzFZYWVnWnhiQVEiLCJ2ZXIiOiIxLjAiLCJ3aWRzIjpbIjYyZTkwMzk0LTY5ZjUtNDIzNy05MTkwLTAxMjE3NzE0NWUxMCIsImI3OWZiZjRkLTNlZjktNDY4OS04MTQzLTc2YjE5NGU4NTUwOSJdLCJ4bXNfaWRyZWwiOiIxIDE2IiwieG1zX3N0Ijp7InN1YiI6IkxTaklsOGozcWlyV2cwNURtcXd3N3FJYTVrdDJvZVUxN24tX081VGhwMHcifSwieG1zX3RjZHQiOjE3MzIzNzY2NzB9.spOjsaJ4N9RNp_bADB1kwiR1uZMXBPUuamitYj9PVgXWR9c5tuHcAHWEttIzQYhlATSKJoWKebsy0Pg3iFAGt2k1mgJI5tJi5B0ydhVNLZgfTKBfqIEFEe1s1AxCvSDAH7UKv4WJFWrQwjg42ikCt1ktqm7hu67hIxNWjr867GDdqT246oAruzQx4D1LbxPHKsWDMO-W5K0L7ppVqK1RUQusXVzbHrQ2-3gXHfYlFlIqytlMDOFUlaSXDV0gUtDRdLPuBnHt5T7d0iGdpHjXfRlDZHWdwiy4ahuXDZQOZNWAG86AtmvIWJCUmMTJiEeggrTfJy_i2KoGgOaBfcFlug";
+    console.log('entra a useeffect!!')
 
-    const embedConfig = {
-      type: 'report',
-      tokenType: powerbi.models.TokenType.Embed,
-      accessToken: token,
-      embedUrl: embedUrl,
-      id: 'f8227953-2483-436c-b175-8711ff11c769',
-      settings: {
-        panes: {
-          filters: {
-            visible: false,
+    //se modifica la url que se genera desde power bi servicies, al crear una nueva área de trabajo nos generó un idgroup valido
+    const embedUrl = "https://app.powerbi.com/reportEmbed?reportId=ee118c4d-2ffd-4bbd-87e2-b959d6ed54d3&groupId=fad3d819-9f17-4777-a2ad-3cc65decf46b&w=2&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly9XQUJJLU1FWElDTy1DRU5UUkFMLUEtUFJJTUFSWS1yZWRpcmVjdC5hbmFseXNpcy53aW5kb3dzLm5ldCIsImVtYmVkRmVhdHVyZXMiOnsidXNhZ2VNZXRyaWNzVk5leHQiOnRydWV9fQ%3d%3d";
+
+     
+    // Cambia la URL a la de tu API
+    const apiUrl = config.apiUrl + '/embed-token';
+    //axios.get(apiUrl)
+      
+    axios.get(apiUrl)
+      .then(response => {          
+        console.log('obtiene response.data.token', response.data.token)
+        const embedConfig = {
+          type: 'report',
+          tokenType: powerbi.models.TokenType.Embed, //se modifica el tipo de token de "embed" a "Aad"
+          accessToken: response.data.token,
+          embedUrl: embedUrl,
+          id: 'ee118c4d-2ffd-4bbd-87e2-b959d6ed54d3',
+          settings: {
+            panes: {
+              filters: {
+                visible: false,
+              },
+              pageNavigation: {
+                visible: true,
+              },
+            },
           },
-          pageNavigation: {
-            visible: true,
-          },
-        },
-      },
-    };
-
-    // const powerBiService = new powerbi.service.Service(powerbi.factories.hpmFactory, powerbi.factories.wpmpFactory, powerbi.factories.routerFactory);
-    // powerBiService.embed(reportContainer.current, embedConfig);
-    try {
-      const powerBiService = new powerbi.service.Service(powerbi.factories.hpmFactory, powerbi.factories.wpmpFactory, powerbi.factories.routerFactory);
-      powerBiService.embed(reportContainer.current, embedConfig);
-    } catch (error) {
-      console.error("Error embedding the Power BI report:", error);
-    }
-
+        };
+    
+        try {
+          const powerBiService = new powerbi.service.Service(powerbi.factories.hpmFactory, powerbi.factories.wpmpFactory, powerbi.factories.routerFactory);
+          powerBiService.embed(reportContainer.current, embedConfig);
+        } catch (error) {
+          console.error("Error embedding the Power BI report:", error);
+        }
+      })
+      .catch(error => console.error('Error al obtener datos:', error))
+  
   }, []);
 
   return (
