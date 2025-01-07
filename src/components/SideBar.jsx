@@ -12,7 +12,7 @@ import { PerfilContext } from './PerfilContext'; // Importa el contexto.
 import Home from './Home';
 import Login from './Login';
 
-import FrmArbitro from './FrmArbitro';
+import FrmDashboardAlcalde from './FrmDashboardAlcalde';
 import FrmUsuario from './FrmUsuario';
 import FrmConsultaIncidencia from './FrmConsultaIncidencia';
 import FrmReporteIncidencia from './FrmReporteIncidencia';
@@ -210,40 +210,40 @@ export const SideBar = () => {
 
                                     <div className="menu-section" >
                                         <div className="menu-section-title" onClick={toggleIncidencias} style={fontsizeH}>
-                                            {isIncidenciasOpen ? '▾' : '▸'} Consultar</div><div style={separatorStyles}></div>
+                                            {isIncidenciasOpen ? '▾' : '▸'} Atención Ciudadana </div><div style={separatorStyles}></div>
                                         {isIncidenciasOpen && (
                                             <div style={fontsize}>
                                                 <NavLink onClick={closeMenu} to='/ConsultarIncidencia' className='nav-link' > {'Consulta de Incidencias'} </NavLink>
-                                                <NavLink onClick={closeMenu} to='/ConsultarSolicitudAgenda' className='nav-link' > {'Consulta de Solicitud de Agenda'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/EncuestaProcesoAtencion' className='nav-link' >{' Encuesta Intermedia'} </NavLink>                                                
+                                                <NavLink onClick={closeMenu} to='/EncuestaSatisfaccionCiudadana' className='nav-link' >{' Encuesta Final'} </NavLink>                                                
                                             </div>
                                         )}
                                     </div>
 
+                                    <div className="menu-section" >
+                                        <div className="menu-section-title" onClick={toggleEncuesta} style={fontsizeH}>
+                                            {isEncuestaOpen ? '▾' : '▸'} Agenda del Alcalde </div><div style={separatorStyles}></div>
+                                        {isEncuestaOpen && (
+                                            <div style={fontsize}>
+                                                <NavLink onClick={closeMenu} to='/ConsultarSolicitudAgenda' className='nav-link' > {'Consulta de Solicitud de Agenda'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/DashboardAlcalde' className='nav-link' > {' Dashboard del Alcalde'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/FichaTecnicaReunion' className='nav-link' > {' Reunión'} </NavLink>
+                                                <NavLink onClick={closeMenu} to='/ConsultarEventos' className='nav-link' > {' Eventos'} </NavLink>                                                
+                                            </div>
+                                        )}
+                                    </div>
+
+{/*
                                     <div className="menu-section" >
                                         <div className="menu-section-title" onClick={toggleEncuesta} style={fontsizeH}>
                                             {isEncuestaOpen ? '▾' : '▸'} Encuestas</div><div style={separatorStyles}></div>
                                         {isEncuestaOpen && (
                                             <div style={fontsize}>
-                                                {/* <NavLink onClick={closeMenu} to='/FrmEncuestaIntermedia' className='nav-link' >{' Intermedia'} </NavLink> */}
-                                                <NavLink onClick={closeMenu} to='/EncuestaProcesoAtencion' className='nav-link' >{' Intermedia'} </NavLink>
-                                                {/* <NavLink onClick={closeMenu} to='/FrmEncuesta' className='nav-link' >{' Clausura'} </NavLink> */}
-                                                <NavLink onClick={closeMenu} to='/EncuestaSatisfaccionCiudadana' className='nav-link' >{' Clausura'} </NavLink>
+                                               
                                             </div>
                                         )}
                                     </div>
-
-                                    <div className="menu-section" >
-                                        <div className="menu-section-title" onClick={toggleEncuesta} style={fontsizeH}>
-                                            {isEncuestaOpen ? '▾' : '▸'} Ficha Técnica</div><div style={separatorStyles}></div>
-                                        {true && (
-                                            <div style={fontsize}>
-                                                <NavLink onClick={closeMenu} to='/FichaTecnicaReunion' className='nav-link' > {' Reunión'} </NavLink>
-                                                <NavLink onClick={closeMenu} to='/ConsultarEventos' className='nav-link' > {' Eventos'} </NavLink>
-                                                <NavLink onClick={closeMenu} to='/Arbitros' className='nav-link' > {' Arbitros'} </NavLink>
-                                            </div>
-                                        )}
-                                    </div>
-
+*/}
                                 </>
                             }
                         </li>
@@ -259,7 +259,7 @@ export const SideBar = () => {
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path='/Login' element={<Login />} /></Route>
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={1} />}><Route path="/access-denied" element={<AccessDeniedPage />} /></Route>
 
-                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/Arbitros' element={<FrmArbitro />} /></Route>
+                        <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/DashboardAlcalde' element={<FrmDashboardAlcalde />} /></Route>
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/ConsultarIncidencia' element={<FrmConsultaIncidencia />} /></Route>
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/ReporteIncidencia' element={<FrmReporteIncidencia />} /></Route>
                         <Route element={<ProtectedRoute profile={perfil} requiredProfile={4} />}><Route path='/Prueba' element={<FrmPrueba />} /></Route>
