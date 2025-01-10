@@ -393,7 +393,7 @@ const FrmEncuesta = () => {
       header: '# Encuesta',
       accessorKey: 'Nombre',
       footer: '',
-      visible: true,
+      visible: false,
     },
     {
       header: 'Id Encuesta',
@@ -490,7 +490,7 @@ const FrmEncuesta = () => {
   return (
     <>
       {isLoading ? (<p>Cargando...</p>) : (<>
-        <SideBarHeader titulo={esNuevo ? ('Encuesta de Satisfacción Ciudadana') : esEditar ? 'Edita Encuesta' : 'Encuestas Contestadas ' + ((claTipoEncuesta == 1) ? 'Clausura' : 'Intermedia')}></SideBarHeader>
+        <SideBarHeader titulo={esNuevo ? ('Encuesta de Satisfacción Ciudadana') : esEditar ? 'Edita Encuesta' : 'Encuesta ' + ((claTipoEncuesta == 1) ? 'Final' : 'Intermedia')}></SideBarHeader>
         <br /><br /><br /><br />
 
         <div>
@@ -519,7 +519,7 @@ const FrmEncuesta = () => {
               <form onSubmit={guardarEncuesta}>
                 <br />
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <ElementoBotones cancelar={cancelar} esOcultaCancelar={true} ></ElementoBotones>
+                  <ElementoBotones cancelar={cancelar} esOcultaCancelar={idincidencia>0} ></ElementoBotones>
                 </div>
                 <>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

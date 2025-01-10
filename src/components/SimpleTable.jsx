@@ -173,7 +173,7 @@ function SimpleTable({ data
                                         >
                                             {
                                                 // let hasMeta = flexRender(cell.column.columnDef.cell, cell.getContext())
-                                                ((cell.column.id == "Id" || cell.column.id == "Nombre" || cell.column.id == "Descripcion" || cell.column.id == "Link")) ?    //VALIDA SI ES COLUMNA TIPO LINK
+                                                ((cell.column.id == "Id" || cell.column.id == "Nombre" || cell.column.id == "IdIncidencia" || cell.column.id == "Descripcion" || cell.column.id == "Link")) ?    //VALIDA SI ES COLUMNA TIPO LINK
                                                     <a href="#" onClick={(e) => { e.preventDefault(); handleEdit(row, cell.column.id) }}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</a>
                                                     // : (cell.column.id == "Activo") ?
                                                     : (cell.column.id == "handleDelete") ?
