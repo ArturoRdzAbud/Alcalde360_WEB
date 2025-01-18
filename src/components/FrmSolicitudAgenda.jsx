@@ -188,10 +188,21 @@ export const FrmSolicitudAgenda = () => {
   };
   const fichaTecnica = (event) => {
     event.preventDefault(); // Cancela el envío del formulario
-    if (idSolicitudAgendaFichaTecnica>0){
-      navigate(`/FichaTecnicaReunion?solicitud=${idSolicitudAgenda}&ficha=${idSolicitudAgendaFichaTecnica}`, { state: data });
-    }else{
-      navigate(`/FichaTecnicaReunion?solicitud=${idSolicitudAgenda}`, { state: data });
+
+    if (idTipoAgenda == 1) {
+
+      if (idSolicitudAgendaFichaTecnica > 0) {
+        navigate(`/FichaTecnicaReunion?solicitud=${idSolicitudAgenda}&ficha=${idSolicitudAgendaFichaTecnica}`, { state: data });
+      } else {
+        navigate(`/FichaTecnicaReunion?solicitud=${idSolicitudAgenda}`, { state: data });
+      }
+
+    } else {
+      if (idSolicitudAgendaFichaTecnica > 0) {
+        navigate(`/FichaTecnicaEvento?solicitud=${idSolicitudAgenda}&ficha=${idSolicitudAgendaFichaTecnica}`, { state: data });
+      } else {
+        navigate(`/FichaTecnicaEvento?solicitud=${idSolicitudAgenda}`, { state: data });
+      }
     }
   };
 
@@ -276,7 +287,7 @@ export const FrmSolicitudAgenda = () => {
       <form onSubmit={guardarSolicitudAgenda}>
         <br />
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <button className="btn btn-secondary" onClick={fichaTecnica} >Registro Ficha Técnica</button>          
+          <button className="btn btn-secondary" onClick={fichaTecnica} >{idTipoAgenda == 1?"Registro Ficha Técnica":"Registro Ficha Evento"}</button>
           <ElementoBotones cancelar={cancelar}></ElementoBotones>
         </div>
 
