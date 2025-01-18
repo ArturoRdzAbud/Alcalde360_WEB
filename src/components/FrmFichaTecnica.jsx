@@ -501,7 +501,7 @@ export const FrmFichaTecnica = () => {
         const rootElement = xmlDoc.documentElement;
 
         datos.forEach(item => {
-            const itemElement = xmlDoc.createElement("item");
+            const itemElement = xmlDoc.createElement("Telefonos");//("item");
             for (const key in item) {
                 if (item.hasOwnProperty(key)) {
                     const propElement = xmlDoc.createElement(key);
@@ -520,10 +520,10 @@ export const FrmFichaTecnica = () => {
         // console.log(ficha)
         // setAlertaMensaje('Al')
         // return
-        const xmlParticipante = convertirAxml(datosParticipantes, "data");
-        const xmlAcuerdos = convertirAxml(datosAcuerdos, "data");
-        const xmlActividades = convertirAxml(datosActividad, "data");
-        const xmlArchivos = convertirAxml(datosArchivos, "data");
+        const xmlParticipante = convertirAxml(datosParticipantes, "Root");//"data");
+        const xmlAcuerdos = convertirAxml(datosAcuerdos, "Root");//"data");
+        const xmlActividades = convertirAxml(datosActividad, "Root");//"data");
+        const xmlArchivos = convertirAxml(datosArchivos, "Root");//"data");
 
         const data = {
             pnIdAlcaldia: idAlcaldia,
@@ -545,12 +545,12 @@ export const FrmFichaTecnica = () => {
         try {
             // console.log(titulo)
             // return
-            if (titulo.trim == '') { setEsMuestraCamposReq(true); return }
-            if (fecha.trim == '') { setEsMuestraCamposReq(true); return }
-            if (hora.trim == '') { setEsMuestraCamposReq(true); return }
-            if (horaFin.trim == '') { setEsMuestraCamposReq(true); return }
-            if (tema.trim == '') { setEsMuestraCamposReq(true); return }
-            if (lugar.trim == '') { setEsMuestraCamposReq(true); return }
+            if (titulo.trim() == '') { setEsMuestraCamposReq(true); return }
+            if (fecha.trim() == '') { setEsMuestraCamposReq(true); return }
+            if (hora.trim() == '') { setEsMuestraCamposReq(true); return }
+            if (horaFin.trim() == '') { setEsMuestraCamposReq(true); return }
+            if (tema.trim()== '') { setEsMuestraCamposReq(true); return }
+            if (lugar.trim() == '') { setEsMuestraCamposReq(true); return }
             if (datosParticipantes.length < 2) {
                 // console.log('a')
                 setAlertaMensaje('Al menos 2 participantes son requeridos, favor de validar')
@@ -576,22 +576,7 @@ export const FrmFichaTecnica = () => {
                     } else {
                         console.log('guardo correctamente')
                         // setEsEditar(false)
-                        // setEsFin(true)
-                        
-                        //var MiAcuerdo = datosAcuerdos;
-                        //MiAcuerdo = MiAcuerdo.filter(item => item.IdAcuerdo == MiActividad.IdAcuerdo)
-
-                        //"Hola ${responsable}, compartimos información relevante, acerca de las siguiente actividad: *${Actividad.Descripcion}*, con fecha inicial *${Actividad.FInicio}* y fecha final *${Actividad.FFin}* con una duración de *${Activdad.Dias}* y estatus *${Actividad.Estatus}*, establecidas en la reunión que se llevó a cabo el día *${fechaFormateada}* de las *${fichaTecnicaReunion[0].HoraIni}* a *${fichaTecnicaReunion[0].HoraFin}*, con el tema *${Tema}* en *${fichaTecnicaReunion[0].Lugar}*.\nPara ver mas detalles de la reunión, puede entrar al siguiente link: ${link}"                    
-
-                        let MensajeWhatsApp = "";
-                       // https://stackoverflow.com/questions/70119706/how-to-parse-xml-data-into-list-using-react-js
-
-                        datosActividad.forEach((MiActividad, index) => {
-                            
-                            MensajeWhatsApp = "Hola " + MiActividad.Responsable + ", compartimos información relevante, acerca de las siguiente actividad: " + MiActividad.Descripcion + ", de fecha inicial " + MiActividad.FechaIni + " y fecha final " + MiActividad.FFin + " con una duración de " + MiActividad.Dias + " y estatus " + MiActividad.Estatus + ", establecidas en la reunión " + titulo + " que se llevó a cabo el día " + fecha + " de las " + hora + " a " + horaFin + ", con el tema " + tema + " en " + lugar; //+ ".\nPara ver mas detalles de la reunión, puede entrar al siguiente link: ${link}"                    
-                            
-
-                        });
+                        // setEsFin(true)    
 
                         setAlertaMensaje('Operación Exitosa')
                     }
